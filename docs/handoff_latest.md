@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.60 B-05 零明文凭证从「内容扫描」硬化到「动作前阻断」：`guard_cmd` 增 **G5**（`git add` 后跟凭据名即拦：`.env` / `.env.local` / `credentials.*` / `id_rsa` / `*.pem`，`.env.example` 与 `id_rsa.pub` 放行）与 **G6**（Write/Edit 目标在 git 仓内且是凭据名即拦，仓外放行）；`next_anchor` 加第二条 `matcher=Write|Edit` 注册（不动旧 Bash 那条，免迁移），install.sh 幂等补插。**两条都实测被平台阻断**：`git add .env` → probe `via=none+guard:G5, hit=true`；Write 到 `520pro/.env` → `via=write-guard:G6`。**顺带修真缺口**：`.gitignore` 原无 `.env`、`secret_scan.CRED_NAMES` 也不含它，批量 add（不带文件名，G5 判不了）可整包带走——已补 `.gitignore` 与 CRED_NAMES，让「未忽略未追踪即红」接住。回归 test_guard_cmd 58 例（含与 secret_scan 名单逐项对账）。**误报当场修掉（首版连拦三次）**：G5 初版用「命令里有 add」+「命令里有凭据名」两个独立条件，结果「批量暂存 + 提交说明里提到 `.env`」被判违例，第三次直接挡住了正常提交。已改为一条正则——凭据名必须紧跟 add、且与 add 之间无命令分隔符（`;` `&` `|` 换行）；13 条正反例全对，测试里补 3 条放行例。残余限制：把命令写进文本的场景（heredoc/字符串）仍会被拦，钩子只能看文本。**遗留：全量 123 个存活仓库批量重采仍未跑；B-07/B-09 两条可硬化项未做。**
+v0.8.61 旧生态经验实体迁入 + 520 规则生效清单：从 `tvbox-skills-eco` 仓 `ecosys-conductor/scripts/rules_full.json`（规则册 v1.34.1）取 **74 条「坑→解法」**，作为附节写入 `docs/通病台账.md`（**不占病号**——病=反复出现的模式，这 74 条多为单点坑，B-15；「对应」列标出 20 条与现有病历同型，其余 54 条为新坑）。同时按 `rule_map.json` 18 条 B 逐条判定生效形态：**硬阻断 2（B-05/B-16）、拽回 1（B-13）、提交闸 1（B-14）、验收入口 4（B-05/07/14/16）、脚本内建 2（B-09/B-10）、纯人工 10、仅登记 1（B-02 虚标 machine）**。查出三个问题已登记 `docs/遗留登记.md`：①**B-19 编号不存在却 5 处引用**（core-8 只到 B-18，`grep -c` = 0；M4 的机检只扫 core-8 内部，跨文件没扫）；②B-02 登记 machine 实际零断言；③B-13 已由 `stop_guard.py` 在守却仍标 manual。**遗留：rule_map 与实物无对账闸（已登记遗留）；B-07 交接摘要注入与 B-09 产物区硬闸两条可硬化项未做；全量 123 个存活仓库批量重采仍未跑。**
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.60 B-05 零明文凭证从「内容扫描」硬化到「动作前阻断」�
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.60
+- 版本：0.8.61
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）
