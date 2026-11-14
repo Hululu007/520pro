@@ -10,52 +10,138 @@
     "B-01": {
       "verify_id": "V-MANUAL-01",
       "kind": "manual",
-      "how": "开场第一条回复是否为简体中文；切换模型/压缩/新开会话后是否仍为中文。英文仅限术语原词。"
+      "how": "开场第一条回复是否为简体中文；切换模型/压缩/新开会话后是否仍为中文。英文仅限术语原词。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-02": {
       "verify_id": "V-TRIPLE",
       "kind": "machine",
-      "check": "verify.sh",
-      "anchor": "三态判定塌陷",
-      "how": "verify.sh 的「三态判定正确（枚举失败=unknown≠fresh）」判据；另核任何报告不得把「未测/无法判定」写成通过。"
+      "check": "verify/tests/test_gate_scan.py",
+      "anchor": "def test_three_state(",
+      "strength": {
+        "S5": "verify/tests/test_gate_scan.py#test_three_state"
+      },
+      "impl": [
+        "verify/tests/test_gate_scan.py"
+      ],
+      "proven_by": {
+        "cmd": "python3 verify/gate_scan.py  （含一个返回 · 的闸）",
+        "expect": "汇总行必须同时报「N 红」与「M 不适用」，且 · 不得算作 ✓",
+        "got": "v0.8.62 实测：构造 probe 闸返回 · → 汇总报「1 不适用」且不判全绿；改回折叠 → 报红"
+      },
+      "retire_if": "工具链不再有「不适用」这一态时（所有检查项要么适用要么不适用），本条自然失效",
+      "how": "机器只查「三态是否被折叠成两态」这一形态；「嘴上说没查到其实没查」机器判不了，只能抽查。后者是人工项，不算机检通过。"
     },
     "B-03": {
       "verify_id": "V-MANUAL-03",
       "kind": "manual",
-      "how": "开工前是否出现 pwd -P + git log --oneline -1（+ VERSION）三条实证；没有就先补再动手。"
+      "how": "开工前是否出现 pwd -P + git log --oneline -1（+ VERSION）三条实证；没有就先补再动手。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-04": {
       "verify_id": "V-MANUAL-04",
       "kind": "manual",
-      "how": "同一消息里独立动作是否并行发出；同一 state/云端库/受管文件的并发写是否串行（有锁或排队）。"
+      "how": "同一消息里独立动作是否并行发出；同一 state/云端库/受管文件的并发写是否串行（有锁或排队）。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-05": {
       "verify_id": "V-SECRET",
       "kind": "machine",
       "check": "secret_scan.py",
       "anchor": "PATTERNS =",
+      "strength": {
+        "S1": "hooks/guard_cmd.py#G5,G6",
+        "S5": "secret_scan.py#PATTERNS"
+      },
+      "impl": [
+        "hooks/guard_cmd.py",
+        "secret_scan.py"
+      ],
+      "proven_by": {
+        "cmd": "git add <凭据文件>  /  Write 到仓内 .env",
+        "expect": "平台返回 PreToolUse hook blocked",
+        "got": "v0.8.60 实测两条均被阻断：via=none+guard:G5 / via=write-guard:G6"
+      },
+      "retire_if": "凭据不再以文件形式存在于工作区时（全走密钥管理服务），G5/G6 可退役",
       "how": "secret_scan.py 九类凭证模式 + 个人路径 + endpoint 扫描；verify.sh 汇总为红/黄两级。"
     },
     "B-06": {
       "verify_id": "V-MANUAL-06",
       "kind": "manual",
-      "how": "每个前提断言能否给出「文件 + 行号」；给不出就应标「无法判定」，不得用记忆顶替。"
+      "how": "每个前提断言能否给出「文件 + 行号」；给不出就应标「无法判定」，不得用记忆顶替。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-07": {
       "verify_id": "V-MANUAL-07",
       "kind": "manual",
-      "how": "新会话/新模型接手后，交接摘要是否含当前主线、版本、术语；过期任务是否已清除。"
+      "strength": {},
+      "impl": [],
+      "retire_if": "会话开始时模型已默认携带交接摘要（平台内建该能力）时，本条的注入机制可退役",
+      "how": "新会话/新模型接手后，交接摘要是否含当前主线、版本、术语；过期任务是否已清除。",
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      }
     },
     "B-08": {
       "verify_id": "V-MANUAL-08",
       "kind": "manual",
-      "how": "动手前是否查过现成入口；同类试错第 2 次后是否停下来查入口而不是继续试。"
+      "how": "动手前是否查过现成入口；同类试错第 2 次后是否停下来查入口而不是继续试。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-09": {
       "verify_id": "V-PRODUCT",
       "kind": "machine",
       "check": "通用层/skills/space-hub/scripts/space_hub.py",
       "anchor": "def archive_out",
+      "strength": {
+        "S5": "通用层/skills/space-hub/scripts/space_hub.py"
+      },
+      "impl": [
+        "通用层/skills/space-hub/scripts/space_hub.py"
+      ],
+      "proven_by": {
+        "cmd": "（无）",
+        "expect": "（无）",
+        "got": "未实测——脚本内建判据存在，但技能是可选调用，不调 space-hub 就完全不受约束"
+      },
+      "retire_if": "产物区概念取消（所有产出默认落库）时本条失效",
       "how": "落库正门 archive_out 存在且带回读；verify.sh 另查自举/跟随/台账/接管入口齐全。"
     },
     "B-10": {
@@ -63,51 +149,155 @@
       "kind": "machine",
       "check": "通用层/skills/space-hub/scripts/space_hub.py",
       "anchor": "def _reject",
+      "strength": {
+        "S5": "通用层/skills/space-hub/scripts/space_hub.py"
+      },
+      "impl": [
+        "通用层/skills/space-hub/scripts/space_hub.py"
+      ],
+      "proven_by": {
+        "cmd": "（无）",
+        "expect": "（无）",
+        "got": "未实测——同 B-09，判据埋在可选技能里，非必经点"
+      },
+      "retire_if": "所有收口脚本统一返回结构化 reject 码、模型侧无需人工判读时，本条可退役",
       "how": "拒收输出含 {error,reason,target,method} 四字段；变异测试：吞掉结构化输出后用例必须翻红。"
     },
     "B-11": {
       "verify_id": "V-MANUAL-11",
       "kind": "manual",
-      "how": "回看长任务：是否走了后台通道并有落盘日志；宣布其结果前是否拿到退出码+日志尾部。给不出就是「还在跑」，不是「完成」。"
+      "how": "回看长任务：是否走了后台通道并有落盘日志；宣布其结果前是否拿到退出码+日志尾部。给不出就是「还在跑」，不是「完成」。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-12": {
       "verify_id": "V-MANUAL-12",
       "kind": "manual",
-      "how": "每轮回复末尾能否指出「做了什么 / 凭什么 / 下一步」；有没有一轮里铺开多个半成品却只报一个。"
+      "how": "每轮回复末尾能否指出「做了什么 / 凭什么 / 下一步」；有没有一轮里铺开多个半成品却只报一个。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-13": {
       "verify_id": "V-MANUAL-13",
-      "kind": "manual",
-      "how": "把每条「完成/通过」拎出来，看是否附了文件+行号（或 sha）、命令+rc、判据输出；缺一项就应写「未验证」。"
+      "kind": "machine",
+      "check": "hooks/stop_guard.py",
+      "anchor": "def judge(text):",
+      "strength": {
+        "S2": "hooks/stop_guard.py#judge"
+      },
+      "impl": [
+        "hooks/stop_guard.py"
+      ],
+      "proven_by": {
+        "cmd": "python3 hooks/stop_guard.py --check \"<宣称完成但零落点证据的文本>\"",
+        "expect": "stdout 出 {\"decision\":\"block\",\"reason\":...}",
+        "got": "v0.8.58 两次对照实测：exit 2 拽不回（S4），JSON decision:block 拽回（S2）"
+      },
+      "retire_if": "模型侧不再出现「我看了一下，应该没问题」式结论时（无法量化，只在观察到连续 0 命中期后评估）",
+      "how": "机器只看「断言词命中 + 全文零落点证据」这一形态；证据是否真、结论是否对，机器判不了。拽回后仍可能写错，靠人复核。"
     },
     "B-14": {
       "verify_id": "V-LEDGER",
       "kind": "machine",
       "check": "verify/tests/test_handoff.py",
       "anchor": "账目三齐",
+      "strength": {
+        "S1": "hooks/commit-msg",
+        "S5": "verify/tests/test_handoff.py#check_ledger"
+      },
+      "impl": [
+        "hooks/commit-msg",
+        "verify/tests/test_handoff.py"
+      ],
+      "proven_by": {
+        "cmd": "git commit（提交说明缺 owner/next/due 任一项）",
+        "expect": "commit-msg 钩子拒绝提交",
+        "got": "多次实测被拒（本会话每次提交都过该闸，缺字段即拒）"
+      },
+      "retire_if": "待办账目不再登记在 handoff 里时（改由外部系统管）",
       "how": "交接摘要的待办账目段：每条须含 owner/next/due 三字段，且全文不得出现「待跟进/后续优化/有空再说」这类无主无期措辞。"
     },
     "B-15": {
       "verify_id": "V-MANUAL-15",
       "kind": "manual",
-      "how": "每个失败项是否先答「孤例还是模式」并给了扫描基数（扫几处/中几处）；判为模式的是否完成承认→同类排查→共性登记→机制候选四步。"
+      "how": "每个失败项是否先答「孤例还是模式」并给了扫描基数（扫几处/中几处）；判为模式的是否完成承认→同类排查→共性登记→机制候选四步。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-16": {
       "verify_id": "V-DUALCORE",
       "kind": "machine",
       "check": "verify.sh",
       "anchor": "双核必保",
+      "strength": {
+        "S1": "hooks/guard_cmd.py#G4",
+        "S5": "verify.sh#双核必保"
+      },
+      "impl": [
+        "hooks/guard_cmd.py",
+        "verify.sh"
+      ],
+      "proven_by": {
+        "cmd": "rm -rf /tmp/gate4/tvbox-core; echo ok",
+        "expect": "PreToolUse 阻断，沙包目录仍在",
+        "got": "v0.8.56 实测被拦；首版漏判「;」分隔符导致真删测试目录，已修并记病15 第 4 例"
+      },
+      "retire_if": "双核合并为单包、不再有「误删即不可用」的风险时",
       "how": "verify.sh 查 probe-hub / tvbox-core(含 scripts/core.py) / learn-hub 三处存在；变异测试：临时移走 tvbox-core 后必须翻红。"
     },
     "B-17": {
       "verify_id": "V-MANUAL-17",
       "kind": "manual",
-      "how": "回看用户短回复（1/2/3、a/b/c、都做、继续、按顺序来、从根源解决）之后：agent 是否直接映射最近一次回复的可选项并执行；有无无谓的复述确认；遇歧义（同一代号指向多条回复）或不可逆动作（删库/覆盖/发布/改线上）时是否先澄清。"
+      "how": "回看用户短回复（1/2/3、a/b/c、都做、继续、按顺序来、从根源解决）之后：agent 是否直接映射最近一次回复的可选项并执行；有无无谓的复述确认；遇歧义（同一代号指向多条回复）或不可逆动作（删库/覆盖/发布/改线上）时是否先澄清。",
+      "strength": {},
+      "impl": [],
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      },
+      "retire_if": ""
     },
     "B-18": {
       "verify_id": "V-MANUAL-18",
       "kind": "manual",
-      "how": "抽查交付正文：每处事实能否指到文件+行号（或文段/页/时间戳）；交付里是否给了「N 条有出处 / M 条无出处」两个数；无出处项是否单列「⚠️ 无出处」而不是删掉或混进正文。"
+      "strength": {},
+      "impl": [],
+      "retire_if": "（不适用：可溯源是产出的固有要求，不随工具链变化）",
+      "how": "抽查交付正文：每处事实能否指到文件+行号（或文段/页/时间戳）；交付里是否给了「N 条有出处 / M 条无出处」两个数；无出处项是否单列「⚠️ 无出处」而不是删掉或混进正文。",
+      "proven_by": {
+        "cmd": "",
+        "expect": "",
+        "got": ""
+      }
     }
-  }
+  },
+  "_strength_levels": {
+    "S1": "硬阻断：PreToolUse / git hook 当场拒绝，动作不发生",
+    "S2": "拽回：Stop 注入反馈，回复已出口但模型被拉回来重写",
+    "S4": "注入提醒：会话开始或首轮把要点塞进上下文，不拦不拽",
+    "S5": "事后扫描：验收入口或扫描脚本报红，事后可见",
+    "S6": "无机制：只靠人读规则"
+  },
+  "_impl": "impl 标记是**实物自报**：在实现该规则的代码里写一行 `# impl: B-xx Sn`，由 gate_scan 的 impl-reconcile 闸收集成 {规则: [等级]}，再与本表 strength 双向对账。为什么要有：本表此前只有 kind（machine/manual）一个维度，「已落地但只登记了最弱的那一环」「登记了 machine 其实没有断言」都无处表达，于是 B-02 虚标、B-13 漏登同时存在却全程绿（v0.8.61 实测）。",
+  "_proven_by": "proven_by 是**首次实测证据**：{cmd, expect, got} 三项。cmd 必须能在仓内 grep 到（防编造一条不存在的命令），got 写当时真实观察到的结果，不写「应该」。为空 = 这条规则从没被证明能拦，只能算草案，不许当「已生效」汇报。",
+  "_retire_if": "retire_if 写「什么情况下这条不再需要」。空着不报错（存量 18 条暂不强制），但新增规则必须填——旧生态 178 条里 28 条 retired 仍在册、6 条 deprecated 混在活跃册里，就是只增不减的后果。"
 }

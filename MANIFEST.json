@@ -1,6 +1,6 @@
 {
   "ecosystem": "520pro",
-  "version": "0.8.61",
+  "version": "0.8.62",
   "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
   "based_on": [
     "WorkBuddy 平台运行时",
@@ -548,5 +548,6 @@
   "changelog_0_8_58": "Stop 拽回协议定版：stop_guard.py 输出由 exit 2+stderr 改为 JSON decision:block（两次对照实测：前者拽不回、后者能拽回）；回归加一条防回退；MANIFEST.version 与 VERSION 对齐并加机检",
   "changelog_0_8_59": "gate_scan 增两道闸：hook-registered（install.sh 声明的「脚本→事件」与 settings.json 实况对账，补病13「写了没挂」）、case-count（测试例数必须 N[0] 自增，压病12 复发）；4 个测试文件同步改为自增，暴露真实例数 25/13/38/20",
   "changelog_0_8_60": "B-05 硬化：guard_cmd 增 G5（add 凭据名）/G6（Write/Edit 到仓内凭据路径），next_anchor 加 matcher=Write|Edit 第二条注册；补 .gitignore 与 secret_scan.CRED_NAMES 的 .env 缺口（批量 add 拦不住的那条）；矩阵 B-05 改 S1 已落地",
-  "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）"
+  "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）",
+  "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账"
 }

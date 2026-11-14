@@ -66,6 +66,8 @@ G5_PAT = (
 )
 
 # 真源在这里；改规则先改这里，再跑 verify/tests/test_guard_cmd.py
+# impl: B-05 S1   ← G5（git add 凭据名）/ G6（Write 到仓内凭据路径）
+# impl: B-16 S1   ← G4（删/移双核）
 RULES = [
     {
         'id': 'G1',

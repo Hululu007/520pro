@@ -244,6 +244,12 @@ def check_rule_map(repo):
         problems.append(f'规则无映射：{", ".join(only_core)}')
     if only_map:
         problems.append(f'映射无规则：{", ".join(only_map)}')
+    # 规则预算：只增不减是 178 条的成因。旧生态 active 153 条 + retired 28 条 + deprecated 6 条，
+    # 退役了也没从正文拿掉，最后没人读得完。这里给个硬顶：超了必须先退役一条再进新的。
+    BUDGET = 20
+    if len(core) > BUDGET:
+        problems.append(f'core-8 已有 {len(core)} 条，超过预算 {BUDGET} 条——'
+                        f'新增规则必须先退役一条（B 号不复用），否则正文会一路膨胀到没人读完')
     no_tag = [k for k, v in core.items() if not v]
     if no_tag:
         problems.append(f'规则缺「｜验证 V-xxx」尾注：{", ".join(no_tag)}')

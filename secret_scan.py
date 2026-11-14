@@ -26,6 +26,7 @@ import re
 import subprocess
 import sys
 
+# impl: B-05 S5   ← 九类凭证模式扫描（事后可见，拦不住已经写下的）
 PATTERNS = [
     re.compile(r'ghp_[A-Za-z0-9]{20,}'),
     re.compile(r'github_pat_[A-Za-z0-9_]{20,}'),

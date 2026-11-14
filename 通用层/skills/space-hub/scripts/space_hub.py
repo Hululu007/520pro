@@ -388,6 +388,7 @@ _JSON_MODE = os.environ.get('SPACE_HUB_JSON', '') not in ('', '0', 'false', 'Fal
 
 
 def _reject(code, reason, target='', method='', human=''):
+# impl: B-10 S5   ← 拒收契约 {error,reason,target,method}（同上，非必经点）
     """★ E3/E9（工程E）：拒收/失败的**结构化契约**——`{error, reason, target, method}`。
 
     为什么必须结构化：调用方（上层技能、子代理、手机通道）拿到的如果只有一句
@@ -1488,6 +1489,7 @@ def cmd_local_rm(a):
     print(f'共销 {len(hit)} 条'); return 0
 
 
+# impl: B-09 S5   ← 产物落库正门（注意：技能可选调用，非必经点）
 # ══ 产物纪律（B-09 · v2.2.0）：产物落库正门 + 索引库 + 搜索框 ═══════════════
 # 规则真源：通用层/rules/core-8.md B-09——产出默认不落产物区，除非用户点名；
 # 需留档的经本正门归类落云端资料库。交互型面板（必须落盘才能预览）属点名例外。

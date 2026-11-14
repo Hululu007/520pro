@@ -9,6 +9,8 @@
 
 退出码 0 全通 / 1 有用例未按预期。
 """
+import importlib.util
+import io
 import json
 import os
 import shutil
@@ -66,9 +68,10 @@ _td0 = tempfile.mkdtemp()
 SET_OK = _fake_settings(os.path.join(_td0, 'ok.json'))
 rc, out = run(['--root', ROOT, '--settings', SET_OK])
 check('真源全绿 rc=0', rc == 0, out[-200:])
-check('输出含四 gate 全绿标记',
-      all('[%s] 全绿' % g in out
-          for g in ('quotepath', 'hook-probe', 'hook-registered', 'case-count')),
+check('输出含五闸标记（impl-reconcile 是 · 不是 ✓）',
+      all(('[%s] 全绿' % g) in out
+          for g in ('quotepath', 'hook-probe', 'hook-registered', 'case-count'))
+      and '[impl-reconcile]' in out,
       out[-300:])
 
 # ── ② 造违例：quotepath ──
@@ -207,6 +210,94 @@ with tempfile.TemporaryDirectory() as td:
     w(bad, "print('test_x：%d " + _V + "len(cases) + 22, len(fails)))\n")
     rc, out = run(['--gate', 'case-count', '--root', td])
     check('偏移估算同样被拦', rc == 2 and 'len(cases' in out, out[-200:])
+
+# impl: B-02 S5   ← 三态不折叠：· 不得被算成 ✓，汇总必须同时报红数与不适用数
+
+
+# ── ⑧ impl-reconcile：映射声称的强度与实物自报的强度双向对账 ──
+# 造的是「映射说有人守 / 实物没人守」和「实物有人守 / 映射说没人」两个方向的断裂。
+with tempfile.TemporaryDirectory() as td:
+    def mk_rulemap(rules):
+        w(os.path.join(td, 'verify', 'rule_map.json'),
+          json.dumps({'rules': rules}, ensure_ascii=False))
+
+    # ⑧-① 虚标：machine 却没有任何强度声明（B-02 的原始形态）
+    mk_rulemap({'B-99': {'verify_id': 'V-X', 'kind': 'machine', 'check': 'a.py', 'anchor': 'x'}})
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('machine 无 strength 判虚标', rc == 2 and '虚标' in out, out[-200:])
+
+    # ⑧-② 漏登：实物自报 S1，映射没登记（B-13 的原始形态）
+    mk_rulemap({'B-98': {'verify_id': 'V-X', 'kind': 'manual', 'how': '看一眼'}})
+    w(os.path.join(td, 'h.py'), '# impl: B-98 S1\nprint(1)\n')
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('实物有标记而映射未登记判漏登', rc == 2 and '漏登' in out, out[-200:])
+
+    # ⑧-③ 过期登记：映射登记 S1，实物没有标记（改小/退役后忘了改表）
+    mk_rulemap({'B-97': {'verify_id': 'V-X', 'kind': 'machine', 'check': 'a.py', 'anchor': 'x',
+                         'strength': {'S1': 'h.py#x'}, 'impl': ['h.py']}})
+    w(os.path.join(td, 'h.py'), 'print(1)\n')
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('映射登记而实物无标记判写了没挂', rc == 2 and ('写了没挂' in out or '过期登记' in out),
+          out[-200:])
+
+    # ⑧-④ 行内提到标记不算实现（自指防护：首版正则把 docstring 示例当成了落点）
+    mk_rulemap({'B-96': {'verify_id': 'V-X', 'kind': 'machine', 'check': 'a.py', 'anchor': 'x',
+                         'strength': {'S1': 'h.py#x'}, 'impl': ['h.py']}})
+    w(os.path.join(td, 'h.py'), 'NOTE = "see `# impl: B-96 S1` for detail"\n')
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('行内提到标记不算实现（只认整行注释）',
+          rc == 2 and ('写了没挂' in out or '过期登记' in out), out[-200:])
+
+    # ⑧-⑤ 双向一致 → 放行
+    mk_rulemap({'B-95': {'verify_id': 'V-X', 'kind': 'machine', 'check': 'a.py', 'anchor': 'x',
+                         'strength': {'S1': 'h.py#x'}, 'impl': ['h.py'],
+                         'proven_by': {'cmd': 'c', 'expect': 'e', 'got': 'g'}}})
+    w(os.path.join(td, 'h.py'), '# impl: B-95 S1\nprint(1)\n')
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('映射与实物一致放行', rc == 0, out[-200:])
+    check('全绿时也报「几无实测」（不假称全verified）', '无实测' in out or '有实测' in out, out[-200:])
+
+    # ⑧-⑥ 无 rule_map → 记不适用，不判通过
+    os.remove(os.path.join(td, 'verify', 'rule_map.json'))
+    rc, out = run(['--gate', 'impl-reconcile', '--root', td])
+    check('无 rule_map 记不适用而非通过', rc == 0 and '不适用' in out, out[-200:])
+
+
+def test_three_state():
+    """B-02 三态诚实：一个检查项说「不适用」时，不许被折叠成「通过」。
+
+    为什么单测它：gate_scan 的返回值支持 ('·', msg)，但「支持」不等于「用对」。
+    v0.8.59 的汇总行曾把这个计数写成 `sum(...) if False else 0`，
+    永远报「0 不适用」——·  照样被当成绿。
+    这里动态注入一个只返回 · 的闸，逼出真实计数。
+    """
+    spec = importlib.util.spec_from_file_location(
+        'gs_for_three_state', os.path.join(ROOT, 'verify', 'gate_scan.py'))
+    gs = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gs)
+    gs.GATES = {'probe': lambda root, settings=None: [('·', '故意不适用')]}
+    old_argv, old_out = sys.argv, sys.stdout
+    sys.argv = ['gate_scan.py', '--gate', 'probe']
+    cap = io.StringIO()
+    sys.stdout = cap
+    try:
+        rc = gs.main()
+    finally:
+        sys.argv, sys.stdout = old_argv, old_out
+    out = cap.getvalue()
+    check('返回 · 时汇总报出「1 不适用」', '1 不适用' in out, out[-200:])
+    check('返回 · 时不打印「全绿」', '全绿' not in out, out[-200:])
+    check('· 不导致非零退出（不适用≠失败）', rc == 0, f'rc={rc}')
+
+    src = open(os.path.join(ROOT, 'verify', 'gate_scan.py'), encoding='utf-8').read()
+    check('汇总格式串同时含红数与不适用数', '%d 红 / %d 不适用' in src,
+          '汇总行少一个数 = 三态被折叠')
+    vsh = open(os.path.join(ROOT, 'verify.sh'), encoding='utf-8').read()
+    check('验收入口汇总也报三态', all(k in vsh for k in ('✓ 通过', '✗ 失败', '不适用')),
+          'verify.sh 汇总行缺三态之一')
+
+
+test_three_state()
 
 print('test_gate_scan：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)

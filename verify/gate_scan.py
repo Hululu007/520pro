@@ -22,9 +22,18 @@
   故从 install.sh 静态提取「变量 → 事件」「脚本 → 变量」两层绑定，得到
   {脚本: [事件]}，再与 `~/.codebuddy/settings.json` 的 hooks 实况对账：
   声明要挂、实际没有 → 红。settings.json 不存在 → 记「不适用」（不判通过，B-02 三态）。
+- case-count（v0.8.59）：测试汇总行第一实参必须 `N[0]` 由 check() 自增。
+  写死字面量或 `len(x)+N` 偏移估算即红——报出的例数是假的，等于没有用例计数。
+- impl-reconcile（v0.8.62，补「登记强度 ≠ 实物强度」）：rule_map 的 `strength`
+  与代码里的 `# impl: B-xx Sn` 自报标记双向对账。虚标（machine 无 strength）/
+  漏登（实物有标记、映射没写）/ 过期登记 / 写了没挂 / 字段是编的，五种都红。
+  首版正则只要求「出现标记」，把本文件 docstring 里的示例行也算成了落点（病15 第 6 例），
+  现要求整行注释。
 
 诚实边界：行级扫描，多行 subprocess 列表会漏报——多行调用须写在同一行，
-或在本文件附近登记豁免理由（M7）。退出码 0 全绿 / 2 有红。
+或在本文件附近登记豁免理由（M7）。impl-reconcile 只对账「谁声称守、谁真的标了守」，
+不判「行为有没有发生」；后者看 proven_by 的实测记录，本闸只统计条数不判红（没测≠错，也不等于通过）。
+退出码 0 全绿 / 2 有红。
 """
 import json
 import os
@@ -218,8 +227,102 @@ def gate_hook_probe(root, settings=None):
     return reds
 
 
+IMPL_RE = re.compile(r'(?m)^[ \t]*#[ \t]*impl:[ \t]*(B-\d{2})[ \t]+(S\d)')
+
+
+def collect_impl(root):
+    """收集实物自报标记 `# impl: B-xx Sn` → {B-xx: {Sn: [相对路径, ...]}}。
+
+    为什么让实物自报、而不是让闸去搜 "B-13" 字样：说明性引用与真实实现
+    在文本上长得一样，扫字样必然把文档注释也当成实现——病15 家族
+    （识别范围 ≠ 对象范围）。标记是显式声明，写的人负责，闸只对账。
+
+    收严过一版：首版正则只要求「出现 # impl: B-xx Sn」，结果把本文件 docstring
+    里的示例行也算成了「B-13 在 gate_scan.py 有实现」，凭空多出一处落点（上线首跑
+    即踩，病15 第 6 例）。现要求**整行注释**（行首 `#`，前面只许空白），
+    行内提到标记不算——这也符合「标记是声明，不是描述」的约定。
+    """
+    out = {}
+    for dirpath, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs
+                   if d not in ('.git', '__pycache__', 'node_modules', '.venv', 'archive')]
+        for f in files:
+            if not (f.endswith('.py') or f.endswith('.sh') or f in ('commit-msg', 'pre-commit')):
+                continue
+            p = os.path.join(dirpath, f)
+            try:
+                t = open(p, encoding='utf-8', errors='ignore').read()
+            except OSError:
+                continue
+            rel = os.path.relpath(p, root)
+            for bid, lv in IMPL_RE.findall(t):
+                out.setdefault(bid, {}).setdefault(lv, []).append(rel)
+    return out
+
+
+def gate_impl_reconcile(root, settings=None):
+    """rule_map 的「声称强度」与实物的「自报强度」双向对账。
+
+    查五种断裂：
+      ① kind=machine 却 strength 为空 —— 机器判据无从谈起（B-02 的原始形态）
+      ② 登记了强度，但全仓找不到该规则的 impl 标记 —— 写了没挂
+      ③ 实物有某等级、映射没登记 —— 漏登（B-13 的原始形态）
+      ④ 映射登记某等级、实物没有 —— 过期登记（改小或退役后忘了改表）
+      ⑤ strength 点名的文件里没有对应标记 —— 字段是编的
+
+    不判「行为有没有发生」：那要靠 proven_by 的实测记录，本闸只统计条数、不判红
+    （没测过不等于错，但也不等于通过 —— B-02 三态不折叠）。
+    """
+    rmp = os.path.join(root, 'verify', 'rule_map.json')
+    if not os.path.isfile(rmp):
+        return [('·', 'verify/rule_map.json 不存在——无映射可比对')]
+    try:
+        R = json.load(open(rmp, encoding='utf-8')).get('rules') or {}
+    except Exception as e:
+        return [('✗', 'rule_map.json 无法解析（%s）——映射等于没有' % type(e).__name__)]
+    if not R:
+        return [('·', 'rule_map.rules 为空——还没有任何规则登记')]
+
+    impl = collect_impl(root)
+    items = []
+    for bid in sorted(R):
+        r = R[bid] or {}
+        declared = set((r.get('strength') or {}).keys())
+        actual = set((impl.get(bid) or {}).keys())
+        kind = r.get('kind')
+        if kind == 'machine' and not declared:
+            items.append(('✗', '%s 标 machine 但 strength 为空——机器判据无从谈起，是虚标' % bid))
+        if declared and not actual:
+            items.append(('✗', '%s 登记 %s，全仓却找不到 `# impl: %s S*` 标记——写了没挂'
+                          % (bid, sorted(declared), bid)))
+        for lv in sorted(actual - declared):
+            items.append(('✗', '%s 实物自报 %s（%s），映射未登记——漏登'
+                          % (bid, lv, ', '.join(sorted(impl[bid][lv])[:2]))))
+        for lv in sorted(declared - actual):
+            items.append(('✗', '%s 映射登记 %s，实物无该等级标记——过期登记' % (bid, lv)))
+        # ⑤ strength 里点名的文件，必须真的带该等级标记
+        for lv, ref in (r.get('strength') or {}).items():
+            if not ref:
+                continue
+            fn = ref.split('#')[0].strip()
+            hit = impl.get(bid, {}).get(lv) or []
+            if fn and fn not in hit:
+                items.append(('✗', '%s 的 %s 指向 %s，但该文件里没有 `# impl: %s %s`'
+                              % (bid, lv, fn, bid, lv)))
+    if items:
+        return items
+
+    # 全绿时也给一条统计，不假装「全绿 = 都实测过」
+    proven = sum(1 for b in R
+                 if ((R[b].get('proven_by') or {}).get('got') or '').strip()
+                 and '未实测' not in ((R[b].get('proven_by') or {}).get('got') or ''))
+    return [('·', '强度对账全对：%d 条有实测记录 / %d 条无（无实测≠通过，只是没测过）'
+             % (proven, len(R) - proven))]
+
+
 GATES = {'quotepath': gate_quotepath, 'hook-probe': gate_hook_probe,
-         'hook-registered': gate_hook_registered, 'case-count': gate_case_count}
+         'hook-registered': gate_hook_registered, 'case-count': gate_case_count,
+         'impl-reconcile': gate_impl_reconcile}
 
 
 def main():
@@ -236,8 +339,8 @@ def main():
         elif a == '--settings':
             settings = args.pop(0)
         else:
-            print('未知参数 %s（支持 --root DIR / --gate quotepath|hook-probe|hook-registered'
-                  ' / --settings PATH）' % a)
+            print('未知参数 %s（支持 --root DIR / --gate %s / --settings PATH）'
+                  % (a, '|'.join(GATES)))
             return 2
     all_reds = []
     n_note = 0

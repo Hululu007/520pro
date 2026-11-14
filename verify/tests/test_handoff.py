@@ -45,7 +45,7 @@ def check_handoff_pointers():
     """三通道都必须写出"接手先读 handoff_latest.md"这个**动作**。
 
     ⚠️ 这是**存在性判据**：它只能证明"条款写在那儿"，不能证明"agent 真读了"。
-    后者机器判不了（B-19：别拿无因果关系的代理指标冒充真判据），故此处只报"在位"。
+    后者机器判不了（B-02：别拿无因果关系的代理指标冒充真判据），故此处只报"在位"。
     但它仍有价值：防止后续改动把这句话删掉而没人发现——这已发生过（B-05 口径、硬轨漏条）。
 
     判据自证第 5 例（2026-11-13）：首版只 grep 文件名 `handoff_latest.md`，结果手机指令
@@ -65,6 +65,7 @@ def check_handoff_pointers():
               '只提到文件名不算：该通道的会话不会因此先读交接摘要')
 
 
+# impl: B-14 S5   ← 待办账目 owner/next/due 三列非空 + 懒词
 def check_ledger(body):
     """B-14 账目三齐：owner / next / due。空表也算三齐（0 条待办是合法状态）。"""
     if LEDGER_HEAD not in body:

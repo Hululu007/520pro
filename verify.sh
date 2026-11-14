@@ -499,6 +499,7 @@ fi
 #   判据只查"在不在"（版本归契约 C4，不在这里重复判），位置取仓内真源，不取安装副本——
 #   仓里没有就是仓库问题，装没装是另一回事。
 echo
+# impl: B-16 S5   ← 双核存在性（probe-hub / tvbox-core/scripts/core.py）
 echo "[双核必保（v0.8.22 起·B-16）]"
 [ -f "$TARGET/能力层/tvbox/skills/probe-hub/SKILL.md" ] \
   && ok "probe-hub 在位（探源司本体）" \
@@ -653,10 +654,10 @@ fi
 # 为什么要有：这两道病之前只有文字病历没有机器判据；verify.sh 全绿 ≠ 它们被守着。
 # 判据三件套（造违例/拦下/改坏溜过）见 verify/tests/test_gate_scan.py。
 echo
-echo "[落地判据扫描（v0.8.47 起·病10 quotepath / 病13 hook-probe+hook-registered / 病12 case-count）]"
+echo "[落地判据扫描（v0.8.47 起·病10 quotepath / 病13 hook-probe+hook-registered / 病12 case-count / 强度对账 impl-reconcile）]"
 if [ -f "$TARGET/verify/gate_scan.py" ]; then
   if python3 "$TARGET/verify/gate_scan.py" --root "$TARGET" > /tmp/_gate_scan.out 2>&1; then
-    ok "gate_scan：quotepath + hook-probe + hook-registered + case-count 全绿"
+    ok "gate_scan：quotepath + hook-probe + hook-registered + case-count + impl-reconcile 全绿"
   else
     no "gate_scan 有红项（细节见上/下）："
     sed 's/^/     /' /tmp/_gate_scan.out | head -8

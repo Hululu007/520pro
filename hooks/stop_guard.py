@@ -103,6 +103,7 @@ def has_evidence(text):
     return False
 
 
+# impl: B-13 S2   ← 断言词命中且零落点证据 → JSON decision:block 拽回
 def judge(text):
     """返回 (是否拽回, 原因)。"""
     if not text or not text.strip():
