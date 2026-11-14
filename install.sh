@@ -62,7 +62,7 @@ PROJ_DIR="$TARGET/.codebuddy"
 # 运行时数据：装在技能 scripts/ 下、随使用增长。有的不在 git（巡检历史/库务司状态），
 # 有的是「入库的种子 + 现场会增长」（探源司监测台 monitor_*.json、壳源候选 shellcrack_cands.json）。
 # 覆盖安装会先删目标，这几个必须先搬走再回填，否则每装一次丢一次巡检历史/监测目标/候选。
-RUNTIME_FILES="findings_history.json monitors.json space_hub_state.json monitor_targets.json monitor_domains.json monitor_pubsources.json dead_repos.json shellcrack_cands.json activity_log.json"
+RUNTIME_FILES="findings_history.json monitors.json space_hub_state.json monitor_targets.json monitor_domains.json monitor_pubsources.json dead_repos.json shellcrack_cands.json activity_log.json" search_results.json
 
 # 运行时**目录**：整目录随使用增长，同样属本机私产，不随分发包走。
 # space-hub 的 scripts/snapshots/ 是 state 写前快照（工程A 的"改坏了能回滚"保证），
@@ -458,6 +458,32 @@ if [ "$DRY" = 0 ]; then
       grep -E '✗' "$_vlog" 2>/dev/null | head -8 | sed 's/^/   /' || true
       echo "   完整日志：$_vlog；修好后重跑本脚本（幂等）"
       exit 1
+    fi
+  fi
+fi
+
+# v0.8.64 方案v3：新项目闭环——装完必验证 artifacts.json 分片被库务司纳入
+# （机制原文：库务司扫描 ~/.codebuddy/skills/*/artifacts.json 自动纳入，加能力零改代码）。
+if [ "$SCOPE" = "user" ] || [ "$SCOPE" = "full" ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    _shard_n="$(python3 - <<'PYEOF'
+import os, json, glob
+n = 0
+for p in glob.glob(os.path.expanduser('~/.codebuddy/skills/*/artifacts.json')):
+    try:
+        d = json.load(open(p))
+        if isinstance(d, dict) and d.get('blueprint'):
+            n += 1
+    except Exception:
+        pass
+print(n)
+PYEOF
+)"
+    if [ "${_shard_n:-0}" -ge 1 ]; then
+      echo " 🧬 库房自举就绪：${_shard_n} 个技能分片已声明蓝图（520进化论产出自动跟随）"
+      echo "    首次交付前可跑：python3 ~/.codebuddy/skills/space-hub/scripts/space_hub.py ensure --dry-run"
+    else
+      echo " ⚠️ 库房自举：未发现任何 artifacts.json 分片——产出将落「未归类」，请核对安装完整性"
     fi
   fi
 fi

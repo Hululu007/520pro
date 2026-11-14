@@ -575,6 +575,8 @@ def chk_structure(target, cfg, ctx):
             'count': a.get('count', 0) + b.get('count', 0)}
 
 
+# v0.8.64 方案v3：落地监测三面（M9/M10/M11），独立文件保持主引擎清爽
+from chk_landing import chk_overview, chk_weakness, chk_projects  # noqa: F401（CHECKERS 自动收集）
 CHECKERS = {k: v for k, v in list(globals().items()) if k.startswith('chk_')}
 
 
@@ -616,7 +618,7 @@ def cmd_run(target, out_dir):
     except Exception as e:
         print('✗ 登记册解析失败（引擎健康预检不过，全盘按无法判定处理）:', repr(e))
         return 2
-    ctx = {'thresholds': reg.get('thresholds', {})}
+    ctx = {'thresholds': reg.get('thresholds', {}), 'worst': worst}  # v0.8.64：外置面可复用聚合器
     gates, all_items = [], []
     for g in reg['gates']:
         fn = g.get('impl')
@@ -705,8 +707,8 @@ def cmd_selfcheck():
         print('✗ 登记册不可解析:', repr(e))
         return 2
     ids = [g['id'] for g in reg['gates']]
-    if len(ids) != 8 or len(set(ids)) != 8:
-        errs.append('八门应为 8 个且不重号: ' + ','.join(ids))
+    if len(ids) < 8 or len(set(ids)) != len(ids):
+        errs.append('巡检门应为 ≥8 个且不重号（v0.8.64 放宽：登记册驱动加面零改代码的承诺）: ' + ','.join(ids))
     for g in reg['gates']:
         fn = g.get('impl')
         if fn and fn not in CHECKERS:

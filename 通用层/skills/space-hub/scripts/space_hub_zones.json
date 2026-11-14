@@ -1,0 +1,10 @@
+{
+  "_doc": "库务司·空间归属登记册（zone_registry，S158 事故修复后的治理主源）。node_id=容器型登记（子树随主）；owner=负责技能；top=区名。2026-11-15 首登：收编 5 个根层级无主 folder（census 当时缝率 75%）。",
+  "zones": [
+    {"top": "📦 产物归档", "node_id": "CjlU2N01ssRv95Z6jMUsqr", "owner": "space-hub", "why": "能力层产出统一落点，库务司自管"},
+    {"top": "🧬 520进化论", "node_id": "fVjCdLBK6GQr8EXjahlCO8", "owner": "inspect-hub", "why": "520 成长史/交付归档/培训（方案 v3），分片真源=inspect-hub/artifacts.json"},
+    {"top": "📚 学习资料", "node_id": "oyY13PiH2E6xgyF5pAL6u4", "owner": "learn-hub", "why": "学习工坊产出"},
+    {"top": "🔍 探源产出", "node_id": "4u46az7ieFDxAjTPthdZAo", "owner": "probe-hub", "why": "探源司测活报告/源数据"},
+    {"top": "🗄 待清理", "node_id": "6Ih9sxfBPgcOJtwmDnzPGC", "owner": "space-hub", "why": "收件箱机制，AI 无删除权的中转区"}
+  ]
+}

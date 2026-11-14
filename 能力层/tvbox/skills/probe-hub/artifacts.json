@@ -1,23 +1,52 @@
 {
-  "_doc": "探源司产出声明（能力层→资料库的接入口）。库务司扫描 ~/.codebuddy/skills/*/artifacts.json 自动纳入：本文件声明『产出什么、归到哪个夹、索引来源写什么、蓝图要哪些夹』。加能力只需加本文件，清道夫零改动。",
-  "artifacts": [
-    {
-      "name": "测活报告",
-      "match": ["livecheck_"],
-      "category": "清单",
-      "target": "🔍 探源产出/测活报告",
-      "source": "探源司·测活",
-      "note_from": "result_summary",
-      "doc": "livecheck --batch 落盘的 JSON；索引说明写『N条/✅x/❌y/⚠️z/死因分布』，回答『这版测了哪批、结果如何』。"
-    }
-  ],
-  "blueprint": {
-    "roots": [
-      {
-        "title": "🔍 探源产出",
-        "doc": "探源司的一切可追溯产出：测活报告（结论）、源数据（候选/去重结果）。",
-        "children": ["测活报告", "源数据"]
-      }
-    ]
+ "_doc": "探源司产出声明（能力层→资料库的接入口）。库务司扫描 ~/.codebuddy/skills/*/artifacts.json 自动纳入：本文件声明『产出什么、归到哪个夹、索引来源写什么、蓝图要哪些夹』。加能力只需加本文件，清道夫零改动。",
+ "artifacts": [
+  {
+   "name": "测活报告",
+   "match": [
+    "livecheck_"
+   ],
+   "category": "清单",
+   "target": "🔍 探源产出/测活报告",
+   "source": "探源司·测活",
+   "note_from": "result_summary",
+   "doc": "livecheck --batch 落盘的 JSON；索引说明写『N条/✅x/❌y/⚠️z/死因分布』，回答『这版测了哪批、结果如何』。"
+  },
+  {
+   "name": "侦察资产(S编号)",
+   "match": [
+    "S1",
+    "S2"
+   ],
+   "category": "侦察资产",
+   "target": "🧬 520进化论/04-侦察资产",
+   "source": "探源司·侦察",
+   "note_from": "result_summary",
+   "doc": "references/S 编号资产文档（S196/S221/S224/S231 等）的云端可浏览副本；正本在 520pro 仓 Git。"
+  },
+  {
+   "name": "探源司演进文档",
+   "match": [
+    "演进时间线",
+    "探源司"
+   ],
+   "category": "子项目演进",
+   "target": "🧬 520进化论/03-子项目演进/探源司",
+   "source": "探源司·演进",
+   "note_from": "result_summary",
+   "doc": "探源司 v1.28.x 每轮交付与亮点（CHANGELOG 人读版）。"
   }
+ ],
+ "blueprint": {
+  "roots": [
+   {
+    "title": "🔍 探源产出",
+    "doc": "探源司的一切可追溯产出：测活报告（结论）、源数据（候选/去重结果）。",
+    "children": [
+     "测活报告",
+     "源数据"
+    ]
+   }
+  ]
+ }
 }

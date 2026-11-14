@@ -156,9 +156,9 @@ if [ -f "$U/skills/space-hub/scripts/space_hub.py" ]; then
   [ -f "$U/skills/space-hub/scripts/classify_rules.json" ] && ok "  └ 归纳登记册在位" || no "  └ 归纳登记册缺失"
   # v2.4.0 库房自举三件：蓝图在位可解析 / 两个新命令注册 / 出口门面可导入
   if [ -f "$U/skills/space-hub/scripts/base_blueprint.json" ]; then
-    python3 -c "import json;d=json.load(open('$U/skills/space-hub/scripts/base_blueprint.json'));assert d.get('roots');assert any('生态演化' in r.get('title','') for r in d['roots'])" 2>/dev/null \
-      && ok "  └ 基础蓝图可解析，且含固定分类「🧬 生态演化」" \
-      || no "  └ 基础蓝图损坏或缺「🧬 生态演化」固定分类"
+    python3 -c "import json;d=json.load(open('$U/skills/space-hub/scripts/base_blueprint.json'));assert d.get('roots');assert any('520进化论' in r.get('title','') for r in d['roots'])" 2>/dev/null \
+      && ok "  └ 基础蓝图可解析，且含固定分类「🧬 520进化论」" \
+      || no "  └ 基础蓝图损坏或缺「🧬 520进化论」固定分类"
   else
     no "  └ 基础蓝图缺失（库房自举不可用）"
   fi
@@ -664,6 +664,18 @@ if [ -f "$TARGET/verify/gate_scan.py" ]; then
   fi
 else
   no "verify/gate_scan.py 缺失——病10/病12/病13 判据闸未装（不静默跳过）"
+fi
+
+# ★ v0.8.64（方案v3 梯度④）：交付落库对账——每轮交付必落资料库，有 bump 无回执=假交付
+# 判据与三态见 verify/gate_archive_ledger.py（--selftest 内置正反向）。
+echo
+echo "[交付落库对账（v0.8.64 起·方案v3：archive_ledger 数据基座）]"
+if python3 "$TARGET/verify/gate_archive_ledger.py" > /tmp/_arch_ledger.out 2>&1; then
+  ok "交付落库对账：近期版本 bump 均有落库回执（或无可判对象）"
+  grep -c '  ✓ \[archive-ledger\]' /tmp/_arch_ledger.out >/dev/null 2>&1
+else
+  no "交付落库对账有红项（假交付/ledger 损坏）："
+  sed 's/^/     /' /tmp/_arch_ledger.out | head -9
 fi
 
 # ★ v0.8.25（规则迁移批2）：台账四律——旧生态 M-R75/82/86/93 的判据化落点

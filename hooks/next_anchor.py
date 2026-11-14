@@ -187,6 +187,19 @@ def main():
         d['last_repo'] = root
         _save(d, probe, hit=True)
         msg = '⏭ 上一轮定的下一步（%s）：%s' % (os.path.basename(root), nxt[:400])
+        # v0.8.64 方案v3 梯度③：交付落库提醒（520进化论·每轮必落库）——只提示不拦截，
+        # 硬对账在 verify/gate_archive_ledger.py（梯度④），提醒与闸分层。
+        import os as _os
+        _led = _os.path.join(root, 'archive_ledger.json')
+        if _os.path.isfile(_led):
+            try:
+                _d = json.load(open(_led, encoding='utf-8'))
+                _last = (_d.get('entries') or [{}])[-1]
+                _lt = (_last.get('ts') or '')[:10]
+                if _lt != time.strftime('%Y-%m-%d'):
+                    msg += '｜📦 提醒：archive_ledger 今日无落库回执——本轮交付完成后走 space-hub archive 正门落库'
+            except Exception:
+                pass
         print(json.dumps({'continue': True,
                           'hookSpecificOutput': {'hookEventName': 'UserPromptSubmit',
                                                  'additionalContext': msg}},
