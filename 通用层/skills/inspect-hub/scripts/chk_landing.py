@@ -312,3 +312,60 @@ def chk_contentflow(target, cfg, ctx):
         pass
 
     return {'status': _worst(ctx, sts), 'items': items}
+
+
+# impl: B-15 S5 ← 痊愈机判：active→观察→retired 状态机由机器推进，不再手工标
+def chk_cure(target, cfg, ctx):
+    """M12-补 痊愈机判（v0.8.66）：扫 experience_recurrence.json 的 last_ts，
+    跨 cure_rounds（默认10）个自然日无新复发自动降级：active→观察→retired。
+    「轮」以自然日近似（每轮 verify.sh 至少跑一次的日子≈日），doc 真源见 experience_recurrence.json rules。
+    机器直接原子写回状态（单进程闸内执行，os.replace 保证不写坏）；retired 病号自动移出注入池。"""
+    import json as _json
+    repo = _repo(target, cfg)
+    items, sts = [], []
+    rec_path = os.path.join(repo, 'experience_recurrence.json')
+    if not os.path.isfile(rec_path):
+        return {'status': 'unknown',
+                'items': [{'s': 'unknown', 't': '复发计数不可读', 'e': 'experience_recurrence.json 缺失'}]}
+    try:
+        rec = _json.load(open(rec_path, encoding='utf-8'))
+    except Exception as ex:
+        return {'status': 'unknown',
+                'items': [{'s': 'unknown', 't': '复发计数不可读（损坏不折叠）', 'e': str(ex)[:80]}]}
+    rules = rec.get('rules', {})
+    cure = int(rules.get('cure_rounds', 10))
+    today = datetime.date.today()
+    changed = []
+    counters = rec.get('counters', {})
+    for bid, c in counters.items():
+        st = c.get('status', 'active')
+        if st == 'retired':
+            continue
+        last = c.get('last_ts') or ''
+        try:
+            days = (today - datetime.date.fromisoformat(last)).days if last else None
+        except ValueError:
+            days = None
+        if days is None:
+            items.append({'s': 'unknown', 't': f'{bid} last_ts 缺失/损坏——不折叠为痊愈', 'e': str(last)[:20]})
+            sts.append('unknown')
+            continue
+        if st == 'active' and days >= cure:
+            c['status'] = '观察'
+            changed.append(f'{bid} active→观察（{days}日无复发）')
+        elif st == '观察' and days >= cure:
+            c['status'] = 'retired'
+            changed.append(f'{bid} 观察→retired（再{days}日无复发，移出注入池）')
+    if changed:
+        tmp = rec_path + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            _json.dump(rec, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, rec_path)
+        items.append({'s': 'yellow', 't': f'痊愈机判降级 {len(changed)} 病号', 'e': '；'.join(changed)})
+        sts.append('yellow')
+    else:
+        n_ret = len([1 for c in counters.values() if c.get('status') == 'retired'])
+        items.append({'s': 'green', 't': f'痊愈机判: 无降级（病号{len(counters)}个/已retired {n_ret}）',
+                      'e': f'机器判据：{cure} 自然日无复发自动降级'})
+        sts.append('green')
+    return {'status': _worst(ctx, sts), 'items': items}

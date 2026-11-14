@@ -216,8 +216,10 @@ def _disease_hint(rule_id):
         return ''  # 降级：映射缺失不阻断主闸功能
 
 
-def _bump_recurrence(rule_id):
-    """经验闭环闸2：拦截即复发计数+1（机器记账，失败静默，同分钟去重）。"""
+def _bump_recurrence(rule_id, coord=None):
+    """经验闭环闸2：拦截/Lesson 记病即复发计数+1（机器记账，失败静默，同分钟去重）。
+
+    v0.8.66：coord 可选（Lesson 复发时传「Lesson 复发 病N 第K次」，与 guard 拦截区分来源）。"""
     try:
         import json as _j, datetime as _dt
         root = _repo_root()
@@ -235,7 +237,8 @@ def _bump_recurrence(rule_id):
             return  # 同分钟同规则去重（一次会话内反复试错只记 1 次复发）
         c['count'] += 1
         c['last_ts'] = now.strftime('%Y-%m-%d')
-        c['events'].append({'ts': now.strftime('%Y-%m-%d %H:%M'), 'coord': f'guard拦截 {rule_id}', 'by': 'hook', 'min': minute_key})
+        c['events'].append({'ts': now.strftime('%Y-%m-%d %H:%M'), 'coord': coord or f'guard拦截 {rule_id}',
+                            'by': 'hook', 'min': minute_key})
         tmp = fp + '.tmp'
         with open(tmp, 'w', encoding='utf-8') as f:
             _j.dump(d, f, ensure_ascii=False, indent=1)
@@ -261,6 +264,8 @@ def main():
     ap.add_argument('--check', metavar='CMD', help='只判定一条命令，打印结果（调试/测试用）')
     ap.add_argument('--check-write', metavar='PATH', help='只判定一个写入路径（调试/测试用）')
     ap.add_argument('--list', action='store_true', help='列出全部规则')
+    ap.add_argument('--bump', metavar='病号ID', help='Lesson 复发记账（commit-msg 调用）：复发计数+1')
+    ap.add_argument('--coord', metavar='说明', help='--bump 的事件说明（默认 guard拦截）')
     a = ap.parse_args()
 
     if a.list:
@@ -276,6 +281,11 @@ def main():
         print(json.dumps({'deny': bool(hit), 'rule': hit['id'] if hit else None,
                           'why': hit['why'] if hit else None}, ensure_ascii=False))
         return 2 if hit else 0
+
+    if a.bump is not None:
+        _bump_recurrence(a.bump, coord=a.coord)
+        print(json.dumps({'bumped': a.bump, 'coord': a.coord or 'guard拦截'}, ensure_ascii=False))
+        return 0
 
     if a.check_write is not None:
         hit = check_write(a.check_write)

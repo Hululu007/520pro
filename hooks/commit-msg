@@ -71,6 +71,7 @@ if printf '%s' "$N" | grep -qE "$LAZY_RE"; then
 fi
 
 # ── ③ Lesson：经验回流（不新建存储，接现有病历）────────────────
+# impl: B-15 S5 ← Lesson 记复发时同步触发机器记账（experience_recurrence.json）
 L="$(field Lesson)"
 [ -n "$L" ] || fail "缺 Lesson: 行" "踩坑写 病N（第K次）/ 新病：<一句>；没踩写 无"
 # 「病N（第K次）」与「新病：」都要落到台账——否则 Lesson 只是一句谁也不会再看的话。
@@ -78,6 +79,13 @@ if printf '%s' "$L" | grep -qE '病[0-9]+（第 ?[0-9]+ ?次）|新病：'; then
   printf '%s\n' "$STAGED_ALL" | grep -qx 'docs/通病台账.md' \
     || fail "Lesson 记了病（复发或新病），但本次提交没改 docs/通病台账.md" \
             "病历要落在台账上才算数；否则「第 K 次」「新病」都是编的"
+  # 机器记账：拦截型复发由 guard_cmd 拦截时已记；这里补 Lesson 手写复发的机器计数。
+  # 去重由 _bump_recurrence 同分钟逻辑兜底；记账失败不阻断提交（B-13：账可以晚到，闸不拦人）。
+  BUMP_ID="$(printf '%s' "$L" | grep -oE '病[0-9]+' | head -1)"
+  if [ -n "$BUMP_ID" ] && [ -f "$ROOT/hooks/guard_cmd.py" ]; then
+    python3 "$ROOT/hooks/guard_cmd.py" --bump "$BUMP_ID" \
+      --coord "Lesson 复发记账 $(printf '%s' "$L" | grep -oE '病[0-9]+（第 ?[0-9]+ ?次）' | head -1)" >/dev/null 2>&1 || true
+  fi
 fi
 
 # ── ④ Reuse：先查再造 + 与暂存清单对账（堵"写新建 0 却偷偷新建"）──

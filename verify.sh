@@ -678,6 +678,20 @@ else
   sed 's/^/     /' /tmp/_arch_ledger.out | head -9
 fi
 
+# ★ v0.8.66（批1-①）：M12 经验门接电——chk_contentflow 四判据（断流/账实脱节/复发超限/效果指标）
+#   此前只在巡检 run（模型自愿发起）时跑，闸建了没接电；接进 verify.sh 必经链路后每轮必检。
+#   黄（断路夹/复发超限）=账面提醒不阻断，红（过期账实脱节/无源内容）才拦。
+# 判据与三态见 verify/gate_experience.py（--selftest 内置正反向）。
+echo
+echo "[M12 经验门（v0.8.66 起·接电：verify 必经链路）]"
+if python3 "$TARGET/verify/gate_experience.py" > /tmp/_exp_gate.out 2>&1; then
+  ok "M12 经验门：无红项（黄提醒见明细）"
+  sed 's/^/     /' /tmp/_exp_gate.out | head -6
+else
+  no "M12 经验门有红项（无源内容/过期账实脱节）："
+  sed 's/^/     /' /tmp/_exp_gate.out | head -9
+fi
+
 # ★ v0.8.25（规则迁移批2）：台账四律——旧生态 M-R75/82/86/93 的判据化落点
 # 为什么要有：这四条原本是旧生态的"教训条目"，只在文档里躺着。docs 不加载
 # （docs/加载机制与可靠性.md 实测），所以只搬条文 = 纸面迁移。这里只挑能机检的形态，

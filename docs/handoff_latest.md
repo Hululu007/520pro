@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.62 规则生效闭环落地：给 `verify/rule_map.json` 加四个字段（**strength** 强度分档 / **impl** 实物清单 / **proven_by** 首次实测证据 / **retire_if** 退役条件），并在代码里写 `# impl: B-xx Sn` **自报标记**，由 `gate_scan` 新增的第五道闸 **impl-reconcile** 双向对账（虚标 / 漏登 / 过期登记 / 写了没挂 / 字段是编的，五种都红）。**两种违例实测各报红一次**：B-13 改回 manual → 报「漏登」；B-02 删 strength 保留 machine → 报「虚标」；恢复后 0 红。同时改了三处登记错误：**B-02** 此前 `machine → verify.sh` 是虚标（verify.sh:424 只是 MUST 字面量集合），已改指 `test_gate_scan.py:test_three_state`（动态注入只返回 · 的闸，逼出真实计数）——**B-13** 从 manual 改 machine（`stop_guard.py#judge` 从 v0.8.58 起就在守）；**B-05/B-14/B-16** 补 S1 强度（此前只记了最弱的 S5 那一环）。另加**规则预算**：core-8 上限 20 条，超了先退役再进新的（旧生态 178 条的成因就是只增不减）。**B-19 悬空引用已清**：6 处（自我更正，上轮报 5 处，漏 `verify/ledger_laws.py:138`）分别改指 B-02 / B-13 / 病15。**上线首跑抓到病15 第 6 例**：impl 正则只要求「出现标记」，把 gate_scan 自己 docstring 里的示例行算成了真实落点，已收严为「只认整行注释」并加回归用例。**遗留：B-07 的 SessionStart 注入协议未实测（写了不算做完）；B-09/B-10 仍在可选技能里、非必经点，路线未定；全量 123 个存活仓库批量重采未跑。**
+v0.8.66 经验闭环接电批1：2026-11-15 四轮漏检排查（账实对账→触发源→库内质量→规则接线）确认 4 断点并全部修复——**①M12 经验门接电**：chk_contentflow 四判据（断流/账实脱节/复发超限/效果指标）此前只在巡检 run（模型自愿发起）跑，闸建了没通电；新建薄壳 `verify/gate_experience.py` 接进 verify.sh 必经链路（--selftest 正反向实测：真数据 yellow/造缺 ref 新账即红）。**②Lesson 机器记账补全**：复发记账声明含 commit-msg 侧但代码不存在（机器计数只有 guard 拦截一半）；commit-msg ③ 段接 `guard_cmd.py --bump`（实测 count 6→7→恢复）。**③痊愈机判**：active→观察→retired 声明了"巡检 chk 自动降级"但代码不存在（病11 retired 是手工标）；chk_landing 新增 `chk_cure`（10 自然日无复发机器写回降级，双向实测）。**④监测者受监测**：rule_map B-15 登记 S5+proven_by 实测记录，impl-reconcile 纳入四闸实物标记；硬化矩阵 B-15 回写 S5（原判"硬化不了"已过时）。**⑤B-07 SessionStart 注入实测通过**（悬挂多轮的遗留项）：next_anchor 加 SessionStart 分支注入 handoff 首段，settings.json 已注册，模拟 payload 正反向实测（正向 via=session-start+handoff；反向无 handoff 明说"未对齐"不装懂）。**排查同期发现的欠账**：版本演化台账断流 11 版（0.8.55→0.8.65 未记，evolve-log 挂 install.sh 而沙箱内 git bump 不触发）+ 22 条 failed/pending 死账无补投闭环 + 01-方法论 2 笔欠账 + VERSION 文件停 0.8.62 与 commit 脱节（本轮已修 VERSION）。**遗留（批2/批3 已批准）**：历史债（台账补记/死账 retry/md 后缀改名）+ 探测器链（content_sources 改可测信号→欠账负账本→探测器→注入）。
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.62 规则生效闭环落地：给 `verify/rule_map.json` 加四个字段（
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.62
+- 版本：0.8.66
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）

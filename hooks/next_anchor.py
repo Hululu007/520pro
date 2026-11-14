@@ -228,6 +228,42 @@ def main():
                          ensure_ascii=False))
         return 0
 
+    # ---- B-07 换模型对账：SessionStart 开机注入 handoff 首段（v0.8.66 批1-⑤）----
+    # 判据（B-07 悬挂项实测）：新会话首轮出现 handoff 首段且 via 含 handoff。
+    # 首段=「## 1. 当前主线」段（主线/习惯/业务上下文三项之首）；读不到明说，不装懂。
+    if event == 'SessionStart':
+        root = _resolve_root(d, cwd, command, probe)
+        probe['root'] = root
+        probe['via'] = 'session-start'
+        hf = os.path.join(root, 'docs', 'handoff_latest.md') if root else ''
+        seg = ''
+        if hf and os.path.isfile(hf):
+            try:
+                t = open(hf, encoding='utf-8', errors='ignore').read(8000)
+                m = re.search(r'## 1\. 当前主线[^\n]*\n+(.{0,500})', t, re.S)
+                seg = (m.group(1).strip() if m else t.strip()[:400])
+            except Exception:
+                seg = ''
+        if not seg:
+            probe['via'] += '+no-handoff'
+            _save(d, probe)
+            print(json.dumps({'continue': True,
+                              'hookSpecificOutput': {'hookEventName': 'SessionStart',
+                                                     'additionalContext':
+                                                         '⚠ B-07：本会话未对齐——docs/handoff_latest.md 不存在或无首段，'
+                                                         '先读交接摘要再动手。'}},
+                             ensure_ascii=False))
+            return 0
+        probe['via'] += '+handoff'
+        _save(d, probe, hit=True)
+        msg = '🤝 B-07 交接对齐（%s）——当前主线：%s' % (os.path.basename(root), seg[:400])
+        msg += '｜（全文：docs/handoff_latest.md，先读三项再动手）'
+        print(json.dumps({'continue': True,
+                          'hookSpecificOutput': {'hookEventName': 'SessionStart',
+                                                 'additionalContext': msg}},
+                         ensure_ascii=False))
+        return 0
+
     # ---- 写文件类硬拦截：Write/Edit 目标在仓内且是凭据文件 → 挡在写下去那一刻 ----
     #   为什么挂这里：settings.json 里本脚本已有一条 matcher='Bash' 的注册，
     #   再加一条 matcher='Write|Edit' 即可复用同一份 deny 协议，不必让 guard_cmd

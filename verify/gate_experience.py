@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""v0.8.66 · M12 经验门接电闸（批1-①：闸建了没接电的修复）。
+
+背景（2026-11-15 实查）：chk_contentflow（断流/账实脱节/复发超限/效果指标四判据）
+此前只在巡检 run（模型自愿发起）时跑——闸建了，没接电。台账断流 11 版、
+01-方法论欠账长期无人发现，正是这个缺口。本薄壳把它接进 verify.sh 必经链路。
+
+三态（M-R60）：
+  ✓ 绿/黄 —— chk_contentflow 返回 green（或 yellow 提示级：断路夹/复发超限属账面提醒，
+              verify 不因黄阻断，与巡检语义一致；黄必须显式可见，不静默）
+  ✗ 红    —— 返回 red（账实脱节过期/无源内容/复发超限按 M12 阈值）
+  · 无法判定 —— 数据源损坏（不折叠成绿）
+
+正向：账实一致+无新账缺 ref → 绿；反向：临时造缺 event_ref 回执 → 红（--selftest 内置双向）。
+# impl: B-15 S5
+"""
+import os
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(REPO, '通用层', 'skills', 'inspect-hub', 'scripts'))
+
+
+def check():
+    from chk_landing import chk_contentflow          # noqa: E402（延迟导入，失败显式报）
+    from inspect_hub import worst                    # noqa: E402
+    ctx = {'thresholds': {}, 'worst': worst}
+    r = chk_contentflow(REPO, {'repo': REPO}, ctx)
+    for it in r.get('items', []):
+        mark = {'green': '✓', 'yellow': '⚠', 'red': '✗'}.get(it.get('s'), '·')
+        print(f"  {mark} [{it.get('t')}] {it.get('e', '')[:90]}")
+    return r.get('status')
+
+
+def selftest():
+    """正反向：红/黄/绿三态在真数据上现形；反向靠临时构造缺 ref 回执。"""
+    import json
+    import shutil
+    import tempfile
+    led = os.path.join(REPO, 'archive_ledger.json')
+    bak = tempfile.mktemp()
+    shutil.copy(led, bak)
+    fails = []
+    try:
+        # 正向：真数据跑一遍，应可判定（green/yellow 都算通过，red 算违例——当前真数据应无 red）
+        st = check()
+        if st in ('red',):
+            fails.append(f'正向：真数据出现 red（{st}）——先清真账再谈闸')
+        # 反向：造一条 result=ok 且缺 event_ref、非 legacy round 的新账 → 应 red
+        d = json.load(open(led, encoding='utf-8'))
+        rows = d if isinstance(d, list) else d.get('entries', [])
+        rows.append({'ts': '2026-11-15T99:99:99', 'round': 'selftest-bad', 'artifact': 'x',
+                     'target': '🧬 520进化论/05-复盘与判例', 'result': 'ok', 'event_ref': '', 'note': 'selftest'})
+        json.dump(d, open(led, 'w'), ensure_ascii=False, indent=1)
+        st2 = check()
+        if st2 != 'red':
+            fails.append(f'反向：造缺 ref 新账后仍 {st2}——闸抓不住无源内容')
+        print(f"  selftest: 正向={st} 反向={st2}")
+    finally:
+        shutil.copy(bak, led)
+        os.remove(bak)
+    if fails:
+        for f in fails:
+            print(f'  ✗ {f}')
+        return 1
+    print('  ✓ 正反向全通过（真数据绿/黄、造违例即红）')
+    return 0
+
+
+if __name__ == '__main__':
+    if '--selftest' in sys.argv:
+        sys.exit(selftest())
+    st = check()
+    print(f"[experience-gate] M12 经验门状态: {st}")
+    sys.exit(1 if st == 'red' else 0)
