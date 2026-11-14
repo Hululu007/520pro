@@ -376,9 +376,12 @@ fi
 #   三条铁律见脚本头部：永不拦截 / Bash 提示节流 15 分钟 / 除状态文件外只读。
 #   settings.json 只做**幂等追加**，不覆盖既有 hooks；失败不阻断安装（只提示）。
 if [ "$DRY" = 0 ] && [ -f "$ROOT/hooks/next_anchor.py" ] && [ "$SCOPE" != "capability" ]; then
+  # guard_cmd.py 是 next_anchor 的 import 依赖（工具级硬拦截，v0.8.55 起），
+  # 少装一个 = 钩子 import 失败 = 静默失去拦截，故两个必须同装。
   if mkdir -p "$HOME/.codebuddy/hooks" 2>/dev/null \
      && cp "$ROOT/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/next_anchor.py" \
-     && chmod +x "$HOME/.codebuddy/hooks/next_anchor.py"; then
+     && cp "$ROOT/hooks/guard_cmd.py" "$HOME/.codebuddy/hooks/guard_cmd.py" \
+     && chmod +x "$HOME/.codebuddy/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/guard_cmd.py"; then
     python3 - "$HOME/.codebuddy/settings.json" "$HOME/.codebuddy/hooks/next_anchor.py" <<'PY' 2>/dev/null \
       && echo " · 锚点钩子已装：~/.codebuddy/hooks/next_anchor.py（UserPromptSubmit 注入 + PreToolUse·Bash 提示，新会话生效）" \
       || echo " ⚠ 锚点钩子脚本已复制，但 settings.json 合并失败——手动在 hooks.UserPromptSubmit 加 command"

@@ -198,6 +198,24 @@ def main():
         probe['via'] = 'skip-tool'
         _save(d, probe)
         return 0
+
+    # ---- 工具级硬拦截：危险命令在**执行前**挡住（逻辑真源 hooks/guard_cmd.py）----
+    #   协议实测（2026-11-14）：deny JSON + exit 2 → 平台直接阻断该次调用，
+    #   模型侧看到 `PreToolUse:Bash hook blocked this tool call: <reason>`。
+    #   fail-open：守卫自身坏了放行，但把 guard_err 写进 state（--probe 可查），
+    #   不许静默失效——静默失效比不设防更危险。
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import guard_cmd
+        _hit = guard_cmd.check(command)
+        if _hit:
+            probe['via'] += '+guard:' + _hit['id']
+            _save(d, probe)
+            print(json.dumps(guard_cmd.deny_payload(_hit), ensure_ascii=False))
+            return 2
+    except Exception as _e:
+        probe['guard_err'] = ('%s: %s' % (type(_e).__name__, _e))[:120]
+
     if not os.path.isdir(cwd):
         probe['via'] = 'bad-cwd'
         _save(d, probe)

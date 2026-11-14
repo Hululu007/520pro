@@ -71,6 +71,26 @@ def gate_quotepath(root):
     return reds
 
 
+def _imported_by_other(root, name):
+    """该脚本是否被 hooks/ 下别的脚本 import（= 依赖库，不是独立注册的钩子）。
+
+    v0.8.55 起区分这两类：guard_cmd.py 是被 next_anchor import 的守卫逻辑，
+    自身不维护 state，观测由 next_anchor 的 probe['via']（+guard:G1）承担。
+    旧判据把「cp 到 hooks 目录的所有脚本」一律当作注册钩子，于是对库也要求
+    --probe/hit/via，必然误红——判据错在归类，不在被测对象，故改判据。
+    """
+    stem = name[:-3] if name.endswith('.py') else name
+    hdir = os.path.join(root, 'hooks')
+    for other in os.listdir(hdir):
+        if other == name or not other.endswith('.py'):
+            continue
+        body = open(os.path.join(hdir, other), encoding='utf-8', errors='ignore').read()
+        if re.search(r'^\s*import\s+%s\b' % re.escape(stem), body, re.M) \
+           or re.search(r'^\s*from\s+%s\s+import\b' % re.escape(stem), body, re.M):
+            return True
+    return False
+
+
 def gate_hook_probe(root):
     reds = []
     inst = os.path.join(root, 'install.sh')
@@ -85,6 +105,12 @@ def gate_hook_probe(root):
         p = os.path.join(root, 'hooks', name)
         if not os.path.isfile(p):
             reds.append('hooks/%s 被 install.sh 注册但文件不存在（病13）' % name)
+            continue
+        if _imported_by_other(root, name):
+            # 依赖库：不要求自带 --probe，但必须真的被引用（防孤儿脚本静默失效）
+            body = open(p, encoding='utf-8', errors='ignore').read()
+            if not body.strip():
+                reds.append('hooks/%s 是空文件却被安装（病13）' % name)
             continue
         body = open(p, encoding='utf-8', errors='ignore').read()
         missing = [k for k in ('--probe', 'hit', 'via') if k not in body]

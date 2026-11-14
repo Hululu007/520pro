@@ -84,6 +84,21 @@ with tempfile.TemporaryDirectory() as td:
     rc, out = run(['--gate', 'hook-probe', '--root', td])
     check('注册但文件不存在被拦', rc == 2 and '不存在' in out, out[-200:])
 
+    # v0.8.55：被 import 的依赖库不要求自带 --probe（观测由调用方 probe['via'] 承担），
+    # 但不能是空文件——空库装上去就是个静默失效的钩子依赖。
+    w(os.path.join(td, 'install.sh'),
+      'cp "$ROOT/hooks/main.py" "$HOME/.codebuddy/hooks/main.py"\n'
+      'cp "$ROOT/hooks/lib.py" "$HOME/.codebuddy/hooks/lib.py"\n')
+    w(os.path.join(td, 'hooks', 'main.py'),
+      "if '--probe' in sys.argv: ...\nimport lib\nprobe = {'hit': False, 'via': 'none'}\n")
+    w(os.path.join(td, 'hooks', 'lib.py'), 'def check(c):\n    return None\n')
+    rc, out = run(['--gate', 'hook-probe', '--root', td])
+    check('被 import 的依赖库不要求 --probe', rc == 0, out[-200:])
+
+    w(os.path.join(td, 'hooks', 'lib.py'), '\n\n')
+    rc, out = run(['--gate', 'hook-probe', '--root', td])
+    check('空依赖库被拦', rc == 2 and '空文件' in out, out[-200:])
+
     w(os.path.join(td, 'install.sh'), 'echo nothing-here\n')
     rc, out = run(['--gate', 'hook-probe', '--root', td])
     check('install.sh 无注册被拦', rc == 2 and '提取不到' in out, out[-200:])
@@ -106,5 +121,5 @@ with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as vd:
 vsh = open(os.path.join(ROOT, 'verify.sh'), encoding='utf-8').read()
 check('verify.sh 注册 gate_scan 调用', 'gate_scan.py' in vsh)
 
-print('test_gate_scan：%d 例，失败 %d' % (12, len(fails)))
+print('test_gate_scan：%d 例，失败 %d' % (14, len(fails)))
 sys.exit(1 if fails else 0)

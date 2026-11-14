@@ -1,3 +1,6 @@
+## v1.28.4 — 2026-11-14
+- 加 allowed-tools 白名单（C11）：Read,Grep,Glob,Bash,Write,Edit,Skill——禁 Task（子代理不继承判据）；为腾字节压缩 AES 兜底说明。
+
 ## v1.28.3 — AI项目监测板块：监测范围扩到 AI 仓库（2026-11-14）
 - **需求**：探源司增加「AI 项目」板块，首个目标 Memory-Palace（`AGI-is-going-to-arrive/Memory-Palace`，MIT）。
 - **实现**（判据复用 repo 四类信号，不另造轮子）：

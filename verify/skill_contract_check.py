@@ -434,6 +434,32 @@ def check_frontload_rec(name, desc):
     rec('C9', name, '✓' if ok else '✗', msg)
 
 
+# ────────────────────────── C11 工具白名单 ──────────────────────────
+# 为什么要有它：allowed-tools 是「这个技能能碰哪些工具」的唯一声明，也是
+# 防模型绕开脚本（自己抓网页 / 拆给子代理）的唯一入口。字段加了没有判据，
+# 就等于随时可被删而无人知——与病10「判据缺失」同族。
+TOOLS_REQUIRED = {'Bash'}       # 技能都靠脚本干活，没 Bash 等于废
+TOOLS_FORBIDDEN = {'Task'}      # 子代理不继承技能判据，拆出去 = 判据失效
+
+
+def check_tools(name, body):
+    raw = fm_get(front_matter(body), 'allowed-tools')
+    if not raw:
+        rec('C11', name, '✗',
+            '缺 allowed-tools：能碰哪些工具没有声明（可绕开脚本自己抓、可拆给子代理）')
+        return
+    tools = {t.strip() for t in raw.split(',') if t.strip()}
+    bad = []
+    miss = TOOLS_REQUIRED - tools
+    if miss:
+        bad.append(f'缺必需工具 {sorted(miss)}（技能靠脚本执行）')
+    forb = TOOLS_FORBIDDEN & tools
+    if forb:
+        bad.append(f'含禁用工具 {sorted(forb)}（子代理不继承判据）')
+    rec('C11', name, '✗' if bad else '✓',
+        '；'.join(bad) if bad else f'{len(tools)} 个工具：{",".join(sorted(tools))}')
+
+
 def check_bridge_rec(name, spec, base, desc):
     rel = spec.get('trigger_samples')
     if not rel:
@@ -503,6 +529,7 @@ def main(argv):
             check_size(name, spec, base)
             check_frontload_rec(name, desc)
             check_bridge_rec(name, spec, base, desc)
+            check_tools(name, body)
         else:
             rec('C3', name, '·', 'lib 类：不注册路由，desc 五组契约不适用')
         check_version(name, spec, base, repo)

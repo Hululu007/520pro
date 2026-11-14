@@ -45,12 +45,12 @@
           "pan": "scripts/pan.py —— 网盘取料（清单/下载/转存/删除）。2026-11-12 自 probe-hub harvest pan 迁入，零外部依赖",
           "self_check": "python3 scripts/learn.py self-check → 16/16；python3 scripts/pan.py self-check → 2/2",
           "not_tvbox": "与 TVBox 无关，纯通用层",
-          "version": "1.4.2"
+          "version": "1.4.3"
         },
         "skills/space-hub/SKILL.md": {
           "install_to": "~/.codebuddy/skills/space-hub/SKILL.md",
           "role": "库务司·云端库总管 v2.7.0（清道夫升级）：清理/归纳/建库/搬运正门，四层空间解析不绑账号，拒收带结构化三元组",
-          "version": "2.7.6"
+          "version": "2.7.7"
         },
         "skills/space-hub/scripts/space_hub.py": {
           "install_to": "~/.codebuddy/skills/space-hub/scripts/space_hub.py",
@@ -63,7 +63,7 @@
         "skills/inspect-hub/SKILL.md": {
           "install_to": "~/.codebuddy/skills/inspect-hub/SKILL.md",
           "role": "巡检司 v1.4.1：520 自家健康 8 面巡检（八卦八门全部转正），景门改集合比对防假红",
-          "version": "1.4.2"
+          "version": "1.4.3"
         },
         "skills/inspect-hub/scripts/inspect_hub.py": {
           "install_to": "~/.codebuddy/skills/inspect-hub/scripts/inspect_hub.py",
@@ -107,7 +107,7 @@
           "entry": "scripts/probe.py",
           "critical": "单独安装必报 ModuleNotFoundError: No module named 'core'",
           "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack}.py · repair/ · forgekit/ · verify/ · references/",
-          "version": "1.28.3"
+          "version": "1.28.4"
         },
         "tvbox/skills/tvbox-pipeline/": {
           "user_install": "~/.codebuddy/skills/tvbox-pipeline/",
@@ -116,7 +116,7 @@
             "tvbox-core"
           ],
           "entry": "SKILL.md → SOP_整包加工.md",
-          "version": "1.3.10"
+          "version": "1.3.11"
         },
         "tvbox/fix_paths.py": {
           "role": "路径适配：把 /root/.codebuddy 改成 os.path.expanduser('~/.codebuddy')，tokenize 精确替换，跳过隐式字符串拼接"
