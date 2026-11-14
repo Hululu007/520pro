@@ -378,15 +378,18 @@ fi
 if [ "$DRY" = 0 ] && [ -f "$ROOT/hooks/next_anchor.py" ] && [ "$SCOPE" != "capability" ]; then
   # guard_cmd.py 是 next_anchor 的 import 依赖（工具级硬拦截，v0.8.55 起），
   # 少装一个 = 钩子 import 失败 = 静默失去拦截，故两个必须同装。
+  # stop_guard.py（v0.8.56 起）独立挂 Stop 事件，B-13 完成态凭落点。
   if mkdir -p "$HOME/.codebuddy/hooks" 2>/dev/null \
      && cp "$ROOT/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/next_anchor.py" \
      && cp "$ROOT/hooks/guard_cmd.py" "$HOME/.codebuddy/hooks/guard_cmd.py" \
-     && chmod +x "$HOME/.codebuddy/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/guard_cmd.py"; then
-    python3 - "$HOME/.codebuddy/settings.json" "$HOME/.codebuddy/hooks/next_anchor.py" <<'PY' 2>/dev/null \
-      && echo " · 锚点钩子已装：~/.codebuddy/hooks/next_anchor.py（UserPromptSubmit 注入 + PreToolUse·Bash 提示，新会话生效）" \
+     && cp "$ROOT/hooks/stop_guard.py" "$HOME/.codebuddy/hooks/stop_guard.py" \
+     && chmod +x "$HOME/.codebuddy/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/guard_cmd.py" "$HOME/.codebuddy/hooks/stop_guard.py"; then
+    python3 - "$HOME/.codebuddy/settings.json" "$HOME/.codebuddy/hooks/next_anchor.py" "$HOME/.codebuddy/hooks/stop_guard.py" <<'PY' 2>/dev/null \
+      && echo " · 钩子已装：next_anchor.py（锚点注入 + PreToolUse 提示）、guard_cmd.py（G1–G4 硬拦截）、stop_guard.py（B-13 完成凭落点，Stop 拽回）——新会话生效" \
       || echo " ⚠ 锚点钩子脚本已复制，但 settings.json 合并失败——手动在 hooks.UserPromptSubmit 加 command"
 import json, sys
 p, script = sys.argv[1], sys.argv[2]
+stop_script = sys.argv[3] if len(sys.argv) > 3 else ''
 try:
     d = json.load(open(p, encoding='utf-8'))
 except Exception:
@@ -410,6 +413,16 @@ if not any('next_anchor.py' in c for c in cmds2):
     changed = True
 if changed:
     json.dump(d, open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+
+# Stop 事件：B-13 完成态凭落点（v0.8.56）
+if stop_script:
+    d.setdefault('hooks', {}).setdefault('Stop', [])
+    cmds3 = [h.get('command', '') for e in d['hooks']['Stop'] for h in e.get('hooks', [])]
+    if not any('stop_guard.py' in c for c in cmds3):
+        d['hooks']['Stop'].append({
+            'hooks': [{'type': 'command', 'command': 'python3 ' + stop_script, 'timeout': 10}],
+        })
+        json.dump(d, open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 sys.exit(0)
 PY
   else
