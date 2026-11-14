@@ -576,7 +576,7 @@ def chk_structure(target, cfg, ctx):
 
 
 # v0.8.64 方案v3：落地监测三面（M9/M10/M11），独立文件保持主引擎清爽
-from chk_landing import chk_overview, chk_weakness, chk_projects  # noqa: F401（CHECKERS 自动收集）
+from chk_landing import chk_overview, chk_weakness, chk_projects, chk_contentflow  # noqa: F401（CHECKERS 自动收集）
 CHECKERS = {k: v for k, v in list(globals().items()) if k.startswith('chk_')}
 
 

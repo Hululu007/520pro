@@ -218,3 +218,97 @@ def chk_projects(target, cfg, ctx):
                           'e': rel, 'c': '无需处置'})
             sts.append('green')
     return {'status': _worst(ctx, sts), 'items': items}
+
+
+def chk_contentflow(target, cfg, ctx):
+    """M12 内容流面（v0.8.64 经验闭环）：五判据+经验效果三指标。
+    数据源全离线：archive_ledger / content_sources / experience_recurrence。
+    原则：空夹不是病，供给信号已现而内容没落才是病；豁免必须显式带期限。"""
+    import json as _json
+    repo = _repo(target, cfg)
+    items, sts = [], []
+    LEDGER_EXEMPT_UNTIL = '2026-12-15'  # legacy 豁免显式登记（带期限，到期自动转红）
+
+    led = _load_ledger_safe(repo)
+    today = datetime.date.today()
+
+    # 判1 账实脱节：ok 回执无 target
+    if led[0] == 'ok':
+        entries = led[1]
+        no_target = [e for e in entries if e.get('result') == 'ok' and not (e.get('target') or '').strip()]
+        # legacy 豁免显式可见（不是隐藏）：豁免条目数+期限列出
+        if no_target and today.isoformat() <= LEDGER_EXEMPT_UNTIL:
+            items.append({'s': 'yellow', 't': f'账实脱节(豁免中): {len(no_target)} 行无 target',
+                          'e': f'legacy 豁免至 {LEDGER_EXEMPT_UNTIL}，到期未补即转红'})
+            sts.append('yellow')
+        elif no_target:
+            items.append({'s': 'red', 't': f'账实脱节: {len(no_target)} 行 ok 回执无 target',
+                          'e': '豁免已过期（2026-12-15），补 target 或显式续期'})
+            sts.append('red')
+        else:
+            items.append({'s': 'green', 't': '账实脱节: 0', 'e': '全部 ok 回执带 target 落点'})
+
+        # 判2 无源内容（event_ref；legacy 豁免同期限）
+        LEGACY_ROUNDS = {'backfill-20261115', 'v1.28.5'}  # 上线前批次=legacy 豁免
+        no_ref = [e for e in entries if e.get('result') == 'ok' and not (e.get('event_ref') or '').strip()
+                  and e.get('round') not in LEGACY_ROUNDS]
+        if no_ref:
+            items.append({'s': 'red', 't': f'无源内容: {len(no_ref)} 条(新账)', 'e': '回执缺 event_ref(指向 commit/run)'})
+            sts.append('red')
+        else:
+            items.append({'s': 'green', 't': '无源内容: 0(新账)', 'e': '2026-11-15 起回执均带 event_ref；存量 legacy 豁免至 ' + LEDGER_EXEMPT_UNTIL})
+            sts.append('green')
+
+        # 判3 内容流断路：供给信号已现而夹空（ledger target 代理）
+        cs_path = os.path.join(repo, 'verify', 'content_sources.json')
+        try:
+            flows = _json.load(open(cs_path, encoding='utf-8')).get('flows', [])
+            covered = set()
+            for e in entries:
+                if e.get('result') == 'ok' and e.get('target'):
+                    for f in flows:
+                        if e['target'].startswith(f['folder']):
+                            covered.add(f['folder'])
+            empty = [f['folder'].split('/')[-1] for f in flows if f['folder'] not in covered]
+            if empty:
+                items.append({'s': 'yellow', 't': f'内容流断路: {len(empty)} 夹无入库',
+                              'e': '，'.join(empty) + '（供给源登记于 content_sources.json）'})
+                sts.append('yellow')
+            else:
+                items.append({'s': 'green', 't': '内容流: 8 夹全有入库', 'e': ''})
+                sts.append('green')
+        except Exception as ex:
+            items.append({'s': 'unknown', 't': 'content_sources 不可读', 'e': str(ex)[:80]})
+            sts.append('unknown')
+    else:
+        items.append({'s': 'unknown', 't': 'archive_ledger 不可读', 'e': str(led[0])})
+        sts.append('unknown')
+
+    # 判4 经验复发（≥3 verify 黄）
+    rec_path = os.path.join(repo, 'experience_recurrence.json')
+    try:
+        rec = _json.load(open(rec_path, encoding='utf-8'))
+        hot = [(k, v.get('count', 0)) for k, v in rec.get('counters', {}).items()
+               if v.get('count', 0) >= 3 and v.get('status', 'active') != 'retired']
+        if hot:
+            items.append({'s': 'yellow', 't': f'经验复发超限: {len(hot)} 病号≥3次',
+                          'e': '，'.join(f'{k}×{n}' for k, n in hot) + '（须升【阻】或闸化）'})
+            sts.append('yellow')
+        else:
+            items.append({'s': 'green', 't': '经验复发: 无超限病号', 'e': '复发计数 hook 自动记账'})
+            sts.append('green')
+    except Exception:
+        items.append({'s': 'unknown', 't': '复发计数不可读', 'e': 'experience_recurrence.json'})
+        sts.append('unknown')
+
+    # 经验效果三指标（消费判据：试错次数=拦截到放行尝试数；复发间隔；纠偏计数）
+    try:
+        rec = _json.load(open(rec_path, encoding='utf-8'))
+        dc = rec.get('direction_cases', [])
+        items.append({'s': 'green', 't': f'效果指标: 病号{len(rec.get("counters", {}))}个/方向纠偏{len(dc)}例',
+                      'e': '试错次数与复发间隔随 hook 事件累积，目标试错≤1次'})
+        sts.append('green')
+    except Exception:
+        pass
+
+    return {'status': _worst(ctx, sts), 'items': items}

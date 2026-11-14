@@ -1,0 +1,69 @@
+{
+ "version": "1.0.0",
+ "doc": "复发计数（经验闭环·机器记账）。写入方：hooks（guard_cmd 拦截时、commit-msg Lesson 结构化时）自动追加，AI 不手工记账。痊愈机判：巡检司 chk 扫 last_ts，跨 N 轮无新复发自动降观察。",
+ "rules": {
+  "promote_at": 2,
+  "red_at": 3,
+  "cure_rounds": 10,
+  "note": "≥2 升病号提醒、≥3 verify 黄、10 轮无复发转痊愈观察"
+ },
+ "counters": {
+  "病11": {
+   "count": 3,
+   "note": "存量补账：1.28.0(2026-11-13)/病14轮(2026-11-14)/1.28.5(2026-11-15)，台账原记2次订正为3次",
+   "last_ts": "2026-11-15",
+   "status": "retired",
+   "events": [
+    {
+     "ts": "2026-11-13",
+     "coord": "probe-hub v1.28.0 bump 漏 MANIFEST",
+     "by": "backfill"
+    },
+    {
+     "ts": "2026-11-14",
+     "coord": "病14轮 bump 同型",
+     "by": "backfill"
+    },
+    {
+     "ts": "2026-11-15",
+     "coord": "v1.28.5 漏 skill_contracts+MANIFEST，C4 拦下",
+     "by": "backfill"
+    }
+   ]
+  },
+  "病15": {
+   "count": 6,
+   "note": "台账 6 例同日，guard G4/G5 回归用例已守住",
+   "last_ts": "2026-11-15",
+   "status": "active",
+   "events": []
+  },
+  "G4-双核": {
+   "count": 2,
+   "events": [
+    {
+     "ts": "2026-11-15 05:34",
+     "coord": "guard拦截 G4-双核",
+     "by": "hook",
+     "min": "202611150534"
+    },
+    {
+     "ts": "2026-11-15 05:35",
+     "coord": "guard拦截 G4-双核",
+     "by": "hook",
+     "min": "202611150535"
+    }
+   ],
+   "last_ts": "2026-11-15",
+   "status": "active"
+  }
+ },
+ "direction_cases": [
+  {
+   "id": "方向1",
+   "ts": "2026-11-15",
+   "case": "91探花6版转圈：按远程配置修，用户纠偏「看7.22包是咋做的」→实为本地包形态",
+   "lesson": "动手前先看形态先例，方向确认再动手"
+  }
+ ]
+}

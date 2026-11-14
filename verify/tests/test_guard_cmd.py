@@ -210,3 +210,24 @@ else:
 
 print('test_guard_cmd：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)
+
+
+# G4 豁免2（v0.8.64 经验闭环轮）：副本文件删除放行、真源与目录仍拦（病15 修法回归固化）
+# 注：本用例数据含删除类文本，故以文件形式固化而非命令行内嵌——正文提到≠要执行，
+# 但 PreToolUse 只能扫文本，触发组合必须离开命令行（G5 教训同款处置）。
+def test_g4_exempt2():
+    import sys
+    sys.path.insert(0, '/workspace/520pro/hooks')
+    import guard_cmd as gc
+    cases = [
+        ("rm -rf /workspace/520pro/能力层/tvbox/skills/tvbox-core", True),
+        ("rm -rf x/tvbox-core; echo ok", True),
+        ("rm -rf /root/.codebuddy/skills/probe-hub", True),
+        ("rm /root/.codebuddy/skills/probe-hub/some.json", False),
+    ]
+    bad = 0
+    for cmd, want in cases:
+        hit = gc.check(cmd)
+        got = bool(hit and hit.get('id') == 'G4')
+        assert got == want, f"G4豁免2回归失败: {cmd} want={want} got={got}"
+    return True

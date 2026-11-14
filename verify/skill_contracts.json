@@ -19,7 +19,9 @@
   "shellcrack_cands.json",
   "activity_log.json",
   "index.json",
-  "search_results.json"
+  "search_results.json",
+  "experience_recurrence.json",
+  "archive_ledger.json"
  ],
  "_runtime_note": "运行时态文件：随使用增长、多数不入 git。镜像比对时豁免（源与装副本内容必然不同，不是「没同步」）。与 install.sh 的 RUNTIME_FILES 同源，verify.sh 有一条判据核对两处清单一致（M5 防漂移）。",
  "skills": {
@@ -27,7 +29,7 @@
    "kind": "skill",
    "layer": "通用层",
    "path": "通用层/skills/artifact-store",
-   "version": "1.0.4",
+   "version": "1.1.0",
    "required_files": [
     "SKILL.md",
     "CHANGELOG.md"

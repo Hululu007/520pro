@@ -6,161 +6,177 @@
    "ts": "2026-11-15T04:07:42",
    "round": "backfill-20261115",
    "artifact": "1014_61站21lives_线路修复版_20261115.json",
-   "target": "EYMrk2HR4nnGO5RggyPxHm",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "EYMrk2HR4nnGO5RggyPxHm",
    "idx_row": "",
    "result": "ok",
-   "note": "EYMrk2HR4nnGO5RggyPxHm"
+   "note": "EYMrk2HR4nnGO5RggyPxHm",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:07:47",
    "round": "backfill-20261115",
    "artifact": "520pro-install-0.5.0.tar.gz",
-   "target": "GzlXtpDaKqImTxbE5ny5L2",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "GzlXtpDaKqImTxbE5ny5L2",
    "idx_row": "",
    "result": "ok",
-   "note": "GzlXtpDaKqImTxbE5ny5L2"
+   "note": "GzlXtpDaKqImTxbE5ny5L2",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:07:50",
    "round": "backfill-20261115",
    "artifact": "520规则生效清单_20261114.md",
-   "target": "pzxo8BQzg0I4oYclfnLrt3",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "pzxo8BQzg0I4oYclfnLrt3",
    "idx_row": "",
    "result": "ok",
-   "note": "pzxo8BQzg0I4oYclfnLrt3"
+   "note": "pzxo8BQzg0I4oYclfnLrt3",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:07:55",
    "round": "backfill-20261115",
    "artifact": "7.22修复包_20261115.zip",
-   "target": "sp6f3GqhzLW4NzkI2hM2ry",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "sp6f3GqhzLW4NzkI2hM2ry",
    "idx_row": "",
    "result": "ok",
-   "note": "sp6f3GqhzLW4NzkI2hM2ry"
+   "note": "sp6f3GqhzLW4NzkI2hM2ry",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:07:59",
    "round": "backfill-20261115",
    "artifact": "7.22修复包v2_20261115.zip",
-   "target": "ndJbKHigHM0SSagP0yLNU6",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "ndJbKHigHM0SSagP0yLNU6",
    "idx_row": "",
    "result": "ok",
-   "note": "ndJbKHigHM0SSagP0yLNU6"
+   "note": "ndJbKHigHM0SSagP0yLNU6",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:04",
    "round": "backfill-20261115",
    "artifact": "7.22修复包v3_20261115.zip",
-   "target": "ZoZiiEz70FNgzqGBHdD1w4",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "ZoZiiEz70FNgzqGBHdD1w4",
    "idx_row": "",
    "result": "ok",
-   "note": "ZoZiiEz70FNgzqGBHdD1w4"
+   "note": "ZoZiiEz70FNgzqGBHdD1w4",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:09",
    "round": "backfill-20261115",
    "artifact": "91探花_URL版_20261115.json",
-   "target": "dpD21K5HEb9zjHTCrYqC5J",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "dpD21K5HEb9zjHTCrYqC5J",
    "idx_row": "",
    "result": "ok",
-   "note": "dpD21K5HEb9zjHTCrYqC5J"
+   "note": "dpD21K5HEb9zjHTCrYqC5J",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:13",
    "round": "backfill-20261115",
    "artifact": "91探花_area版_20261115.json",
-   "target": "0sGzMwPObZlnaoFZ7uhJ62",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "0sGzMwPObZlnaoFZ7uhJ62",
    "idx_row": "",
    "result": "ok",
-   "note": "0sGzMwPObZlnaoFZ7uhJ62"
+   "note": "0sGzMwPObZlnaoFZ7uhJ62",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:18",
    "round": "backfill-20261115",
    "artifact": "91探花_jar终版_20261115.json",
-   "target": "8ESYmfBDQ4Wzy4oSn4r0FN",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "8ESYmfBDQ4Wzy4oSn4r0FN",
    "idx_row": "",
    "result": "ok",
-   "note": "8ESYmfBDQ4Wzy4oSn4r0FN"
+   "note": "8ESYmfBDQ4Wzy4oSn4r0FN",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:23",
    "round": "backfill-20261115",
    "artifact": "91探花_测试包_20261115.json",
-   "target": "Jvs8BdGSGUfqKlookn6z9O",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "Jvs8BdGSGUfqKlookn6z9O",
    "idx_row": "",
    "result": "ok",
-   "note": "Jvs8BdGSGUfqKlookn6z9O"
+   "note": "Jvs8BdGSGUfqKlookn6z9O",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:27",
    "round": "backfill-20261115",
    "artifact": "91探花_静态版_20261115.json",
-   "target": "NpYYyMDxNClwmLM30dwSJ8",
-   "node_id": "",
+   "target": "🧬 520进化论/04-侦察资产",
+   "node_id": "NpYYyMDxNClwmLM30dwSJ8",
    "idx_row": "",
    "result": "ok",
-   "note": "NpYYyMDxNClwmLM30dwSJ8"
+   "note": "NpYYyMDxNClwmLM30dwSJ8",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:30",
    "round": "backfill-20261115",
    "artifact": "GATE虚标审计-20261108.md",
-   "target": "J4cbsfiUogMcI3gP7KNBz8",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "J4cbsfiUogMcI3gP7KNBz8",
    "idx_row": "",
    "result": "ok",
-   "note": "J4cbsfiUogMcI3gP7KNBz8"
+   "note": "J4cbsfiUogMcI3gP7KNBz8",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:33",
    "round": "backfill-20261115",
    "artifact": "GATE虚标审计-修订v2-20261108.md",
-   "target": "pfMMNRGZwr8c8LZTCLBQq8",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "pfMMNRGZwr8c8LZTCLBQq8",
    "idx_row": "",
    "result": "ok",
-   "note": "pfMMNRGZwr8c8LZTCLBQq8"
+   "note": "pfMMNRGZwr8c8LZTCLBQq8",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:37",
    "round": "backfill-20261115",
    "artifact": "MP规则全量_20261114.md",
-   "target": "RcuGWOUTQdXGVzOXf740O4",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "RcuGWOUTQdXGVzOXf740O4",
    "idx_row": "",
    "result": "ok",
-   "note": "RcuGWOUTQdXGVzOXf740O4"
+   "note": "RcuGWOUTQdXGVzOXf740O4",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:40",
    "round": "backfill-20261115",
    "artifact": "TVBox生态_架构认知与防踩坑手册_2026-11-11.md",
-   "target": "fxcVje2he8hGJGU72Gwjt5",
-   "node_id": "",
+   "target": "🧬 520进化论/00-SOP",
+   "node_id": "fxcVje2he8hGJGU72Gwjt5",
    "idx_row": "",
    "result": "ok",
-   "note": "fxcVje2he8hGJGU72Gwjt5"
+   "note": "fxcVje2he8hGJGU72Gwjt5",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:43",
    "round": "backfill-20261115",
    "artifact": "TVBox生态全景纪要_演化_技能_规则_细化版_20261110.md",
-   "target": "o7EJzQPsBBWgaHVQ4KtlmF",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "o7EJzQPsBBWgaHVQ4KtlmF",
    "idx_row": "",
    "result": "ok",
-   "note": "o7EJzQPsBBWgaHVQ4KtlmF"
+   "note": "o7EJzQPsBBWgaHVQ4KtlmF",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:08:53",
@@ -206,11 +222,12 @@
    "ts": "2026-11-15T04:09:28",
    "round": "backfill-20261115",
    "artifact": "tvbox-eco-governance-audit-20261108.md",
-   "target": "HKgyj6oChKCCy4jSgs7dKC",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "HKgyj6oChKCCy4jSgs7dKC",
    "idx_row": "",
    "result": "ok",
-   "note": "HKgyj6oChKCCy4jSgs7dKC"
+   "note": "HKgyj6oChKCCy4jSgs7dKC",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:09:38",
@@ -236,111 +253,122 @@
    "ts": "2026-11-15T04:09:52",
    "round": "backfill-20261115",
    "artifact": "三步走_折中口径执行结论.md",
-   "target": "iOA1ne7dGIALJniA66Uw9i",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "iOA1ne7dGIALJniA66Uw9i",
    "idx_row": "",
    "result": "ok",
-   "note": "iOA1ne7dGIALJniA66Uw9i"
+   "note": "iOA1ne7dGIALJniA66Uw9i",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:09:55",
    "round": "backfill-20261115",
    "artifact": "三步走执行结论_第2步第3步.md",
-   "target": "Tc5fNQF6O4fq7cOqHmcpNx",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "Tc5fNQF6O4fq7cOqHmcpNx",
    "idx_row": "",
    "result": "ok",
-   "note": "Tc5fNQF6O4fq7cOqHmcpNx"
+   "note": "Tc5fNQF6O4fq7cOqHmcpNx",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:09:58",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程A_数据保全_20261112.md",
-   "target": "GqO2fcYwwVkOq6vT9pyRSC",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "GqO2fcYwwVkOq6vT9pyRSC",
    "idx_row": "",
    "result": "ok",
-   "note": "GqO2fcYwwVkOq6vT9pyRSC"
+   "note": "GqO2fcYwwVkOq6vT9pyRSC",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:01",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程B_发布卫生闸_20261112.md",
-   "target": "rKxUsEwDonztNLcierp0ge",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "rKxUsEwDonztNLcierp0ge",
    "idx_row": "",
    "result": "ok",
-   "note": "rKxUsEwDonztNLcierp0ge"
+   "note": "rKxUsEwDonztNLcierp0ge",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:05",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程C_技能契约机检_20261112.md",
-   "target": "TCdq04pZhKEyUfrk2toylq",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "TCdq04pZhKEyUfrk2toylq",
    "idx_row": "",
    "result": "ok",
-   "note": "TCdq04pZhKEyUfrk2toylq"
+   "note": "TCdq04pZhKEyUfrk2toylq",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:08",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程D_触发样本集与口径机检_20261112.md",
-   "target": "yk73i0sA3uLy8lRLw5WXUw",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "yk73i0sA3uLy8lRLw5WXUw",
    "idx_row": "",
    "result": "ok",
-   "note": "yk73i0sA3uLy8lRLw5WXUw"
+   "note": "yk73i0sA3uLy8lRLw5WXUw",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:11",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程E_行为规则补丁_20261112.md",
-   "target": "iXEyFAaxNwxwLxJsDuV95P",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "iXEyFAaxNwxwLxJsDuV95P",
    "idx_row": "",
    "result": "ok",
-   "note": "iXEyFAaxNwxwLxJsDuV95P"
+   "note": "iXEyFAaxNwxwLxJsDuV95P",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:14",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程F_形态升级_20261112.md",
-   "target": "s7iXhvdjy125FzXDlGZyBS",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "s7iXhvdjy125FzXDlGZyBS",
    "idx_row": "",
    "result": "ok",
-   "note": "s7iXhvdjy125FzXDlGZyBS"
+   "note": "s7iXhvdjy125FzXDlGZyBS",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:17",
    "round": "backfill-20261115",
    "artifact": "交付报告_工程G_遗留治理与发布门_20261112.md",
-   "target": "3zxOaKe9lBWWKQb9scsLZP",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "3zxOaKe9lBWWKQb9scsLZP",
    "idx_row": "",
    "result": "ok",
-   "note": "3zxOaKe9lBWWKQb9scsLZP"
+   "note": "3zxOaKe9lBWWKQb9scsLZP",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:20",
    "round": "backfill-20261115",
    "artifact": "交付纪律未生效_机制诊断_20261109_1025.md",
-   "target": "oquWfJ3y1MPSaSRI0XqUlX",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "oquWfJ3y1MPSaSRI0XqUlX",
    "idx_row": "",
    "result": "ok",
-   "note": "oquWfJ3y1MPSaSRI0XqUlX"
+   "note": "oquWfJ3y1MPSaSRI0XqUlX",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:23",
    "round": "backfill-20261115",
    "artifact": "产物区合并清单_20261112.md",
-   "target": "ccl48IUos8tgxzpHaYrIVn",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "ccl48IUos8tgxzpHaYrIVn",
    "idx_row": "",
    "result": "ok",
-   "note": "ccl48IUos8tgxzpHaYrIVn"
+   "note": "ccl48IUos8tgxzpHaYrIVn",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:34",
@@ -356,151 +384,166 @@
    "ts": "2026-11-15T04:10:37",
    "round": "backfill-20261115",
    "artifact": "借鉴施工方案_MemoryPalace_20261112.md",
-   "target": "CBFLgO6pJuIA7IGqDPNSjV",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "CBFLgO6pJuIA7IGqDPNSjV",
    "idx_row": "",
    "result": "ok",
-   "note": "CBFLgO6pJuIA7IGqDPNSjV"
+   "note": "CBFLgO6pJuIA7IGqDPNSjV",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:40",
    "round": "backfill-20261115",
    "artifact": "回执_P1热修_20261108.md",
-   "target": "oVX6Y6iDYXiQ3CuJNXOwrm",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "oVX6Y6iDYXiQ3CuJNXOwrm",
    "idx_row": "",
    "result": "ok",
-   "note": "oVX6Y6iDYXiQ3CuJNXOwrm"
+   "note": "oVX6Y6iDYXiQ3CuJNXOwrm",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:44",
    "round": "backfill-20261115",
    "artifact": "回执_三虚标降级施工_20261108.md",
-   "target": "dizp0PTni4mdQZ643MnIqQ",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "dizp0PTni4mdQZ643MnIqQ",
    "idx_row": "",
    "result": "ok",
-   "note": "dizp0PTni4mdQZ643MnIqQ"
+   "note": "dizp0PTni4mdQZ643MnIqQ",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:47",
    "round": "backfill-20261115",
    "artifact": "回执_三问闭环与双向共读实证_20261109.md",
-   "target": "c0VldraaD45NBI2qxXnjTS",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "c0VldraaD45NBI2qxXnjTS",
    "idx_row": "",
    "result": "ok",
-   "note": "c0VldraaD45NBI2qxXnjTS"
+   "note": "c0VldraaD45NBI2qxXnjTS",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:50",
    "round": "backfill-20261115",
    "artifact": "回执_令003施工_20261108.md",
-   "target": "IT9lg8sJMLbcEz8BnTYkIh",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "IT9lg8sJMLbcEz8BnTYkIh",
    "idx_row": "",
    "result": "ok",
-   "note": "IT9lg8sJMLbcEz8BnTYkIh"
+   "note": "IT9lg8sJMLbcEz8BnTYkIh",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:53",
    "round": "backfill-20261115",
    "artifact": "回执_拍板落地_20261108.md",
-   "target": "vgsT3fAwCb9qdUft7WZ9aZ",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "vgsT3fAwCb9qdUft7WZ9aZ",
    "idx_row": "",
    "result": "ok",
-   "note": "vgsT3fAwCb9qdUft7WZ9aZ"
+   "note": "vgsT3fAwCb9qdUft7WZ9aZ",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:56",
    "round": "backfill-20261115",
    "artifact": "回执_派活单如实性判定与属实项闭环_220c613_20261109.md",
-   "target": "vRLCKaTeRU6rnhp3LRNvq5",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "vRLCKaTeRU6rnhp3LRNvq5",
    "idx_row": "",
    "result": "ok",
-   "note": "vRLCKaTeRU6rnhp3LRNvq5"
+   "note": "vRLCKaTeRU6rnhp3LRNvq5",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:10:59",
    "round": "backfill-20261115",
    "artifact": "回执_第13段_接线层施工完成_立法接线闭环_e8db9f2_20261110.md",
-   "target": "TPw2mzX08t6d6F2ZZOxgue",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "TPw2mzX08t6d6F2ZZOxgue",
    "idx_row": "",
    "result": "ok",
-   "note": "TPw2mzX08t6d6F2ZZOxgue"
+   "note": "TPw2mzX08t6d6F2ZZOxgue",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:02",
    "round": "backfill-20261115",
    "artifact": "回执_第14段_凭据v2逐条hash根治_施工完成_c5dc3ce_20261110.md",
-   "target": "Q9nrEIJQtsqPCBztaZ8hZf",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "Q9nrEIJQtsqPCBztaZ8hZf",
    "idx_row": "",
    "result": "ok",
-   "note": "Q9nrEIJQtsqPCBztaZ8hZf"
+   "note": "Q9nrEIJQtsqPCBztaZ8hZf",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:05",
    "round": "backfill-20261115",
    "artifact": "回执_第一段_20261108.md",
-   "target": "SfuXpgZ8xLF9ZipMus16UT",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "SfuXpgZ8xLF9ZipMus16UT",
    "idx_row": "",
    "result": "ok",
-   "note": "SfuXpgZ8xLF9ZipMus16UT"
+   "note": "SfuXpgZ8xLF9ZipMus16UT",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:08",
    "round": "backfill-20261115",
    "artifact": "回执_第二段_20261108.md",
-   "target": "SZLehD3AheQxNaMuTrxmXV",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "SZLehD3AheQxNaMuTrxmXV",
    "idx_row": "",
    "result": "ok",
-   "note": "SZLehD3AheQxNaMuTrxmXV"
+   "note": "SZLehD3AheQxNaMuTrxmXV",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:11",
    "round": "backfill-20261115",
    "artifact": "回执_面板施工完成_W1-W4_52b0633_20261109.md",
-   "target": "DUbl2dKljAuPHuBFF4Ba58",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "DUbl2dKljAuPHuBFF4Ba58",
    "idx_row": "",
    "result": "ok",
-   "note": "DUbl2dKljAuPHuBFF4Ba58"
+   "note": "DUbl2dKljAuPHuBFF4Ba58",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:14",
    "round": "backfill-20261115",
    "artifact": "回执补件_成果盘点与计划_20261108.md",
-   "target": "pcw8NEmaHgsWc9UnkIN6nW",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "pcw8NEmaHgsWc9UnkIN6nW",
    "idx_row": "",
    "result": "ok",
-   "note": "pcw8NEmaHgsWc9UnkIN6nW"
+   "note": "pcw8NEmaHgsWc9UnkIN6nW",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:19",
    "round": "backfill-20261115",
    "artifact": "库务普查.json",
-   "target": "nNDOrro31hOQvW4BjMOT8x",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "nNDOrro31hOQvW4BjMOT8x",
    "idx_row": "",
    "result": "ok",
-   "note": "nNDOrro31hOQvW4BjMOT8x"
+   "note": "nNDOrro31hOQvW4BjMOT8x",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:22",
    "round": "backfill-20261115",
    "artifact": "待owner拍板事项全量盘点-20261108.md",
-   "target": "PBydxz3QvYatolgjZ4yfMP",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "PBydxz3QvYatolgjZ4yfMP",
    "idx_row": "",
    "result": "ok",
-   "note": "PBydxz3QvYatolgjZ4yfMP"
+   "note": "PBydxz3QvYatolgjZ4yfMP",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:33",
@@ -516,11 +559,12 @@
    "ts": "2026-11-15T04:11:36",
    "round": "backfill-20261115",
    "artifact": "待删清单_1112.md",
-   "target": "FQwmSSi1wfvhBgcI8FdDaj",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "FQwmSSi1wfvhBgcI8FdDaj",
    "idx_row": "",
    "result": "ok",
-   "note": "FQwmSSi1wfvhBgcI8FdDaj"
+   "note": "FQwmSSi1wfvhBgcI8FdDaj",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:11:47",
@@ -536,11 +580,12 @@
    "ts": "2026-11-15T04:11:50",
    "round": "backfill-20261115",
    "artifact": "待删清单_1113.md",
-   "target": "clfa87GaI9EHlm7Dnyt0zP",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "clfa87GaI9EHlm7Dnyt0zP",
    "idx_row": "",
    "result": "ok",
-   "note": "clfa87GaI9EHlm7Dnyt0zP"
+   "note": "clfa87GaI9EHlm7Dnyt0zP",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:01",
@@ -556,181 +601,199 @@
    "ts": "2026-11-15T04:12:04",
    "round": "backfill-20261115",
    "artifact": "待删清单_1114.md",
-   "target": "kfxIwrKiGxBj3BTuAu69TX",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "kfxIwrKiGxBj3BTuAu69TX",
    "idx_row": "",
    "result": "ok",
-   "note": "kfxIwrKiGxBj3BTuAu69TX"
+   "note": "kfxIwrKiGxBj3BTuAu69TX",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:07",
    "round": "backfill-20261115",
    "artifact": "按交付纪律流程走_流程实录与断点_执行侧_2026-11-09.md",
-   "target": "O1abiUPTXLQJz88fTNEQ53",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "O1abiUPTXLQJz88fTNEQ53",
    "idx_row": "",
    "result": "ok",
-   "note": "O1abiUPTXLQJz88fTNEQ53"
+   "note": "O1abiUPTXLQJz88fTNEQ53",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:10",
    "round": "backfill-20261115",
    "artifact": "换机司_一键换机流程_梳理.md",
-   "target": "Ek8CKNE1V7rXjQAAwDhnCw",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "Ek8CKNE1V7rXjQAAwDhnCw",
    "idx_row": "",
    "result": "ok",
-   "note": "Ek8CKNE1V7rXjQAAwDhnCw"
+   "note": "Ek8CKNE1V7rXjQAAwDhnCw",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:13",
    "round": "backfill-20261115",
    "artifact": "换机司_换机验证方法.md",
-   "target": "y8j4kcyawW1bvVD0Vi3qIF",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "y8j4kcyawW1bvVD0Vi3qIF",
    "idx_row": "",
    "result": "ok",
-   "note": "y8j4kcyawW1bvVD0Vi3qIF"
+   "note": "y8j4kcyawW1bvVD0Vi3qIF",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:16",
    "round": "backfill-20261115",
    "artifact": "收口准入实测_打包转批复一次收口_20261109.md",
-   "target": "HKuMLXOb7pScPlGIovDMW5",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "HKuMLXOb7pScPlGIovDMW5",
    "idx_row": "",
    "result": "ok",
-   "note": "HKuMLXOb7pScPlGIovDMW5"
+   "note": "HKuMLXOb7pScPlGIovDMW5",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:20",
    "round": "backfill-20261115",
    "artifact": "收口施工完成_打包转批复一次收口_2e31678_20261109.md",
-   "target": "pxD0Nukl9mkwKcPjvO1cir",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "pxD0Nukl9mkwKcPjvO1cir",
    "idx_row": "",
    "result": "ok",
-   "note": "pxD0Nukl9mkwKcPjvO1cir"
+   "note": "pxD0Nukl9mkwKcPjvO1cir",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:23",
    "round": "backfill-20261115",
    "artifact": "方案_施工问题根源机制闭环_立法接线_分侧_待拍板_20261109.md",
-   "target": "XbiuCjRT6wxbqHOm2IGdeA",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "XbiuCjRT6wxbqHOm2IGdeA",
    "idx_row": "",
    "result": "ok",
-   "note": "XbiuCjRT6wxbqHOm2IGdeA"
+   "note": "XbiuCjRT6wxbqHOm2IGdeA",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:26",
    "round": "backfill-20261115",
    "artifact": "方案_旧生态规则全量并入520_待拍板_20261113.md",
-   "target": "wWGTkztUIak5pboGJLtjbR",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "wWGTkztUIak5pboGJLtjbR",
    "idx_row": "",
    "result": "ok",
-   "note": "wWGTkztUIak5pboGJLtjbR"
+   "note": "wWGTkztUIak5pboGJLtjbR",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:29",
    "round": "backfill-20261115",
    "artifact": "方案_空间交付可视化面板与方法论板块_待拍板_20261109.md",
-   "target": "6BzuS2UYZ0x9mz2wdSQSLq",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "6BzuS2UYZ0x9mz2wdSQSLq",
    "idx_row": "",
    "result": "ok",
-   "note": "6BzuS2UYZ0x9mz2wdSQSLq"
+   "note": "6BzuS2UYZ0x9mz2wdSQSLq",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:32",
    "round": "backfill-20261115",
    "artifact": "方案_规则迁移_数据版_待拍板_20261113.md",
-   "target": "sCgSssr88IryNl5lBWpVx1",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "sCgSssr88IryNl5lBWpVx1",
    "idx_row": "",
    "result": "ok",
-   "note": "sCgSssr88IryNl5lBWpVx1"
+   "note": "sCgSssr88IryNl5lBWpVx1",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:35",
    "round": "backfill-20261115",
    "artifact": "施工完成_补跑加机制拦截_判据H_41b6d6c_20261109.md",
-   "target": "3kta9xNgke6mWr9PIjoAwF",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "3kta9xNgke6mWr9PIjoAwF",
    "idx_row": "",
    "result": "ok",
-   "note": "3kta9xNgke6mWr9PIjoAwF"
+   "note": "3kta9xNgke6mWr9PIjoAwF",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:38",
    "round": "backfill-20261115",
    "artifact": "机制改造方案_拍板广播化_流程纪律同批_待拍板_20261109.md",
-   "target": "LQaHMs3gRDHhkT0OjMxaMB",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "LQaHMs3gRDHhkT0OjMxaMB",
    "idx_row": "",
    "result": "ok",
-   "note": "LQaHMs3gRDHhkT0OjMxaMB"
+   "note": "LQaHMs3gRDHhkT0OjMxaMB",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:41",
    "round": "backfill-20261115",
    "artifact": "机制改造施工完成_拍板广播化_a4346b9_20261109.md",
-   "target": "ehVsRz00POk4iq6dEgYijs",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "ehVsRz00POk4iq6dEgYijs",
    "idx_row": "",
    "result": "ok",
-   "note": "ehVsRz00POk4iq6dEgYijs"
+   "note": "ehVsRz00POk4iq6dEgYijs",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:44",
    "round": "backfill-20261115",
    "artifact": "模板_阶段完工交付报告.md",
-   "target": "0RISIcdl2VPbEx2KNSUAU8",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "0RISIcdl2VPbEx2KNSUAU8",
    "idx_row": "",
    "result": "ok",
-   "note": "0RISIcdl2VPbEx2KNSUAU8"
+   "note": "0RISIcdl2VPbEx2KNSUAU8",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:48",
    "round": "backfill-20261115",
    "artifact": "治理层引用分类清单_第1步.md",
-   "target": "xFEcWzV3B1rR4eJ9p5RHfB",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "xFEcWzV3B1rR4eJ9p5RHfB",
    "idx_row": "",
    "result": "ok",
-   "note": "xFEcWzV3B1rR4eJ9p5RHfB"
+   "note": "xFEcWzV3B1rR4eJ9p5RHfB",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:51",
    "round": "backfill-20261115",
    "artifact": "第13段_完工交付报告_20261110.md",
-   "target": "TJwPZAPK9Zedp52x199ohV",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "TJwPZAPK9Zedp52x199ohV",
    "idx_row": "",
    "result": "ok",
-   "note": "TJwPZAPK9Zedp52x199ohV"
+   "note": "TJwPZAPK9Zedp52x199ohV",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:54",
    "round": "backfill-20261115",
    "artifact": "第14段_完工交付报告_20261110.md",
-   "target": "ud4Iw8q2fR2Yub5iwv5BEE",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "ud4Iw8q2fR2Yub5iwv5BEE",
    "idx_row": "",
    "result": "ok",
-   "note": "ud4Iw8q2fR2Yub5iwv5BEE"
+   "note": "ud4Iw8q2fR2Yub5iwv5BEE",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:12:57",
    "round": "backfill-20261115",
    "artifact": "第6段_完工交付报告_2026-11-05.md",
-   "target": "D6SPpjqfZsLCeDaK6MyprG",
-   "node_id": "",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "D6SPpjqfZsLCeDaK6MyprG",
    "idx_row": "",
    "result": "ok",
-   "note": "D6SPpjqfZsLCeDaK6MyprG"
+   "note": "D6SPpjqfZsLCeDaK6MyprG",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:08",
@@ -746,61 +809,67 @@
    "ts": "2026-11-15T04:13:13",
    "round": "backfill-20261115",
    "artifact": "终局对照包_20261115.json",
-   "target": "3M7aRFQvsjQ1IcUhddvsun",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "3M7aRFQvsjQ1IcUhddvsun",
    "idx_row": "",
    "result": "ok",
-   "note": "3M7aRFQvsjQ1IcUhddvsun"
+   "note": "3M7aRFQvsjQ1IcUhddvsun",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:16",
    "round": "backfill-20261115",
    "artifact": "经验规则全量_20261114.md",
-   "target": "gDTgdIFNybKjhT8jVZAMME",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "gDTgdIFNybKjhT8jVZAMME",
    "idx_row": "",
    "result": "ok",
-   "note": "gDTgdIFNybKjhT8jVZAMME"
+   "note": "gDTgdIFNybKjhT8jVZAMME",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:19",
    "round": "backfill-20261115",
    "artifact": "能力对账专项_前置调研与疑点清单_待拍板_2026-11-06.md",
-   "target": "LCibOaDisb3GQvnii0VvQO",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "LCibOaDisb3GQvnii0VvQO",
    "idx_row": "",
    "result": "ok",
-   "note": "LCibOaDisb3GQvnii0VvQO"
+   "note": "LCibOaDisb3GQvnii0VvQO",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:23",
    "round": "backfill-20261115",
    "artifact": "规则全景_6341b64.md",
-   "target": "j2LJqROSgvW4TayBEXsTID",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "j2LJqROSgvW4TayBEXsTID",
    "idx_row": "",
    "result": "ok",
-   "note": "j2LJqROSgvW4TayBEXsTID"
+   "note": "j2LJqROSgvW4TayBEXsTID",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:26",
    "round": "backfill-20261115",
    "artifact": "规则全量_9仓库_20261114.md",
-   "target": "jnNnifi9xZYnmVwEMGR6J4",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "jnNnifi9xZYnmVwEMGR6J4",
    "idx_row": "",
    "result": "ok",
-   "note": "jnNnifi9xZYnmVwEMGR6J4"
+   "note": "jnNnifi9xZYnmVwEMGR6J4",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:29",
    "round": "backfill-20261115",
    "artifact": "规则生效闭环方案_20261114.md",
-   "target": "Qbh5MuPcK9nGzSwKLgrKio",
-   "node_id": "",
+   "target": "🧬 520进化论/02-生态总览",
+   "node_id": "Qbh5MuPcK9nGzSwKLgrKio",
    "idx_row": "",
    "result": "ok",
-   "note": "Qbh5MuPcK9nGzSwKLgrKio"
+   "note": "Qbh5MuPcK9nGzSwKLgrKio",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:40",
@@ -816,21 +885,23 @@
    "ts": "2026-11-15T04:13:43",
    "round": "backfill-20261115",
    "artifact": "语言门_3x2矩阵验证工具包_2026-11-11.md",
-   "target": "VPIQC0S4XwH9CTWfh0jnLa",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "VPIQC0S4XwH9CTWfh0jnLa",
    "idx_row": "",
    "result": "ok",
-   "note": "VPIQC0S4XwH9CTWfh0jnLa"
+   "note": "VPIQC0S4XwH9CTWfh0jnLa",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:13:46",
    "round": "backfill-20261115",
    "artifact": "调查报告_技能互引与精简断链.md",
-   "target": "pY4nycodr7jrIr0CqvsvhS",
-   "node_id": "",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "pY4nycodr7jrIr0CqvsvhS",
    "idx_row": "",
    "result": "ok",
-   "note": "pY4nycodr7jrIr0CqvsvhS"
+   "note": "pY4nycodr7jrIr0CqvsvhS",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:38",
@@ -870,7 +941,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "probe-hub v1.28.4（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "probe-hub v1.28.4（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -880,7 +952,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "space-hub v2.7.7（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "space-hub v2.7.7（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -890,7 +963,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "inspect-hub v1.4.3（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "inspect-hub v1.4.3（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -900,7 +974,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "tvbox-pipeline v1.3.11（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "tvbox-pipeline v1.3.11（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -910,7 +985,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "learn-hub v1.4.3（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "learn-hub v1.4.3（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -920,7 +996,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "artifact-store v1.0.0（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "artifact-store v1.0.0（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -930,7 +1007,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "machine-bootstrap v1.0.0（2026-11-14 bump）历史交付经存量回填补账"
+   "note": "machine-bootstrap v1.0.0（2026-11-14 bump）历史交付经存量回填补账",
+   "event_ref": "legacy:backfill-20261115"
   },
   {
    "ts": "2026-11-15T04:17:46",
@@ -1040,7 +1118,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "探源司 v1.20→v1.28.5 演进主线+6 亮点（46 条 CHANGELOG 人读提炼）"
+   "note": "探源司 v1.20→v1.28.5 演进主线+6 亮点（46 条 CHANGELOG 人读提炼）",
+   "event_ref": "v1.28.5 CHANGELOG 46 条提炼（T3）"
   },
   {
    "ts": "2026-11-15T04:19:37",
@@ -1050,7 +1129,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "课程：三态/B-13/真假落地判读，含 3 判例+3 题"
+   "note": "课程：三态/B-13/真假落地判读，含 3 判例+3 题",
+   "event_ref": "T3 培训批（真源 520pro 课程文件）"
   },
   {
    "ts": "2026-11-15T04:19:40",
@@ -1060,7 +1140,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "课程：深挖法四步+S231 案例+壳矩阵翻案教训"
+   "note": "课程：深挖法四步+S231 案例+壳矩阵翻案教训",
+   "event_ref": "T3 培训批"
   },
   {
    "ts": "2026-11-15T04:19:43",
@@ -1070,7 +1151,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "任务卡：livecheck 复测 3 条线路，判据齐备"
+   "note": "任务卡：livecheck 复测 3 条线路，判据齐备",
+   "event_ref": "T3 培训批"
   },
   {
    "ts": "2026-11-15T04:19:46",
@@ -1080,7 +1162,8 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "任务卡：复跑落库对账闸正反向，含造违例"
+   "note": "任务卡：复跑落库对账闸正反向，含造违例",
+   "event_ref": "T3 培训批"
   },
   {
    "ts": "2026-11-15T04:23:40",
@@ -1090,7 +1173,41 @@
    "node_id": "",
    "idx_row": "",
    "result": "ok",
-   "note": "监测报告自身也落库（自指闭环）"
+   "note": "监测报告自身也落库（自指闭环）",
+   "event_ref": "inspect-hub run 2026-11-15（T6）"
+  },
+  {
+   "ts": "2026-11-15T05:41:53",
+   "round": "v0.8.64-E4",
+   "artifact": "判据设计四步法.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "E1-E4 经验闭环落地轮",
+   "note": "首批内容（content_sources 供给事件触发）"
+  },
+  {
+   "ts": "2026-11-15T05:41:53",
+   "round": "v0.8.64-E4",
+   "artifact": "交付落库正门SOP.md",
+   "target": "🧬 520进化论/00-SOP",
+   "node_id": "",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "E1-E4 经验闭环落地轮",
+   "note": "首批内容（content_sources 供给事件触发）"
+  },
+  {
+   "ts": "2026-11-15T05:46:08",
+   "round": "v1.1.0",
+   "artifact": "瘦身司v1.1.0经验热冷分层.md",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "artifact-store v1.1.0 bump（本提交）",
+   "note": "交付说明落库，SKILL.md 正本在 Git"
   }
  ]
 }

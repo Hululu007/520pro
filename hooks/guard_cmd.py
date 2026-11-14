@@ -109,7 +109,8 @@ RULES = [
                  #   因为后面跟 ; 而漏判——实测真删了一个测试目录才发现）
                  r'\b(?:tvbox-core|probe-hub)(?=[/\s;&|)\}"\']|$)'],
         # 豁免：双核作为 mv 的**目标**（最后一个参数）= 往双核里放东西，不是删它
-        'exempt': r'\bmv\b[^|;&\n]*\s+(?:\./)?(?:[\w./-]*/)?(?:tvbox-core|probe-hub)/?\s*$',
+        'exempt': (r'\bmv\b[^|;&\n]*\s+(?:\./)?(?:[\w./-]*/)?(?:tvbox-core|probe-hub)/?\s*$'
+                   r'|/skills/(?:tvbox-core|probe-hub)/[^\s;&|]*\.[A-Za-z0-9]+\s*$'),
         'fix': '双核不得删除、改名、合并；确要动先备替代件并通过技能契约机检（C1–C6），'
                '备份请用 cp 到仓外目录',
     },
@@ -188,13 +189,69 @@ def check(command):
     return None
 
 
+def _repo_root():
+    d = os.getcwd()
+    while True:
+        if os.path.exists(os.path.join(d, '.git')):
+            return d
+        nd = os.path.dirname(d)
+        if nd == d:
+            return os.getcwd()
+        d = nd
+
+
+def _disease_hint(rule_id):
+    """经验闭环闸1：拦截即递病号修法（读映射表，失败降级为空）。"""
+    try:
+        import json as _j
+        root = _repo_root()
+        mp = _j.load(open(os.path.join(root, 'verify', '病号映射表.json'), encoding='utf-8'))
+        for g, d in mp.get('guard_rules', {}).items():
+            if rule_id.startswith(g) or g in rule_id:
+                for dz in mp['diseases']:
+                    if dz['id'] == d:
+                        return f"📚 同型病历 {dz['id']}·{dz['name']}｜修法：{dz['fix']}"
+        return ''
+    except Exception:
+        return ''  # 降级：映射缺失不阻断主闸功能
+
+
+def _bump_recurrence(rule_id):
+    """经验闭环闸2：拦截即复发计数+1（机器记账，失败静默，同分钟去重）。"""
+    try:
+        import json as _j, datetime as _dt
+        root = _repo_root()
+        fp = os.path.join(root, 'experience_recurrence.json')
+        d = _j.load(open(fp, encoding='utf-8')) if os.path.exists(fp) else {'counters': {}}
+        mp_path = os.path.join(root, 'verify', '病号映射表.json')
+        mp = _j.load(open(mp_path, encoding='utf-8')) if os.path.exists(mp_path) else {}
+        gr = mp.get('guard_rules', {})
+        rid0 = rule_id.split(' ')[0]
+        dis = gr.get(rid0) or next((v for k, v in gr.items() if not k.startswith('_') and rid0.startswith(k)), rid0)
+        now = _dt.datetime.now()
+        c = d['counters'].setdefault(dis, {'count': 0, 'events': [], 'last_ts': '', 'status': 'active'})
+        minute_key = now.strftime('%Y%m%d%H%M')
+        if c['events'] and c['events'][-1].get('min') == minute_key:
+            return  # 同分钟同规则去重（一次会话内反复试错只记 1 次复发）
+        c['count'] += 1
+        c['last_ts'] = now.strftime('%Y-%m-%d')
+        c['events'].append({'ts': now.strftime('%Y-%m-%d %H:%M'), 'coord': f'guard拦截 {rule_id}', 'by': 'hook', 'min': minute_key})
+        tmp = fp + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            _j.dump(d, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, fp)
+    except Exception:
+        pass  # 记账失败不阻断主闸
+
+
 def deny_payload(rule):
+
     """PreToolUse 的阻断载荷（协议已实测）。"""
     return {
         'hookSpecificOutput': {
             'hookEventName': 'PreToolUse',
             'permissionDecision': 'deny',
-            'permissionDecisionReason': f"⛔ [{rule['id']}] {rule['why']}｜正门：{rule['fix']}",
+            'permissionDecisionReason': f"⛔ [{rule['id']}] {rule['why']}｜正门：{rule['fix']}" + _disease_hint(rule['id']),
         }
     }
 
@@ -240,6 +297,7 @@ def main():
         cmd = data.get('command') or ti.get('command') or ''
         hit = check(cmd)
     if hit:
+        _bump_recurrence(hit['id'])
         print(json.dumps(deny_payload(hit), ensure_ascii=False))
         return 2
     return 0

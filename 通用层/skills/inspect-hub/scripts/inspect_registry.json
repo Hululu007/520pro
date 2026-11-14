@@ -176,6 +176,17 @@
    "tp": 49.7,
    "config": {},
    "note": "方案v3：逐子项目 version/最近变更/最近落库回执，阈值复用 stale_yellow/red_days"
+  },
+  {
+   "id": "M12",
+   "gua": "★",
+   "men": "经验",
+   "face": "内容流与经验闭环",
+   "impl": "chk_contentflow",
+   "lp": 50.0,
+   "tp": 8.0,
+   "config": {},
+   "note": "v0.8.64 经验闭环：账实脱节/无源内容/断流/复发超限 + 效果指标；legacy 豁免显式带期限"
   }
  ]
 }

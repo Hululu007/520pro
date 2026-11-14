@@ -187,6 +187,28 @@ def main():
         d['last_repo'] = root
         _save(d, probe, hit=True)
         msg = '⏭ 上一轮定的下一步（%s）：%s' % (os.path.basename(root), nxt[:400])
+        # 经验闭环闸3：按 Next 任务类型注入同型病号（读映射表+复发计数，降级静默）
+        try:
+            import json as _jj, re as _re, os as _os2
+            _mp = _jj.load(open(_os2.path.join(root, 'verify', '病号映射表.json'), encoding='utf-8'))
+            _rec_path = _os2.path.join(root, 'experience_recurrence.json')
+            _rec = _jj.load(open(_rec_path, encoding='utf-8')) if _os2.path.isfile(_rec_path) else {}
+            _cnt = _rec.get('counters', {})
+            _hits = []
+            _nxt_low = nxt.lower()
+            for _dz in _mp.get('diseases', []):
+                if _dz.get('status') != 'active':
+                    continue
+                _tags = _dz.get('tags', [])
+                if any(_tg in nxt or _tg in _nxt_low for _tg in _tags):
+                    _n = _cnt.get(_dz['id'], {}).get('count', 0)
+                    _hits.append((_n, _dz))
+            if _hits:
+                _hits.sort(key=lambda x: -x[0])
+                _top = _hits[0][1]
+                msg += '｜📚 本轮同型坑 %s·%s：%s' % (_top['id'], _top['name'], _top['fix'][:60])
+        except Exception:
+            pass  # 经验注入失败不影响主提醒
         # v0.8.64 方案v3 梯度③：交付落库提醒（520进化论·每轮必落库）——只提示不拦截，
         # 硬对账在 verify/gate_archive_ledger.py（梯度④），提醒与闸分层。
         import os as _os

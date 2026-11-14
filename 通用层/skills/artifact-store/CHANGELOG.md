@@ -1,3 +1,7 @@
+## v1.1.0 — 2026-11-15
+- 经验热冷分层（第 21 章）：experience_recurrence/病号映射表=热经验永不瘦身；痊愈病号冷归档 01-方法论留指针
+- runtime_files 豁免双源登记（experience_recurrence.json + archive_ledger.json）
+
 ## v1.0.4 — dry-run 试点补「哪几个文件」（520 v0.8.35，2026-11-13）
 
 - **背景**：v1.0.3 的 `scan` 只给汇总（「普通产物 87B / 12 文件」），给不出「这 12 个是哪 12 个」。

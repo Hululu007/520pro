@@ -1,0 +1,156 @@
+{
+ "version": "1.0.0",
+ "updated": "2026-11-15",
+ "doc": "病号映射表（经验闭环·闸1数据件）。真源=docs/通病台账.md；本表是机器可读投影：病号→一句修法(≤40字)→归宿(闸化/注入/归档)→任务标签(next_anchor 匹配用)。维护纪律：台账新增病历须同步本表；每条必须答归宿三选一，答不出不收。",
+ "task_tags": {
+  "bump": "版本升级/CHANGELOG/契约登记",
+  "判据": "写闸/改 verify/自检/判据设计",
+  "建库": "新建 db/枚举/schema/字段",
+  "报数": "统计/汇总/覆盖率/计数输出",
+  "结论": "下判定/验活/宣完成",
+  "路径": "中文路径/git 比对/文件移动",
+  "钩子": "hooks 改动/拦截规则/注入",
+  "台账": "台账/登记/账目处理"
+ },
+ "diseases": [
+  {
+   "id": "病1",
+   "name": "检查器自指",
+   "fix": "计数与匹配必须排除自身，先跑零违例基线",
+   "destination": "闸化",
+   "guard": "gate_scan 零违例基线",
+   "tags": [
+    "判据",
+    "报数"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病4",
+   "name": "相关当因果·凭印象报数",
+   "fix": "数字必须可复算：给来源文件/命令，否则标无法判定",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "报数",
+    "结论"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病8",
+   "name": "单信号判不存在",
+   "fix": "查不到≠没有：至少双通道穷尽再下不存在结论",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "结论"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病9",
+   "name": "概率证据下确定性结论",
+   "fix": "证据是概率则结论带不确定度，三态不折叠",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "结论"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病10",
+   "name": "中文路径 git 转义",
+   "fix": "路径比对用 core.quotepath=false 或 git status --porcelain 解转义",
+   "destination": "闸化",
+   "guard": "gate_scan --gate quotepath",
+   "tags": [
+    "路径"
+   ],
+   "status": "retired"
+  },
+  {
+   "id": "病11",
+   "name": "引用已作废结论/版本漏改",
+   "fix": "bump 四处同改：SKILL/CHANGELOG/skill_contracts/MANIFEST；结论先查真源订正（C4 闸+作废结论闸已守，降观察）",
+   "destination": "闸化",
+   "guard": "C4 版本闸+作废结论闸",
+   "tags": [
+    "bump",
+    "台账"
+   ],
+   "status": "retired",
+   "recurrence": 3
+  },
+  {
+   "id": "病12",
+   "name": "集合规模写死",
+   "fix": "数字从真源集合现算，禁字面量与偏移估算",
+   "destination": "闸化",
+   "guard": "gate_scan --gate case-count",
+   "tags": [
+    "报数",
+    "判据"
+   ],
+   "status": "retired"
+  },
+  {
+   "id": "病13",
+   "name": "验到中间态就宣布生效",
+   "fix": "验到语义末端：钩子须真回合验证，通道须末端打样",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "钩子",
+    "判据"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病14",
+   "name": "凭常识造枚举",
+   "fix": "新建先扫真实取值再定枚举与字段类型",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "建库"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "病15",
+   "name": "判据识别范围≠对象范围",
+   "fix": "只认整行注释/精确锚点，单测覆盖五种后接形态",
+   "destination": "闸化",
+   "guard": "guard_cmd G4/G5 回归用例",
+   "tags": [
+    "判据",
+    "钩子"
+   ],
+   "status": "active"
+  },
+  {
+   "id": "方向1",
+   "name": "方向性踩坑（用户纠偏级）",
+   "fix": "开工先看形态先例（如本地包 vs 远程配置），方向确认再动手",
+   "destination": "注入",
+   "guard": "",
+   "tags": [
+    "结论",
+    "判据"
+   ],
+   "status": "active",
+   "first_case": "91探花6版转圈：用户纠偏'看7.22包是咋做的'——方向错烧6轮，比执行病单价高"
+  }
+ ],
+ "guard_rules": {
+  "G1": "病13",
+  "G2": "病15",
+  "G3": "病15",
+  "G4": "病15",
+  "G5": "病15",
+  "G6": "病15",
+  "_note": "拦截规则→递送病号：G1 绕闸递病13(验到语义末端)；删除/凭据类递病15(正门意识)。映射缺失时降级不带📚行"
+ }
+}
