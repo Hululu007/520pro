@@ -404,6 +404,17 @@ if not any('next_anchor.py' in c for c in cmds):
         'hooks': [{'type': 'command', 'command': 'python3 ' + script}],
     })
     changed = True
+# v0.8.60（B-05）：同一脚本再挂一条 Write|Edit——matcher 不同即两条独立注册，
+# 用于「写仓内凭据文件」的硬拦截。不能合并成 matcher='Bash|Write|Edit'：
+# 老机器上那条已存在，改成合并式要迁移，且锚点提示会在每次 Edit 时白跑一遍。
+_has_write = any('next_anchor.py' in h.get('command', '') and 'Write' in str(e.get('matcher', ''))
+                 for e in d['hooks']['PreToolUse'] for h in e.get('hooks', []))
+if not _has_write:
+    d['hooks']['PreToolUse'].append({
+        'matcher': 'Write|Edit',
+        'hooks': [{'type': 'command', 'command': 'python3 ' + script, 'timeout': 10}],
+    })
+    changed = True
 d['hooks'].setdefault('UserPromptSubmit', [])
 cmds2 = [h.get('command', '') for e in d['hooks']['UserPromptSubmit'] for h in e.get('hooks', [])]
 if not any('next_anchor.py' in c for c in cmds2):

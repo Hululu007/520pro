@@ -187,7 +187,10 @@ def scan_gitconfig(root, found):
 # 一次都不会打开它。实测（2026-11-13）：probe.py:6360 `token --set` 写
 # SELF_DIR/.gh_token，SELF_DIR 在仓内，此前 .gitignore 无此条 → 一次 --set + add -A
 # 即把 PAT 推上公网，而全绿。故此处不依赖内容、不依赖扩展名，只看文件名与 git 状态。
-CRED_NAMES = ('.gh_token', '.git-credentials', '.netrc', 'id_rsa', 'id_ed25519')
+CRED_NAMES = ('.gh_token', '.git-credentials', '.netrc', 'id_rsa', 'id_ed25519',
+              # v0.8.60：`.env` 是实际最常见的凭据载体。此前只有 guard_cmd 的 G5 按名字点名拦，
+              # 但批量 add（不带文件名）拦不住——这里靠「未忽略未追踪即红」补上这个缺口。
+              '.env')
 
 # ★ git-as-DB 边界（v0.8.30）：单文件上限——908 蓝图 §4.5 的落地判据
 MAX_FILE_BYTES = 10 * 1024 * 1024

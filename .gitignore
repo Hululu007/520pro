@@ -31,6 +31,19 @@ docs/巡检/
 .gh_token
 .git-credentials
 .netrc
+# v0.8.60（B-05）：.env 是最常见的凭据载体，此前漏了——`git add -A` 会直接把仓内 .env 带走，
+# 而批量 add 不带文件名，G5 的名字判据拦不住，只能靠这里「已忽略」+ secret_scan 的「未忽略即红」。
+.env
+.env.*
+!.env.example
+!.env.sample
+credentials.json
+credentials.yml
+credentials.yaml
+*.pem
+*.key
+*.p12
+*.pfx
 # 探源司·本机运行时数据（v0.8.12：含用户个人采集的监测目标/死册/候选，属私产，不随分发携带）
 # 各留同名 .example.json 作结构模板；新机器首次运行按模板自动建空册
 能力层/tvbox/skills/probe-hub/scripts/monitor_targets.json

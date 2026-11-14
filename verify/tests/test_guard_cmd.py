@@ -132,9 +132,66 @@ for cmd, why in g4_pass:
     h = G.check(cmd)
     check(f'G4 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
 
+# ── ⑦ B-05 零明文凭证：G5（git add 凭据）/ G6（写仓内凭据）──
+g5_hit = [
+    ('git add .env', '最常见的一条'),
+    ('git add .env.local', '多环境写法（首版前瞻漏了 `.`，实测漏判）'),
+    ('git add config/credentials.json', '子目录里的凭据'),
+    ('git add ~/.ssh/id_rsa', '私钥'),
+    ('git add deploy/server.pem', '证书私钥'),
+    ('git add -- .env', '带 -- 分隔符'),
+]
+for cmd, why in g5_hit:
+    h = G.check(cmd)
+    check(f'G5 拦下：{why}', h is not None and h['id'] == 'G5',
+          f'实际={h["id"] if h else "放行"}')
+
+g5_pass = [
+    ('git add -A', '批量 add 不含文件名，判不了（交给 secret_scan 兜）'),
+    ('git add .env.example', '模板不含真凭据'),
+    ('git add .env.sample', '同上'),
+    ('git add id_rsa.pub', '公钥可以进库'),
+    ('git add src/app.py', '普通文件'),
+    # 以下是首版判据的真实误伤（连拦我三次）：批量 add 与提交说明分处两段，
+    # 说明里提到 `.env` 只是文档，不该算「要把凭据加进库」。
+    ('git add -A && git commit -q -F /tmp/msg.txt', '批量 add + 说明文件（说明里可能提到凭据名）'),
+    ('git add -A && git commit -m "docs: mention .env handling"', '提交说明里提到凭据名'),
+    ('cd repo && git add src/ && git commit -m "x"', '先 cd 再提交'),
+]
+for cmd, why in g5_pass:
+    h = G.check(cmd)
+    check(f'G5 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
+
+g6_hit = [os.path.join(ROOT, '.env'),
+          os.path.join(ROOT, 'deploy', 'server.pem'),
+          os.path.join(ROOT, 'credentials.json')]
+for p_ in g6_hit:
+    h = G.check_write(p_)
+    check(f'G6 拦下：{os.path.relpath(p_, ROOT)}', h is not None and h['id'] == 'G6',
+          f'实际={h["id"] if h else "放行"}')
+
+g6_pass = [(os.path.join(ROOT, '.env.example'), '模板'),
+           ('/tmp/.env', '仓外临时文件（不入库就无风险）'),
+           (os.path.join(ROOT, 'src', 'app.py'), '普通源文件')]
+for p_, why in g6_pass:
+    h = G.check_write(p_)
+    check(f'G6 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
+
+# 凭据名单两份必须一致：secret_scan.py 的 CRED_NAMES 是「已追踪凭据」的真源，
+# guard_cmd 的 CRED_BASENAMES 是它的镜像。改了单边就红——不靠「记得改两处」。
+SS = load(os.path.join(ROOT, 'secret_scan.py'))
+check('G5 基础名单与 secret_scan.CRED_NAMES 逐项一致',
+      tuple(SS.CRED_NAMES) == tuple(G.CRED_BASENAMES),
+      f'secret_scan={SS.CRED_NAMES} vs guard={G.CRED_BASENAMES}')
+
+# install.sh 必须真的把 Write|Edit 那条注册进去（写了脚本但没挂 = 等于没写）
+instsh = open(os.path.join(ROOT, 'install.sh'), encoding='utf-8').read()
+check("install.sh 声明 Write|Edit 注册", "'Write|Edit'" in instsh)
+
 # ── ④ 闸必须真的挂在执行路径上 ──
 na = open(os.path.join(SCRIPTS, 'next_anchor.py'), encoding='utf-8').read()
 check('next_anchor 调用 guard_cmd', 'import guard_cmd' in na and 'guard_cmd.check(' in na)
+check('next_anchor 调用 check_write（G6 走的就是这条路）', 'guard_cmd.check_write(' in na)
 check('next_anchor 命中后返回非零', re.search(r'guard_cmd\.deny_payload.*\n.*return 2', na) is not None
       or re.search(r'deny_payload\(_hit\).*?\n.*?return 2', na, re.S) is not None)
 check('守卫故障留痕（fail-open 不静默）', 'guard_err' in na)

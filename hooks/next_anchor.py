@@ -193,9 +193,24 @@ def main():
                          ensure_ascii=False))
         return 0
 
-    # ---- 用户侧提示：PreToolUse·Bash 前打印（stdout 不进模型，只给人看）----
-    if tool and tool != 'Bash':                         # 只挂 Bash：Edit/Write 太频繁
-        probe['via'] = 'skip-tool'
+    # ---- 写文件类硬拦截：Write/Edit 目标在仓内且是凭据文件 → 挡在写下去那一刻 ----
+    #   为什么挂这里：settings.json 里本脚本已有一条 matcher='Bash' 的注册，
+    #   再加一条 matcher='Write|Edit' 即可复用同一份 deny 协议，不必让 guard_cmd
+    #   同时当「库」和「注册钩子」（那会让 hook-probe 的依赖库豁免规则失效）。
+    if tool and tool != 'Bash':
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            import guard_cmd
+            fp = ti.get('file_path') or ti.get('path') or ti.get('notebook_path') or ''
+            _w = guard_cmd.check_write(fp)
+            if _w:
+                probe['via'] = 'write-guard:' + _w['id']
+                _save(d, probe, hit=True)               # 命中守卫也算 hit（否则 probe 看着像没干活）
+                print(json.dumps(guard_cmd.deny_payload(_w), ensure_ascii=False))
+                return 2
+        except Exception as _e:
+            probe['guard_err'] = ('%s: %s' % (type(_e).__name__, _e))[:120]
+        probe['via'] = 'skip-tool'                      # 锚点提示仍只挂 Bash（Edit/Write 太频繁）
         _save(d, probe)
         return 0
 
@@ -210,7 +225,7 @@ def main():
         _hit = guard_cmd.check(command)
         if _hit:
             probe['via'] += '+guard:' + _hit['id']
-            _save(d, probe)
+            _save(d, probe, hit=True)                   # 同上：拦下来就是命中了
             print(json.dumps(guard_cmd.deny_payload(_hit), ensure_ascii=False))
             return 2
     except Exception as _e:

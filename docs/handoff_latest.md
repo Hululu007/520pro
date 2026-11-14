@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.59 gate_scan 从两道闸扩到四道，补的是「钩子写了没挂」这条死角：**hook-registered** 从 install.sh 静态提取两层绑定（变量→事件、脚本→变量）得到 {脚本:[事件]}，再与 `~/.codebuddy/settings.json` 实况对账——声明挂了却没挂即红；settings.json 不在本机记「不适用」（三态不折叠，不判通过）。五种情形实测：删 Stop 段 / Stop 空数组 / 多事件脚本只挂一半 → 红；原样 → 绿；删掉 install.sh 合并段 → 红（防「删掉判据即绕过」）。**case-count** 是意外收获：改完统计行发现 4 个测试文件全在写死例数（12/「+22」/「+8」/14），实际是 13/38/20/22——病12 复发，已全部改为 `N[0]` 由 check() 自增，并加闸拦住字面量与偏移估算。病12 台账从 retired 改回「复发」并补第 ④ 实例。**遗留：全量 123 个存活仓库批量重采仍未跑；B-05/B-07/B-09 三条可硬化项未做。**
+v0.8.60 B-05 零明文凭证从「内容扫描」硬化到「动作前阻断」：`guard_cmd` 增 **G5**（`git add` 后跟凭据名即拦：`.env` / `.env.local` / `credentials.*` / `id_rsa` / `*.pem`，`.env.example` 与 `id_rsa.pub` 放行）与 **G6**（Write/Edit 目标在 git 仓内且是凭据名即拦，仓外放行）；`next_anchor` 加第二条 `matcher=Write|Edit` 注册（不动旧 Bash 那条，免迁移），install.sh 幂等补插。**两条都实测被平台阻断**：`git add .env` → probe `via=none+guard:G5, hit=true`；Write 到 `520pro/.env` → `via=write-guard:G6`。**顺带修真缺口**：`.gitignore` 原无 `.env`、`secret_scan.CRED_NAMES` 也不含它，批量 add（不带文件名，G5 判不了）可整包带走——已补 `.gitignore` 与 CRED_NAMES，让「未忽略未追踪即红」接住。回归 test_guard_cmd 58 例（含与 secret_scan 名单逐项对账）。**误报当场修掉（首版连拦三次）**：G5 初版用「命令里有 add」+「命令里有凭据名」两个独立条件，结果「批量暂存 + 提交说明里提到 `.env`」被判违例，第三次直接挡住了正常提交。已改为一条正则——凭据名必须紧跟 add、且与 add 之间无命令分隔符（`;` `&` `|` 换行）；13 条正反例全对，测试里补 3 条放行例。残余限制：把命令写进文本的场景（heredoc/字符串）仍会被拦，钩子只能看文本。**遗留：全量 123 个存活仓库批量重采仍未跑；B-07/B-09 两条可硬化项未做。**
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.59 gate_scan 从两道闸扩到四道，补的是「钩子写了没挂」�
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.59
+- 版本：0.8.60
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）
