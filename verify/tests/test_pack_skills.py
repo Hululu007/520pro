@@ -21,7 +21,11 @@ SCRIPT = os.path.join(ROOT, 'pack_skills.py')
 fails = []
 
 
+N = [0]   # 例数由 check 自增；手工偏移量迟早对不上真实用例数（4 个测试文件同病）
+
+
 def check(name, cond, detail=''):
+    N[0] += 1
     if not cond:
         fails.append(name)
         print(f'  ✗ {name}  {detail}')
@@ -128,5 +132,5 @@ check('verify.sh 注册 pack_skills 回归', 'test_pack_skills' in vsh)
 for t in (t2, t3, t4, t5, t6, td):
     shutil.rmtree(t, ignore_errors=True)
 
-print('test_pack_skills：12 例，失败 %d' % len(fails))
+print('test_pack_skills：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)

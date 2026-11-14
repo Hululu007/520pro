@@ -26,7 +26,11 @@ GUARD = os.path.join(HOOKS, 'stop_guard.py')
 fails = []
 
 
+N = [0]   # 例数由 check 自增；手工偏移量迟早对不上真实用例数（4 个测试文件同病）
+
+
 def check(name, cond, detail=''):
+    N[0] += 1
     if not cond:
         fails.append(name)
         print(f'  ✗ {name}  {detail}')
@@ -131,5 +135,5 @@ if os.path.exists(sp):
         regd = False
 check('settings.json 注册了 stop_guard.py', regd, '写了没挂 = 等于没写')
 
-print('test_stop_guard：%d 例，失败 %d' % (len(bad) + len(good) + 8, len(fails)))
+print('test_stop_guard：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)

@@ -9,6 +9,7 @@
 
 退出码 0 全通 / 1 有用例未按预期。
 """
+import json
 import os
 import shutil
 import subprocess
@@ -22,7 +23,11 @@ SCAN = os.path.join(ROOT, 'verify', 'gate_scan.py')
 fails = []
 
 
+N = [0]   # 例数由 check 自增；手工偏移量迟早对不上真实用例数（4 个测试文件同病）
+
+
 def check(name, cond, detail=''):
+    N[0] += 1
     print(('  ✓ ' if cond else '  ✗ ') + name + (f' ｜ {detail}' if detail and not cond else ''))
     if not cond:
         fails.append(name)
@@ -39,10 +44,32 @@ def w(path, text):
     open(path, 'w', encoding='utf-8').write(text)
 
 
-# ── ① 正向：真源仓库两 gate 全绿 ──
-rc, out = run(['--root', ROOT])
+# ── ① 正向：真源仓库三 gate 全绿 ──
+# 用合成 settings 而非宿主机那份：判据本身要能跨机器复现，
+# 不能让「本机装没装钩子」决定测试红绿（那测的是环境，不是判据）。
+def _fake_settings(path, drop=None, hollow=None):
+    cfg = {'hooks': {
+        'PreToolUse': [{'matcher': 'Bash',
+                        'hooks': [{'type': 'command', 'command': 'python3 /x/next_anchor.py'}]}],
+        'UserPromptSubmit': [{'hooks': [{'type': 'command', 'command': 'python3 /x/next_anchor.py'}]}],
+        'Stop': [{'hooks': [{'type': 'command', 'command': 'python3 /x/stop_guard.py'}]}],
+    }}
+    if drop:
+        cfg['hooks'].pop(drop, None)
+    if hollow:
+        cfg['hooks'][hollow] = []
+    open(path, 'w', encoding='utf-8').write(json.dumps(cfg, ensure_ascii=False))
+    return path
+
+
+_td0 = tempfile.mkdtemp()
+SET_OK = _fake_settings(os.path.join(_td0, 'ok.json'))
+rc, out = run(['--root', ROOT, '--settings', SET_OK])
 check('真源全绿 rc=0', rc == 0, out[-200:])
-check('输出含两 gate 全绿标记', '[quotepath] 全绿' in out and '[hook-probe] 全绿' in out, out[-200:])
+check('输出含四 gate 全绿标记',
+      all('[%s] 全绿' % g in out
+          for g in ('quotepath', 'hook-probe', 'hook-registered', 'case-count')),
+      out[-300:])
 
 # ── ② 造违例：quotepath ──
 with tempfile.TemporaryDirectory() as td:
@@ -121,5 +148,65 @@ with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as vd:
 vsh = open(os.path.join(ROOT, 'verify.sh'), encoding='utf-8').read()
 check('verify.sh 注册 gate_scan 调用', 'gate_scan.py' in vsh)
 
-print('test_gate_scan：%d 例，失败 %d' % (14, len(fails)))
+# ── ⑥ hook-registered：脚本合格 ≠ 钩子挂上（病13 的另一半） ──
+# 典型事故：stop_guard.py 在盘上、--probe 齐全、cp 那行还在 install.sh 里，
+# 但 settings.json 的 Stop 段被删/被覆盖 → 钩子一次都不跑，而闸全绿。
+with tempfile.TemporaryDirectory() as td:
+    p = _fake_settings(os.path.join(td, 's.json'))
+    rc, out = run(['--gate', 'hook-registered', '--root', ROOT, '--settings', p])
+    check('声明与实况一致时放行 rc=0', rc == 0 and '全绿' in out, out[-200:])
+
+    p = _fake_settings(os.path.join(td, 's_drop.json'), drop='Stop')
+    rc, out = run(['--gate', 'hook-registered', '--root', ROOT, '--settings', p])
+    check('删掉 Stop 段被拦', rc == 2 and 'stop_guard.py' in out and 'hooks.Stop' in out, out[-200:])
+
+    p = _fake_settings(os.path.join(td, 's_hollow.json'), hollow='Stop')
+    rc, out = run(['--gate', 'hook-registered', '--root', ROOT, '--settings', p])
+    check('Stop 段为空数组同样被拦', rc == 2 and 'stop_guard.py' in out, out[-200:])
+
+    # 同一个脚本挂两个事件（next_anchor：PreToolUse + UserPromptSubmit），
+    # 只摘掉其中一个也要红——否则「挂了一半」会被当成挂上了。
+    import copy as _copy
+    cfg = json.load(open(_fake_settings(os.path.join(td, 's_u.json')), encoding='utf-8'))
+    cfg['hooks']['UserPromptSubmit'] = []
+    pu = os.path.join(td, 's_u2.json')
+    open(pu, 'w', encoding='utf-8').write(json.dumps(cfg, ensure_ascii=False))
+    rc, out = run(['--gate', 'hook-registered', '--root', ROOT, '--settings', pu])
+    check('多事件脚本挂一半也拦', rc == 2 and 'next_anchor.py' in out and 'UserPromptSubmit' in out,
+          out[-200:])
+
+    # 三态：机器上根本没装 → 「不适用」，既不判通过也不判失败（B-02），退出码 0
+    rc, out = run(['--gate', 'hook-registered', '--root', ROOT,
+                   '--settings', os.path.join(td, 'not_here.json')])
+    check('settings 不存在记不适用 rc=0', rc == 0 and '不适用' in out and '全绿' not in out,
+          out[-200:])
+
+    # 判据自证：把 install.sh 的绑定段删掉，就提不出 {脚本:事件}，
+    # 此时必须红——否则「删掉合并段」本身就成了一条绕过路径。
+    w(os.path.join(td, 'install.sh'),
+      'cp "$ROOT/hooks/na.py" "$HOME/.codebuddy/hooks/na.py"\necho no-binding-here\n')
+    w(os.path.join(td, 'hooks', 'na.py'), 'x=1\n')
+    rc, out = run(['--gate', 'hook-registered', '--root', td, '--settings', SET_OK])
+    check('提不出绑定时报红（不可绕过）', rc == 2 and '提取不到' in out, out[-200:])
+
+# ── ⑦ case-count：测试例数不许写死（病12 复发型，2026-11-14 四文件同时命中） ──
+# 造违例要用的字面量必须拆成两段存：整串写进源码会被本闸扫到（病1 自指家族，已三犯）。
+# 拆开后 `例，失败 %d'` 与 `% (` 不再相邻，正则匹配不上真实源码，只匹配造出来的文件。
+_V = "例，失败 %d'" + " % ("
+
+with tempfile.TemporaryDirectory() as td:
+    bad = os.path.join(td, 'verify', 'tests', 'test_x.py')
+    w(bad, "print('test_x：%d " + _V + "14, len(fails)))\n")
+    rc, out = run(['--gate', 'case-count', '--root', td])
+    check('例数写死被拦', rc == 2 and 'test_x.py' in out and '病12' in out, out[-200:])
+
+    w(bad, "N = [0]\nprint('test_x：%d " + _V + "N[0], len(fails)))\n")
+    rc, out = run(['--gate', 'case-count', '--root', td])
+    check('N[0] 自增放行', rc == 0, out[-200:])
+
+    w(bad, "print('test_x：%d " + _V + "len(cases) + 22, len(fails)))\n")
+    rc, out = run(['--gate', 'case-count', '--root', td])
+    check('偏移估算同样被拦', rc == 2 and 'len(cases' in out, out[-200:])
+
+print('test_gate_scan：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)

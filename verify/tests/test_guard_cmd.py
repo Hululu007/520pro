@@ -24,7 +24,11 @@ GUARD = os.path.join(SCRIPTS, 'guard_cmd.py')
 fails = []
 
 
+N = [0]   # 例数由 check 自增；手工偏移量迟早对不上真实用例数（4 个测试文件同病）
+
+
 def check(name, cond, detail=''):
+    N[0] += 1
     if not cond:
         fails.append(name)
         print(f'  ✗ {name}  {detail}')
@@ -147,5 +151,5 @@ if os.path.isdir(inst):
 else:
     check('安装根不存在时跳过镜像比对', True)
 
-print('test_guard_cmd：%d 例，失败 %d' % (len(cases) + len(ok_cases) + 22, len(fails)))
+print('test_guard_cmd：%d 例，失败 %d' % (N[0], len(fails)))
 sys.exit(1 if fails else 0)

@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.58 Stop 拽回协议定版（两次对照实测）：同一判据下，`exit 2 + stderr` **拽不回**——回合照常结束，用户得自己再发一条才被拉回来，只算「事后可见」；`stdout 出 JSON {"decision":"block","reason":...}` + `exit 0` **能拽回**——reason 作为 `Stop hook feedback` 注入，模型当场续写。探针日志佐证脚本仅被调用 1 次（stop_hook_active=false、计数 1），说明是平台注入而非钩子二次执行。故 stop_guard.py 定版为 JSON 形式，MSG 压成单行（避免注入后被当排版块），回归加一条「拽回走 JSON 而非 exit 2」防以后有人好心改回；矩阵 B-13 强度标为「S2 实测生效」并附两版对照表。另修一处静默漂移：MANIFEST.version 长期停在 0.8.31，无任何闸看它，已对齐 0.8.58 并在 test_handoff 加机检。**隐患登记**：走 JSON 时平台注入后续写、再次 Stop 时 `stop_hook_active` 是否置真未观测到，故本机 `MAX_RETRY` 是主防线。**遗留：全量 123 个存活仓库批量重采仍未跑；B-05/B-07/B-09 三条可硬化项未做。**
+v0.8.59 gate_scan 从两道闸扩到四道，补的是「钩子写了没挂」这条死角：**hook-registered** 从 install.sh 静态提取两层绑定（变量→事件、脚本→变量）得到 {脚本:[事件]}，再与 `~/.codebuddy/settings.json` 实况对账——声明挂了却没挂即红；settings.json 不在本机记「不适用」（三态不折叠，不判通过）。五种情形实测：删 Stop 段 / Stop 空数组 / 多事件脚本只挂一半 → 红；原样 → 绿；删掉 install.sh 合并段 → 红（防「删掉判据即绕过」）。**case-count** 是意外收获：改完统计行发现 4 个测试文件全在写死例数（12/「+22」/「+8」/14），实际是 13/38/20/22——病12 复发，已全部改为 `N[0]` 由 check() 自增，并加闸拦住字面量与偏移估算。病12 台账从 retired 改回「复发」并补第 ④ 实例。**遗留：全量 123 个存活仓库批量重采仍未跑；B-05/B-07/B-09 三条可硬化项未做。**
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.58 Stop 拽回协议定版（两次对照实测）：同一判据下，`exi
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.58
+- 版本：0.8.59
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）

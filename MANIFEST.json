@@ -1,6 +1,6 @@
 {
   "ecosystem": "520pro",
-  "version": "0.8.58",
+  "version": "0.8.59",
   "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
   "based_on": [
     "WorkBuddy 平台运行时",
@@ -545,5 +545,6 @@
     "verify/tests/test_trigger_frontload.py 8 用例变异回归（F2 真实形态「触发词埋 400 字后」、F4 第 41 字边界、B3 只重合泛用词必须翻红）；挂进 verify.sh 扩展回归",
     "连带修两处：① inspect-hub 前置句与原句重复 4 词，惊门（test_triggers）判黄 → 去重；② test_triggers 反例② 前提更新——v0.8.31 起触发词有两个来源，只删正文段造不出「缺词」，改为两处都删光（不变量未变：没有触发词才判黄）"
   ],
-  "changelog_0_8_58": "Stop 拽回协议定版：stop_guard.py 输出由 exit 2+stderr 改为 JSON decision:block（两次对照实测：前者拽不回、后者能拽回）；回归加一条防回退；MANIFEST.version 与 VERSION 对齐并加机检"
+  "changelog_0_8_58": "Stop 拽回协议定版：stop_guard.py 输出由 exit 2+stderr 改为 JSON decision:block（两次对照实测：前者拽不回、后者能拽回）；回归加一条防回退；MANIFEST.version 与 VERSION 对齐并加机检",
+  "changelog_0_8_59": "gate_scan 增两道闸：hook-registered（install.sh 声明的「脚本→事件」与 settings.json 实况对账，补病13「写了没挂」）、case-count（测试例数必须 N[0] 自增，压病12 复发）；4 个测试文件同步改为自增，暴露真实例数 25/13/38/20"
 }

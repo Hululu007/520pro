@@ -653,16 +653,16 @@ fi
 # 为什么要有：这两道病之前只有文字病历没有机器判据；verify.sh 全绿 ≠ 它们被守着。
 # 判据三件套（造违例/拦下/改坏溜过）见 verify/tests/test_gate_scan.py。
 echo
-echo "[落地判据扫描（v0.8.47 起·病10 quotepath / 病13 hook-probe）]"
+echo "[落地判据扫描（v0.8.47 起·病10 quotepath / 病13 hook-probe+hook-registered / 病12 case-count）]"
 if [ -f "$TARGET/verify/gate_scan.py" ]; then
   if python3 "$TARGET/verify/gate_scan.py" --root "$TARGET" > /tmp/_gate_scan.out 2>&1; then
-    ok "gate_scan：quotepath + hook-probe 全绿"
+    ok "gate_scan：quotepath + hook-probe + hook-registered + case-count 全绿"
   else
     no "gate_scan 有红项（细节见上/下）："
     sed 's/^/     /' /tmp/_gate_scan.out | head -8
   fi
 else
-  no "verify/gate_scan.py 缺失——病10/病13 判据闸未装（不静默跳过）"
+  no "verify/gate_scan.py 缺失——病10/病12/病13 判据闸未装（不静默跳过）"
 fi
 
 # ★ v0.8.25（规则迁移批2）：台账四律——旧生态 M-R75/82/86/93 的判据化落点
