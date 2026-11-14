@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "id": "S231",
+    "title": "一键写PY引擎 URL 语义词典（机器可读）",
+    "source": "OK影视一键写py.py（原文快照 references/S231_物料_OK影视一键写py.py，md5 668aacfd13e153a7fa6ae0a63530c1e3）",
+    "usage": "供 repair/recon、forge 模板、shellcrack 直接 import；词表是踩坑沉淀，改前先对照原文行号",
+    "collected": "2026-11-15"
+  },
+  "NON_CONTENT": {
+    "source_line": "L378-382",
+    "desc": "URL 语义黑名单：这些路径段不是内容详情页（父目录命中且非 CONTENT_DIRS 时整条链接剔除）",
+    "words": ["login", "register", "user", "users", "about", "contact", "help", "search", "so", "vodsearch", "list", "type", "show", "category", "channel", "news", "article", "page", "pages", "tag", "tags", "topic", "topics", "index", "home", "map", "rss", "sitemap", "feedback", "gbook", "guestbook", "download", "app", "apk", "share", "playlist", "playlists", "filter", "rank", "richlist", "requests", "api", "static", "upload", "assets", "images", "image", "css", "js", "fonts", "ajax", "member", "vip", "pay", "order", "cart", "comment", "comments", "notice", "notices", "ad", "ads", "gg", "adress", "address", "app-download", "dm8", "mine", "my", "vodtype", "vodshow", "detail", "voddetail", "post", "cat", "movie", "tv", "anime", "yingshi", "ziyuan", "gongju", "zhinan", "yule", "site", "web", "item", "items", "file", "files"]
+  },
+  "CONTENT_DIRS": {
+    "source_line": "L422-424",
+    "desc": "内容目录白名单：父目录命中时链接按详情页处理，优先级高于 NON_CONTENT",
+    "words": ["detail", "voddetail", "vodshow", "vodtype", "post", "play", "vodplay", "detail-", "vod-", "show-", "vodshow-", "movie", "movies", "tv", "anime", "show", "video", "videos", "subject", "mv", "stream", "watch", "item", "items", "file", "files", "info", "content", "drama", "list", "playinfo", "v", "d", "ep", "eps", "video-", "watch-", "mv-", "anime-"]
+  },
+  "NAVI_ZH": {
+    "source_line": "L385-387 NAV_PATS",
+    "desc": "中文导航分类词（字母路径站点 /movie /tv /anime 的分类识别）",
+    "words": ["电影", "电视剧", "剧集", "动漫", "动画", "综艺", "短剧", "院线", "影视", "大片", "韩剧", "美剧", "国漫", "日番", "纪录片"]
+  },
+  "AD_EXCLUDE_TEXT": {
+    "source_line": "L986-988, L1001-1004",
+    "desc": "播放集提取时的推广/广告文案排除（命中即跳过该链接）",
+    "anchor_text": ["APP", "下载", "安装", "vip", "开通"],
+    "episode_text": ["教程", "帮助", "下载", "注册", "登录", "充值", "公告", "APP", "求片", "\\d\\.\\d\\s*分", "\\b19\\d{2}\\b", "\\b20\\d{2}\\b"]
+  },
+  "SEARCH_PATH_CANDIDATES": {
+    "source_line": "L1047-1059",
+    "desc": "搜索 URL 12 形态穷举（{kw}=urlencode 关键词，{pg}=页码；逐个试，parse_items 有货即停）",
+    "patterns": ["/search?q={kw}&page={pg}", "/search?q={kw}", "/vodsearch/{kw}-------------.html", "/vodsearch/{kw}----------{pg}---.html", "/index.php/vod/search.html?wd={kw}&page={pg}", "/vodsearch/{kw}.html", "/search.php?searchword={kw}", "/search?wd={kw}&page={pg}", "/vod/search/{kw}/{pg}", "/search/{kw}/page/{pg}.html", "/index.php?m=vod-search&wd={kw}&page={pg}", "/so/{kw}.html"]
+  },
+  "PROBE_API_CANDIDATES": {
+    "source_line": "L1662-1667",
+    "desc": "MacCMS JSON 接口探测路径（语义测活：追加 ac=list 后 data.list 非空才算接口活）",
+    "patterns": ["/api.php/provide/vod", "/api.php/provide/vod/at/json", "/provide/vod", "/api/vod"]
+  },
+  "PAGE_FMT": {
+    "source_line": "L761-770",
+    "desc": "分页 URL 三形态判定",
+    "forms": ["dash(-N.html)", "slash(/N.html)", "dash2(-N)"]
+  },
+  "SNIFF_SCORE": {
+    "source_line": "L643-651",
+    "desc": "sniff 聚类打分：score = 唯一ID数*10 + ID均长*3 + min(链接数,200)*0.2；唯一ID<3 不参选；选最优组最长 URL 作正则模板",
+    "formula": "len(uniq_ids)*10 + avg_len*3 + min(len(urls),200)*0.2",
+    "min_uniq_ids": 3
+  },
+  "REMARQ_PATTERNS": {
+    "source_line": "L1006-1010",
+    "desc": "剧集备注提取（更新至X集/HD/完结/预告/全X集）",
+    "patterns": ["更新至?\\s*\\d+\\s*集?", "HD[\\d.]*", "完结", "预告", "全\\d+集"]
+  }
+}

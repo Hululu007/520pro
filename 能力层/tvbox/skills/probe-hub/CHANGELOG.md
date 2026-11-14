@@ -1,3 +1,14 @@
+## v1.28.5 — S231 一键写PY引擎六层资产沉淀 + 壳矩阵翻案（2026-11-15）
+- **需求**：用户拍板把 WeiXin.zip 三轮深挖产出的六层可移植资产（网络层/词典/算法/接口/播放/通道）做进探源司（S224 同型续作）。
+- **落地**（references/ 三件套，行号锚定原文快照）：
+  ① `S231_一键写PY引擎六层资产_WeiXin深挖.md`——正本：TLS 指纹伪装段（L104-118，WAF 反指纹）、sniff 聚类打分公式（L643-651）、`_build_detail_re` 五层决策（L717-771）、`_probe_site` 语义测活（`ac=list`+`data.list` 非空，L1659-1683）、6 层播放集兜底+跨域广告排除（L972-1019）、FongMi 系本地推送协议（`Proxy.getPort()`+`/action?do=sync&mode=1&type=history`，L1747-1773）、wsrv.nl 图代理（L1900-1920）、原子写（L1603-1624）；含壳矩阵翻案：Muse_from_Meta 鉴定为 Meta 官方 App（dex `com/facebook/`×7648）非 TVBox 壳、LeeCat 全本地引擎（Node49MB+Chaquopy py3.10+lxml+drpy3 内置，唯一免远程 jar）、云取=QuickJS+aria2、MilkCode=手机越狱 Agent（69 技能/62 breakerKit，⚠️不建议安装）；
+  ② `S231_url_wordlists.json`——NON_CONTENT 60 词 / CONTENT_DIRS 40 词 / 中文导航词 / 广告排除词 / search 12 形态 / probe API 4 路径，机器可读供 repair/recon/forge import；
+  ③ `S231_物料_OK影视一键写py.py`——2587 行原文快照（md5 `668aacfd13e153a7fa6ae0a63530c1e3`，与沙箱原件一致），行号引用唯一真源。
+- **SKILL.md**：§3.17 段尾挂 S231 指针（M2 引用不复制）。
+- **待办登记（B-14）**：TLS 段试挂 livecheck（due=三态改善+verify.sh 全绿）；语义测活并入死因分型；shellcrack 第 7 金律候选实测评估。
+- **孤例留痕（B-15）**：references 编号 S229 缺号（S228→S230），全库 grep 无登记，留痕不判模式。
+- **判据**：三件套文件存在且快照 md5 一致；本文档 27 组发现全部带快照行号出处 / 1 条无出处（移植优先级建议，已明示）。
+
 ## v1.28.4 — 2026-11-14
 - 加 allowed-tools 白名单（C11）：Read,Grep,Glob,Bash,Write,Edit,Skill——禁 Task（子代理不继承判据）；为腾字节压缩 AES 兜底说明。
 
