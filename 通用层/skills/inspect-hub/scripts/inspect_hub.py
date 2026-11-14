@@ -726,7 +726,7 @@ def cmd_selfcheck():
         for e in errs:
             print('✗', e)
         return 2
-    print('✓ 登记册 8 门齐 · impl 映射一致 · 面板模板可渲染（self-check 通过）')
+    print(f"✓ 登记册 {len(ids)} 门齐 · impl 映射一致 · 面板模板可渲染（self-check 通过）")
     return 0
 
 
