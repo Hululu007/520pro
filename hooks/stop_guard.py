@@ -7,11 +7,23 @@
   B-13「说完成必须同时给落点」，但那是**软约束**——模型想省就省，用户只能事后发现。
   Stop 是唯一能在「这条消息即将成为最终答复」这个时刻介入的地方。
 
-协议（实测确认，2026-11-14）:
+协议（实测确认，2026-11-14 · 两次对照实验）:
   Stop payload 含 `last_assistant_message`（本轮最后一条回复全文）+ `transcript_path`
-  + `stop_hook_active`。exit 2 且 stderr 有内容时，平台把该内容作为
-  `stopHookFeedback` 注入回模型（CLI 侧以 <system-reminder data-role="hook"> 呈现），
-  模型被拉回来继续——**这不是硬阻断，是拽回**：说错了要重说，但话说出口了。
+  + `stop_hook_active`。两种「拦住不让停」的写法，实测结果不同：
+
+    ① exit 2 + stderr 有内容  → **未观察到当场续写**。回合照常结束，用户得自己再发
+       一条消息才被拉回来。降级为「事后可见」，不是拽回。
+    ② stdout 输出 JSON {"decision":"block","reason":"..."} + exit 0 → **确实拽回**。
+       平台把 reason 作为 `Stop hook feedback`（CLI 侧呈现为用户消息）注入回模型，
+       模型当场看到并必须继续这一轮。探针日志佐证：脚本仅被调用 1 次
+       （stop_hook_active=false，计数 1），说明是平台注入而非钩子二次执行。
+
+  结论：本脚本走 ② 。**这不是硬阻断，是拽回**——话说出口了才被拽回来重说，
+  用户仍会看到那次失败的收尾，只是紧接着就能看到补充。
+
+  注意 stop_hook_active 的重入语义：走 ② 时平台注入反馈、模型续写、再次 Stop 时
+  该字段是否置真未观测到（探针只跑了 1 次）。因此本机计数 MAX_RETRY 是**主**防线，
+  不能只依赖 stop_hook_active。
 
 判据（保守优先，误报会让人关掉钩子 = 全域失防）:
   同时满足三条才拽回：
@@ -102,10 +114,10 @@ def judge(text):
     return True, '宣称完成但全文无任何落点证据'
 
 
-MSG = ('⛔ B-13 完成态凭落点：上一条回复宣称「完成 / 通过」，但全文找不到任何落点证据。\n'
-       '落点证据指：改动的文件与行号、跑过的命令与退出码（rc=0）、commit sha，'
-       '或判据输出原文。\n'
-       '请二选一：①补上上述证据后重发结论；②把结论改写成「未验证 / 无法判定」。\n'
+# 单行：注入回模型后不占多行、不被当成排版块（踩过「多行字段被闸截断」的坑）
+MSG = ('⛔ B-13 完成态凭落点：上一条回复宣称「完成 / 通过」，但全文找不到任何落点证据。'
+       '落点证据指：改动的文件与行号、跑过的命令与退出码（rc=0）、commit sha，或判据输出原文。'
+       '请二选一：①补上上述证据后重发结论；②把结论改写成「未验证 / 无法判定」。'
        '这条拦的是「我看了一下，应该没问题」——它不算完成。')
 
 
@@ -174,8 +186,9 @@ def main():
     st.setdefault(sid, {})['n'] = n + 1
     st[sid]['last_why'] = why
     _write_state(st)
-    sys.stderr.write(MSG + '\n')
-    return 2
+    # JSON decision:block（实测能拽回；exit 2 + stderr 不能，见文件头「协议」）
+    print(json.dumps({'decision': 'block', 'reason': MSG}, ensure_ascii=False))
+    return 0
 
 
 if __name__ == '__main__':

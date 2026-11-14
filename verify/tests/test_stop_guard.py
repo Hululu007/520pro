@@ -3,7 +3,7 @@
 """stop_guard.py · 回归测试（B-13 完成态凭落点，Stop 拽回）
 
 判据三件套：
-  ① 造违例：宣称完成且零落点证据 → 必须拽回（exit 2）
+  ① 造违例：宣称完成且零落点证据 → 必须拽回（stdout 出 JSON decision:block）
   ② 具体判据：判定理由要写清是「无证据」还是「否定语境豁免」
   ③ 元变异：清空断言词表后，同样的违例必须溜过（自证判据真在守）
 
@@ -99,12 +99,23 @@ _st.pop(sid, None)
 S._write_state(_st)
 payload = json.dumps({'session_id': sid, 'stop_hook_active': False,
                       'last_assistant_message': f'{DONE}修复。'})
-codes = []
+res = []
 for _ in range(S.MAX_RETRY + 2):
-    codes.append(subprocess.run(['python3', GUARD], input=payload,
-                                capture_output=True, text=True).returncode)
-check('前 MAX_RETRY 次拽回', codes[:S.MAX_RETRY] == [2] * S.MAX_RETRY, f'实际={codes}')
-check('达上限后放行', all(c == 0 for c in codes[S.MAX_RETRY:]), f'实际={codes}')
+    p = subprocess.run(['python3', GUARD], input=payload,
+                       capture_output=True, text=True)
+    try:
+        blk = json.loads(p.stdout.strip() or '{}').get('decision') == 'block'
+    except Exception:
+        blk = False
+    res.append((p.returncode, blk, p.stderr.strip()[:40]))
+check('前 MAX_RETRY 次拽回', all(rc == 0 and b for rc, b, _ in res[:S.MAX_RETRY]),
+      f'实际={res[:S.MAX_RETRY]}')
+check('达上限后放行', all(rc == 0 and not b for rc, b, _ in res[S.MAX_RETRY:]),
+      f'实际={res[S.MAX_RETRY:]}')
+# 协议：实测 exit 2 + stderr 拽不回，只有 JSON decision:block 能拽回。
+# 这条防的是「以后有人好心把输出改回 exit 2」——那样钩子还在跑，但语义降级成事后可见。
+check('拽回走 JSON decision:block（非 exit 2）',
+      res[0][0] == 0 and res[0][1] and not res[0][2], f'实际={res[0]}')
 st = json.load(open(S.STATE, encoding='utf-8'))
 check('放行痕迹已登记', st.get(sid, {}).get('gave_up') is True, f'实际={st.get(sid)}')
 

@@ -14,6 +14,7 @@
 只查"是否过期/是否缺项"，不查文字质量——那机器判不了（三态不标注就是骗自己）。
 用法：python3 verify/tests/test_handoff.py
 """
+import json
 import os
 import re
 import sys
@@ -125,6 +126,17 @@ def main():
     got = m.group(1) if m else ''
     check(f'版本号与 VERSION 一致（{got} vs {ver}）', bool(ver) and got == ver,
           '交接摘要过期：接手的人会按旧版本口径干活')
+
+    # 分发元数据也是版本「一处」：MANIFEST 顶层 version 长期停在 0.8.31 没人发现，
+    # 正因为没有任何闸看它。查的是「同一个版本号被写进两处却不同步」这类病。
+    mver = ''
+    try:
+        mver = str(json.load(open(os.path.join(REPO, 'MANIFEST.json'),
+                                  encoding='utf-8')).get('version') or '')
+    except Exception:
+        mver = ''
+    check(f'MANIFEST.version 与 VERSION 一致（{mver} vs {ver}）', bool(mver) and mver == ver,
+          '分发元数据过期：装的人会看到旧版本号')
 
     check('含"先跑自检"的提醒', 'verify.sh' in body)
     check_handoff_pointers()

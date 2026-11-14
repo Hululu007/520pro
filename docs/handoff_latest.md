@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.57 B-13 完成态凭落点接入 Stop 通道：`hooks/stop_guard.py` 判「断言词命中 + 全文零落点证据」双条件，任一证据（rc= / 退出码 / commit sha / 文件:行号 / `0 ✗` / `✓ N`）存在即放行。**关键发现**：Stop payload 自带 `last_assistant_message`（本轮回复全文），判定不必解析 transcript；另带 `stop_hook_active`（防死循环）与 `transcript_path`。防卡死两道：stop_hook_active 一律放行 + 同 session 连续拽回达 MAX_RETRY 次后放行并记 gave_up。`--probe` 可查 hit/via（走过 deny 还是 pass）。回归 20 例（含元变异：清空断言表后违例必须溜过）。install.sh 已加三钩子同装 + Stop 幂等注册。**未验证**：exit 2 + stderr 是否真能把模型拽回——上一轮探针 exit 2 后并未自动续写，**疑似平台只在用户下条消息时注入 stopHookFeedback**；下一步改用 JSON decision:block 形式实测。**遗留：全量 123 个存活仓库批量重采仍未跑；B-05/B-07/B-09 三条可硬化项未做；Stop 拽回语义待实测。**
+v0.8.58 Stop 拽回协议定版（两次对照实测）：同一判据下，`exit 2 + stderr` **拽不回**——回合照常结束，用户得自己再发一条才被拉回来，只算「事后可见」；`stdout 出 JSON {"decision":"block","reason":...}` + `exit 0` **能拽回**——reason 作为 `Stop hook feedback` 注入，模型当场续写。探针日志佐证脚本仅被调用 1 次（stop_hook_active=false、计数 1），说明是平台注入而非钩子二次执行。故 stop_guard.py 定版为 JSON 形式，MSG 压成单行（避免注入后被当排版块），回归加一条「拽回走 JSON 而非 exit 2」防以后有人好心改回；矩阵 B-13 强度标为「S2 实测生效」并附两版对照表。另修一处静默漂移：MANIFEST.version 长期停在 0.8.31，无任何闸看它，已对齐 0.8.58 并在 test_handoff 加机检。**隐患登记**：走 JSON 时平台注入后续写、再次 Stop 时 `stop_hook_active` 是否置真未观测到，故本机 `MAX_RETRY` 是主防线。**遗留：全量 123 个存活仓库批量重采仍未跑；B-05/B-07/B-09 三条可硬化项未做。**
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.57 B-13 完成态凭落点接入 Stop 通道：`hooks/stop_guard.py` 判「
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.57
+- 版本：0.8.58
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）
