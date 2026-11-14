@@ -2866,6 +2866,7 @@ def cmd_ensure(a):
 # 这里只负责"往里写一条"：哪一版、哪天、增加了什么、证据在哪——可逐版追溯。
 # 数据源全部是可实证的：VERSION / MANIFEST.changelog_<ver> / 已装技能快照。
 EVOLVE_ROOT = '🧬 生态演化'
+EVOLVE_ROOT_ALIASES = ['🧬 520进化论']  # v0.8.64 根改名后 evolve-log 正门不断（别名回退，改名连带欠账修复）
 EVOLVE_DB = '版本演化台账'
 
 
@@ -2966,6 +2967,11 @@ def cmd_evolve_log(a):
     """写一条演化记录。同版本 + 同技能快照不重复写（反复安装不算演化）。"""
     ensure_library(quiet=True)          # 固定分类必须先在：这是"新机落地即带"的落实点
     rid = _root_id(EVOLVE_ROOT)
+    if not rid:                          # v0.8.64 根改名「🧬 520进化论」——别名回退，正门不断
+        for _alias in EVOLVE_ROOT_ALIASES:
+            rid = _root_id(_alias)
+            if rid:
+                break
     if not rid:
         print(f'❌ 演化根「{EVOLVE_ROOT}」不存在且自举未建成——先跑 ensure 看过错原因')
         return 2

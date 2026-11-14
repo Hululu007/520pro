@@ -84,7 +84,7 @@
    "kind": "skill",
    "layer": "通用层",
    "path": "通用层/skills/space-hub",
-   "version": "2.7.7",
+   "version": "2.7.8",
    "required_files": [
     "SKILL.md",
     "CHANGELOG.md",
