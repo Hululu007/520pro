@@ -59,6 +59,25 @@ RULES = [
                  r'\b(?:main|master)\b'],
         'fix': '用 hooks/git_push_safe.sh（带重试与校验）；确需强推先说明原因',
     },
+    {
+        'id': 'G4',
+        'why': '删除/移走双核（probe-hub、tvbox-core）——B-16 硬依赖，'
+               'tvbox-core/scripts/core.py 被 probe-hub import，删了或改名会全线崩',
+        # 只拦「rm/mv 在前、双核在后」的组合：
+        #   命中：rm -rf .../tvbox-core ｜ mv probe-hub /tmp ｜ git rm -r .../probe-hub
+        #   不拦：cp -r probe-hub /tmp/bak（备份不改原件）
+        #         mv /tmp/x probe-hub（往双核里塞东西，非删除）
+        # 双核名后必须紧跟 / 空白 或结尾，避免误伤 tvbox-core-backup 这类备份目录
+        'pats': [r'\b(?:rm|mv|git\s+rm)\b[^|;&\n]*',
+                 # 双核名后允许的分隔符要写全：行尾、空白、/、;、&、|、) 、} 、引号
+                 # （首版只写了 / 空白 行尾 引号，`rm -rf x/tvbox-core; echo ok`
+                 #   因为后面跟 ; 而漏判——实测真删了一个测试目录才发现）
+                 r'\b(?:tvbox-core|probe-hub)(?=[/\s;&|)\}"\']|$)'],
+        # 豁免：双核作为 mv 的**目标**（最后一个参数）= 往双核里放东西，不是删它
+        'exempt': r'\bmv\b[^|;&\n]*\s+(?:\./)?(?:[\w./-]*/)?(?:tvbox-core|probe-hub)/?\s*$',
+        'fix': '双核不得删除、改名、合并；确要动先备替代件并通过技能契约机检（C1–C6），'
+               '备份请用 cp 到仓外目录',
+    },
 ]
 
 
@@ -68,6 +87,8 @@ def check(command):
         return None
     cmd = str(command)
     for r in RULES:
+        if r.get('exempt') and re.search(r['exempt'], cmd):
+            continue
         if r.get('pats'):
             if all(re.search(p, cmd) for p in r['pats']):
                 return r

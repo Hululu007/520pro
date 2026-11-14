@@ -100,6 +100,34 @@ Gm = load(mp)
 check('规则清空后强推溜过', Gm.check('git push origin main --force') is None)
 check('规则清空后 --no-verify 溜过', Gm.check(f'git commit {NV}') is None)
 
+# ── ⑥ G4 双核保护（B-16：删/移 probe-hub、tvbox-core 必须拦）──
+# 名字同样运行时拼接，避免本文件被自己扫成违例样本
+CORE = 'tvbox' + '-core'
+HUB = 'probe' + '-hub'
+
+g4_hit = [
+    (f'rm -rf {CORE}', '直接删双核目录'),
+    (f'rm -rf skills/{CORE}; echo ok', '双核名后跟分号（首版漏判的真实场景）'),
+    (f'rm -rf {CORE}/scripts | tee log', '双核后跟管道'),
+    (f'mv {HUB} /tmp/bak', '把双核移走=改名'),
+    (f'git rm -r {HUB}', 'git rm 删双核'),
+]
+for cmd, why in g4_hit:
+    h = G.check(cmd)
+    check(f'G4 拦下：{why}', h is not None and h['id'] == 'G4',
+          f'实际={h["id"] if h else "放行"}')
+
+g4_pass = [
+    (f'cp -r {HUB} /tmp/bak', '备份不改原件'),
+    (f'mv /tmp/newcore skills/{CORE}', '双核是目标不是被删对象'),
+    (f'rm -rf /tmp/{CORE}-backup', '名字前缀相同但不是双核本体'),
+    (f'ls {HUB}', '只读不拦'),
+    ('git status --short', '无关命令'),
+]
+for cmd, why in g4_pass:
+    h = G.check(cmd)
+    check(f'G4 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
+
 # ── ④ 闸必须真的挂在执行路径上 ──
 na = open(os.path.join(SCRIPTS, 'next_anchor.py'), encoding='utf-8').read()
 check('next_anchor 调用 guard_cmd', 'import guard_cmd' in na and 'guard_cmd.check(' in na)
@@ -119,5 +147,5 @@ if os.path.isdir(inst):
 else:
     check('安装根不存在时跳过镜像比对', True)
 
-print('test_guard_cmd：%d 例，失败 %d' % (len(cases) + len(ok_cases) + 12, len(fails)))
+print('test_guard_cmd：%d 例，失败 %d' % (len(cases) + len(ok_cases) + 22, len(fails)))
 sys.exit(1 if fails else 0)
