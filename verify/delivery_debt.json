@@ -1305,6 +1305,25 @@
    "waived_ts": "2026-11-15T11:57:12"
   },
   {
+   "id": "D-903ada7-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "903ada7",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "docs(phone): 手机指令第10条补回非阻塞取/禁轮询/子代理探查（走 pre-commit 自动同步云端）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 流程已接线的动作（pre-commit 自动同步云端）不许自己臆造额外拍板门槛再绕过——「写云端要拍板」把流程内动作误判成流程外，导致改了又撤、文档停在旧版 2",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "",
+   "waived_until": "2026-12-31",
+   "note": "豁免至 2026-12-31：903ada7 手机指令自动同步提交的 F02 方法论欠账（Lesson 型信号触发），写云端方法论需 owner 拍板，本轮按 B-12 收敛在途任务跟踪机制不开新战线；显式豁免留痕不洗绿，到期 2026-12-31 转 open 后走 space-hub archive 正门真补",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-15T23:57:34"
+  },
+  {
    "id": "D-adfc4c9-F03",
    "flow": "F03",
    "folder": "🧬 520进化论/02-生态总览",

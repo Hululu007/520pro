@@ -211,6 +211,22 @@ check('思考闸门注入：探查走子代理一问', '子代理' in na_src and
 check('思考闸门注入：收尾非阻塞一问', '禁 block' in na_src and '禁轮询' in na_src)
 check('G8 洪水闸接进 next_anchor 执行路径', 'check_flood' in na_src)
 
+# ── 在途任务跟踪：完成通知自动销账 + 台账 CLI + 超阈值标红（真 import 测函数，非读源码）──
+NA = load(os.path.join(SCRIPTS, 'next_anchor.py'))
+_inf = {'t1': {'desc': 'push', 'ts': 1}, 't2': {'desc': 'verify', 'ts': 2}}
+_done = '<task-notification><task-id>t1</task-id><status>completed</status></task-notification>'
+_l, _c = NA.autoclose_inflight(_done, _inf)
+check('在途-完成通知自动销账', list(_l) == ['t2'] and _c == ['t1'], f'left={list(_l)} closed={_c}')
+check('在途-working 不销', NA.autoclose_inflight(
+    '<task-notification><task-id>t1</task-id><status>working</status></task-notification>', _inf)[1] == [])
+check('在途-无关消息不销', NA.autoclose_inflight('普通消息', _inf)[1] == [])
+check('在途-四种终态全认', all(
+    't2' in NA.autoclose_inflight(
+        '<task-notification><task-id>t2</task-id><status>%s</status></task-notification>' % st, _inf)[1]
+    for st in ('completed', 'failed', 'canceled', 'rejected')))
+check('在途-台账注入接进执行路径', 'autoclose_inflight' in na_src and '🔄 在途任务' in na_src)
+check('在途-超阈值标红接进执行路径', 'STALE_SEC' in na_src and '⛔' in na_src)
+
 g6_hit = [os.path.join(ROOT, '.env'),
           os.path.join(ROOT, 'deploy', 'server.pem'),
           os.path.join(ROOT, 'credentials.json')]

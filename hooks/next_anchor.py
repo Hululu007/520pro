@@ -42,8 +42,30 @@ STATE = os.path.expanduser('~/.codebuddy/hooks/.next_anchor_state')
 THROTTLE_SEC = 15 * 60
 MAX_STATE_KEYS = 50          # 状态文件有界，防无限增长
 CMD_HEAD = 80                # probe 里只留命令开头，避免存整条长命令
+MAX_INFLIGHT = 20            # 在途任务台账有界，防无限增长
+STALE_SEC = 30 * 60          # 在途超 30 分钟标红提醒主动查（不等用户追问）
 
-EMPTY = {'repos': {}, 'last_repo': '', 'probe': {}}
+EMPTY = {'repos': {}, 'last_repo': '', 'probe': {}, 'inflight': {}}
+
+# 完成通知自动销账：UserPromptSubmit 的 prompt 里带 <task-notification> 块，
+# 命中终态即把该 task_id 从在途台账移除——完成即销，不靠记忆/追问。
+_TASK_NOTIF_RE = re.compile(r'<task-notification>(.*?)</task-notification>', re.S)
+_TASK_ID_RE = re.compile(r'<task-id>\s*([^<\s]+)\s*</task-id>')
+_TASK_TERM_RE = re.compile(r'<status>\s*(completed|failed|canceled|rejected)\s*</status>', re.I)
+
+
+def autoclose_inflight(prompt, inflight):
+    """返回 (剩余台账, 本次自动销掉的 id 列表)。纯函数，供 selftest 直喂样本。"""
+    if not prompt or not inflight:
+        return inflight, []
+    done = set()
+    for blk in _TASK_NOTIF_RE.findall(prompt):
+        tid = _TASK_ID_RE.search(blk)
+        st = _TASK_TERM_RE.search(blk)
+        if tid and st:
+            done.add(tid.group(1).strip())
+    closed = [k for k in inflight if k in done]
+    return {k: v for k, v in inflight.items() if k not in done}, closed
 
 
 def _read_state():
@@ -60,6 +82,9 @@ def _read_state():
     d.setdefault('repos', {})
     d.setdefault('last_repo', '')
     d.setdefault('probe', {})
+    d.setdefault('inflight', {})
+    if not isinstance(d['inflight'], dict):
+        d['inflight'] = {}
     return d
 
 
@@ -69,6 +94,10 @@ def _write_state(d):
         if len(repos) > MAX_STATE_KEYS:                 # 按时间留最近的
             keep = sorted(repos.items(), key=lambda kv: kv[1], reverse=True)[:MAX_STATE_KEYS]
             d['repos'] = dict(keep)
+        inf = d.get('inflight') or {}
+        if len(inf) > MAX_INFLIGHT:                     # 台账有界
+            keep = sorted(inf.items(), key=lambda kv: kv[1].get('ts', 0), reverse=True)[:MAX_INFLIGHT]
+            d['inflight'] = dict(keep)
         tmp = STATE + '.tmp'
         with open(tmp, 'w', encoding='utf-8') as f:
             json.dump(d, f)
@@ -164,6 +193,29 @@ def main():
         print(json.dumps(p, ensure_ascii=False, indent=2) if p else '（无调用记录）')
         return 0
 
+    # ---- 在途任务台账 CLI（发后台任务登记 / 完成销账 / 回读验证）----
+    argv = sys.argv[1:]
+    if '--task-list' in argv:
+        print(json.dumps(_read_state().get('inflight') or {}, ensure_ascii=False, indent=2))
+        return 0
+    if '--task-add' in argv:
+        i = argv.index('--task-add')
+        parts = argv[i + 1:]
+        if len(parts) >= 2:
+            d = _read_state()
+            d['inflight'][parts[0]] = {'desc': ' '.join(parts[1:])[:80], 'ts': int(time.time())}
+            _write_state(d)
+            print('[task-add] %s' % parts[0])
+        return 0
+    if '--task-done' in argv:
+        i = argv.index('--task-done')
+        if i + 1 < len(argv):
+            d = _read_state()
+            removed = d['inflight'].pop(argv[i + 1], None)
+            _write_state(d)
+            print('[task-done] %s %s' % (argv[i + 1], '✓' if removed else '(不在台账)'))
+        return 0
+
     data = _payload()
     event = data.get('hook_event_name') or ''
     tool = data.get('tool_name') or data.get('toolName') or ''
@@ -247,6 +299,29 @@ def main():
         msg += ('｜🧠 思考闸：①定性——要方案就零探查零施工直接出，要施工才动手；'
                 '②探查——要查仓库丢子代理，主会话不连发命令；'
                 '③收尾——后台非阻塞取（禁 block 等/禁轮询/禁前台 sleep），一目标收敛即停')
+        # 在途任务跟踪（2026-11-15）：后台任务发时 --task-add 登记，完成通知到了自动
+        # 销账（扫本轮 prompt 的 <task-notification>），每轮显示剩余清单——超 STALE_SEC
+        # 标红提醒主动查。不再靠记忆/用户追问跟踪"完成了没"（用户实证痛点）。
+        try:
+            _inf = d.get('inflight') or {}
+            if _inf:
+                _prompt = str(data.get('prompt') or data.get('message') or '')
+                _inf, _closed = autoclose_inflight(_prompt, _inf)
+                if _closed:                              # 完成即销账，落 state
+                    d['inflight'] = _inf
+                    _write_state(d)
+                if _inf:
+                    _now = int(time.time())
+                    _parts = []
+                    for _tid, _tv in sorted(_inf.items(), key=lambda kv: kv[1].get('ts', 0)):
+                        _age = max(0, _now - int(_tv.get('ts', _now)))
+                        _flag = '⛔' if _age > STALE_SEC else '🔄'
+                        _parts.append('%s%s(%s·%d分)' % (_flag, _tid,
+                                      str(_tv.get('desc', ''))[:24], _age // 60))
+                    msg += ('｜🔄 在途任务 %d 个：%s——完成即 --task-done 销账，⛔ 超 30 分钟主动查'
+                            % (len(_inf), '，'.join(_parts[:5])))
+        except Exception:
+            pass  # 在途注入失败不影响主提醒（永不拦截铁律）
         # v0.8.64 方案v3 梯度③：交付落库提醒（520进化论·每轮必落库）——只提示不拦截，
         # 硬对账在 verify/gate_archive_ledger.py（梯度④），提醒与闸分层。
         import os as _os
