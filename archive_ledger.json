@@ -2356,6 +2356,28 @@
    "result": "ok",
    "event_ref": "commit d054c8d",
    "note": "监测快照（七问七答）：chk_landing.py 判4 闸化识别变更的落地监测，事件指针 event_ref=commit d054c8d；覆盖 D-d054c8d-F08"
+  },
+  {
+   "ts": "2026-11-15T15:53:48",
+   "round": "archive 判例_闸化登记推广_四病号实证暂不登记_20261115.md @e62f110",
+   "artifact": "判例_闸化登记推广_四病号实证暂不登记_20261115.md",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "MkkRC1oxkJD1jO62SedDe0",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit e62f110",
+   "note": "event_ref=commit e62f110；4 病号实证暂不登记、不造空 gate 骗绿"
+  },
+  {
+   "ts": "2026-11-15T15:53:58",
+   "round": "evolve-log 0.8.74",
+   "artifact": "版本演化台账记录 0.8.74",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.74 · commit e62f110 · VERSION=0.8.74 · MANIFEST.changelog_0_8_74",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
   }
  ]
 }
