@@ -72,8 +72,81 @@ def check():
     return 'yellow' if 'yellow' in sts else 'green'
 
 
+def _gate_selftest():
+    """v0.8.73 闸化登记分支：五种后接形态 + 反例 + 端到端 green/yellow。
+
+    隔离：独立临时 repo（造最小账本/计数/落点脚本），全程只读真仓、不写任何受管文件；
+    gate_registry 经 ctx 注入判4（不碰 verify/病号映射表.json）。
+    本轮病15 同型坑防御：识别 selftest 靠 ast 结构化节点，注释/docstring 造不出
+    FunctionDef/Call → 天然排除；五种真实后接写法全覆盖，防止「只认精确锚点」漏判。
+    """
+    import json
+    import shutil
+    import tempfile
+    from chk_landing import chk_contentflow, _selftest_landed   # noqa: E402（sys.path 模块顶已插）
+    from inspect_hub import worst                                # noqa: E402
+    fails = []
+    ANCH = 'S233①'
+    # ── A. 五种后接形态（应全 True）──
+    forms = {
+        '①def+SystemExit': "def selftest():\n    chk('S233①x', 1)\nif __name__=='__main__':\n    if '--selftest' in sys.argv:\n        raise SystemExit(selftest())\n",
+        '②async+sys.exit': "import sys\nasync def selftest():\n    chk('S233①x', 1)\nif '--selftest' in sys.argv:\n    sys.exit(selftest())\n",
+        '③方法/test_前缀': "class T:\n    def test_selftest(self):\n        chk('S233①x', 1)\nif '--selftest' in sys.argv:\n    T().test_selftest()\n",
+        '④argparse开关': "import argparse\ndef selftest():\n    chk('S233①x', 1)\np=argparse.ArgumentParser(); p.add_argument('--selftest', action='store_true')\nselftest()\n",
+        '⑤裸调用无argv': "def selftest():\n    chk('S233①x', 1)\nselftest()\n",
+    }
+    for k, v in forms.items():
+        ok, why = _selftest_landed(v, ANCH)
+        if not ok:
+            fails.append(f'闸化·形态{k} 应 True：{why}')
+    # ── B. 反例（应全 False；注释/docstring/空壳/未接电/锚点只在注释）──
+    negs = {
+        '纯注释def': "# def selftest():\n#     if '--selftest' in sys.argv: selftest()\n",
+        'docstring字样': '"""def selftest(): --selftest S233①"""\nx=1\n',
+        '无函数只有开关': "if '--selftest' in sys.argv:\n    print('S233①')\n",
+        '空壳selftest': "def selftest():\n    pass\nif '--selftest' in sys.argv: selftest()\n",
+        '有def无接电': "def selftest():\n    chk('S233①x', 1)\n",
+        '锚点只在注释': "def selftest():\n    # S233①\n    chk('x', 1)\nif '--selftest' in sys.argv: selftest()\n",
+    }
+    for k, v in negs.items():
+        ok, why = _selftest_landed(v, ANCH)
+        if ok:
+            fails.append(f'闸化·反例{k} 应 False（注释/docstring 不算落点）：{why}')
+    # ── C. 端到端：有 gate→green / gate 指向不存在文件→仍 yellow / 无 gate→yellow ──
+    tmp = tempfile.mkdtemp(prefix='exp_gate_')
+    try:
+        os.makedirs(os.path.join(tmp, 'verify'))
+        json.dump({'entries': []}, open(os.path.join(tmp, 'archive_ledger.json'), 'w'))
+        json.dump({'counters': {'病15': {'count': 7, 'status': 'active'}}, 'direction_cases': []},
+                  open(os.path.join(tmp, 'experience_recurrence.json'), 'w'))
+        json.dump({'flows': []}, open(os.path.join(tmp, 'verify', 'content_sources.json'), 'w'))
+        open(os.path.join(tmp, '_gate_probe.py'), 'w', encoding='utf-8').write(forms['①def+SystemExit'])
+        base = {'thresholds': {}, 'worst': worst}
+
+        def item4(reg):
+            r = chk_contentflow(tmp, {'repo': tmp}, dict(base, gate_registry=reg))
+            return next((i for i in r['items'] if '经验复发' in i.get('t', '')), None)
+
+        it = item4({'病15': {'script': '_gate_probe.py', 'anchor': ANCH}})
+        if not it or it['s'] != 'green':
+            fails.append(f'闸化·端到端 有 gate 应 green：{it}')
+        it2 = item4({'病15': {'script': '__不存在__.py', 'anchor': ANCH}})
+        if not it2 or it2['s'] != 'yellow':
+            fails.append(f'闸化·端到端 gate 指向不存在文件应仍 yellow：{it2}')
+        it3 = item4({})
+        if not it3 or it3['s'] != 'yellow':
+            fails.append(f'闸化·端到端 无 gate 登记应 yellow：{it3}')
+        print(f"  selftest[闸化]: 形态{len(forms)}/反例{len(negs)} "
+              f"端到端 green={it['s'] if it else 'None'} "
+              f"不存在文件={it2['s'] if it2 else 'None'} 无登记={it3['s'] if it3 else 'None'}")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return fails
+
+
 def selftest():
-    """正反向：红/黄/绿三态在真数据上现形；反向靠临时构造缺 ref 回执。"""
+    """正反向：红/黄/绿三态在真数据上现形；反向靠临时构造缺 ref 回执。
+    v0.8.73 追加闸化登记分支（_gate_selftest）：五种形态/反例/端到端 green-yellow。"""
     import json
     import shutil
     import tempfile
@@ -82,6 +155,8 @@ def selftest():
     shutil.copy(led, bak)
     fails = []
     try:
+        # 闸化登记分支（独立临时 repo，不碰真账本，放在造违例之前）
+        fails += _gate_selftest()
         # 正向：真数据跑一遍，应可判定（green/yellow 都算通过，red 算违例——当前真数据应无 red）
         st = check()
         if st in ('red',):
@@ -103,7 +178,7 @@ def selftest():
         for f in fails:
             print(f'  ✗ {f}')
         return 1
-    print('  ✓ 正反向全通过（真数据绿/黄、造违例即红）')
+    print('  ✓ 正反向全通过（闸化五形态+反例+端到端 green/yellow；真数据绿/黄、造违例即红）')
     return 0
 
 

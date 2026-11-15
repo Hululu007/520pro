@@ -1,3 +1,10 @@
+## v1.4.4 — M12 经验门 yellow 机制级闸化消解（2026-11-15）
+- **需求**：病15×7 长期挂「须升【阻】或闸化」⚠——`chk_contentflow` 判4 只读 `experience_recurrence.json` 的 count/status，而病15 其实早已闸化（S233① 词边界+8 形态 selftest）。按真源约定计数由 hook 机器记、AI 不手工改，改 count/status 消黄=洗绿，禁止。
+- **正解**：判4 采信「已闸化登记」并**实证落点**——`verify/病号映射表.json` 病15 加结构化 `gate`（script/selftest/anchor/evidence/registered）；`chk_landing.py` 加 `_selftest_landed`/`_gate_landed`，用 **ast 结构化节点**认 selftest 函数定义+接电+判据锚点，注释与 docstring 天然不产生节点（本轮病15 同型坑「识别范围≠对象范围」：既防扫字样误收 docstring，又防只认精确锚点漏判，五种后接写法全覆盖）。
+- **三态**：结构化登记+脚本存在+selftest 实证+锚点命中→green；无登记/脚本不存在/未接电/锚点不命中→仍 yellow（计数不洗绿）；计数文件损坏→unknown 不装绿。判据明细显式写实证细节。
+- **判据**：`verify/gate_experience.py:_gate_selftest` 五种后接形态全 True / 六类反例全 False / 端到端（有 gate→green、gate 指向不存在文件→yellow、无登记→yellow）；真数据临时反向破坏（script 不存在/删 gate/锚点不匹配）三次均正确退回 yellow、还原回 green。存证 `能力层/tvbox/skills/probe-hub/references/S235_M12经验门闸化登记消解.md`。
+- **不改**：`experience_recurrence.json`（count=7/active 原样，痊愈由 `chk_cure` 10 轮机判推进）。
+
 ## v1.4.3 — 2026-11-14
 - 加 allowed-tools 白名单（C11）。
 

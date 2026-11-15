@@ -3,7 +3,7 @@
 契约与既有 chk_* 一致：chk(target, cfg, ctx) -> {'status', 'items'}。
 三态铁律：取不到/失败 → 白（无法判定），绝不装绿；数据源全部离线为主，census 一项可失败降级。
 """
-import datetime, glob, json, os, re, subprocess
+import ast, datetime, glob, json, os, re, subprocess
 
 TH = lambda ctx, k, dflt: (ctx.get('thresholds') or {}).get(k, dflt)
 
@@ -220,6 +220,95 @@ def chk_projects(target, cfg, ctx):
     return {'status': _worst(ctx, sts), 'items': items}
 
 
+# ── v0.8.73 闸化登记实证（M12 经验门 yellow 机制级消解）──────────────────
+# 背景：判4 原只读 experience_recurrence.counters，病15 count=7 就永远报
+#   「须升【阻】或闸化」yellow，即使该病早已闸化（词边界+8形态 selftest）。
+# 真源纪律：experience_recurrence.json 是 hook 机器记账、doc 明写「AI 不手工记账」，
+#   改 count/status 消黄 = 洗绿，禁止。正解是让判据采信「已闸化登记」并实证落点。
+# 病15 同型坑（识别范围≠对象范围）：若只扫「出现 --selftest 字样」会把注释/
+#   docstring/示例当落点（gate_scan.py 第6例镜像）；收严成「只认整行精确锚点」
+#   又漏掉别的真实写法。这里用 ast 结构化节点识别——注释/docstring 造不出
+#   FunctionDef/Call 节点，天然排除；五种后接写法全覆盖（见 gate_experience --selftest）。
+
+
+def _selftest_landed(src, anchor=''):
+    """ast 结构化实证：落点脚本确有 selftest 函数定义且接电（+可选判据锚点）。
+
+    五种后接形态（真实 Python 写法）全覆盖：
+      ① def selftest():          ② async def selftest():      ③ 方法/test_ 前缀
+      ④ '--selftest' 字符串开关（argv/argparse）  ⑤ selftest() 调用出口（SystemExit/sys.exit/裸调用）
+    反例天然排除：注释 `# def selftest()`、docstring 里的字样都不产生节点。
+    返回 (landed: bool, reason: str)。
+    """
+    try:
+        tree = ast.parse(src)
+    except (SyntaxError, ValueError) as ex:
+        return False, f'落点脚本语法不可解析 {str(ex)[:30]}'
+    defs, wired, invokes, nonempty = [], 0, 0, 0
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and \
+                ('selftest' in node.name.lower() or node.name.startswith('test_')):
+            defs.append(node.name)
+            body = [s for s in node.body
+                    if not isinstance(s, ast.Pass)
+                    and not (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant)
+                             and isinstance(s.value.value, str))]   # 排除 docstring
+            if body:
+                nonempty += 1
+        if isinstance(node, ast.Constant) and isinstance(node.value, str) and '--selftest' in node.value:
+            wired += 1
+        if isinstance(node, ast.Call):
+            fn = node.func
+            nm = fn.id if isinstance(fn, ast.Name) else (fn.attr if isinstance(fn, ast.Attribute) else '')
+            if nm == 'selftest':
+                invokes += 1
+    if not defs:
+        return False, '落点脚本无 selftest 函数定义（注释/docstring 不算）'
+    if not (wired or invokes):
+        return False, 'selftest 未接电（无 --selftest 开关 / 调用出口）'
+    if nonempty == 0:
+        return False, 'selftest 是空壳（仅 pass/docstring）'
+    if anchor:
+        hit = False
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and \
+                    ('selftest' in node.name.lower() or node.name.startswith('test_')):
+                for i, s in enumerate(node.body):
+                    if i == 0 and isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant) \
+                            and isinstance(s.value.value, str):
+                        continue                                    # 跳过 docstring
+                    for sub in ast.walk(s):
+                        if isinstance(sub, ast.Constant) and isinstance(sub.value, str) and anchor in sub.value:
+                            hit = True
+                            break
+                    if hit:
+                        break
+                if hit:
+                    break
+        if not hit:
+            return False, f'selftest 体内未见判据锚点 {anchor}（注释不算）'
+    return True, f'def×{len(defs)}/非空×{nonempty}/开关×{wired}/调用×{invokes}' + \
+                 (f'/锚点{anchor}命中' if anchor else '')
+
+
+def _gate_landed(repo, gate):
+    """实证一条「已闸化登记」：结构化字段 + 落点脚本存在 + selftest 真实落地。
+    返回 (landed: bool, reason: str)。三态由调用方包装（取不到记无法判定，不折叠）。"""
+    if not isinstance(gate, dict):
+        return False, 'gate 非结构化登记'
+    script = (gate.get('script') or '').strip()
+    if not script:
+        return False, 'gate 缺落点脚本'
+    path = script if os.path.isabs(script) else os.path.join(repo, script)
+    if not os.path.isfile(path):
+        return False, f'落点脚本不存在 {script}'
+    try:
+        src = open(path, encoding='utf-8').read()
+    except OSError as ex:
+        return False, f'落点脚本不可读 {str(ex)[:40]}'
+    return _selftest_landed(src, (gate.get('anchor') or '').strip())
+
+
 def chk_contentflow(target, cfg, ctx):
     """M12 内容流面（v0.8.64 经验闭环）：五判据+经验效果三指标。
     数据源全离线：archive_ledger / content_sources / experience_recurrence。
@@ -286,16 +375,38 @@ def chk_contentflow(target, cfg, ctx):
         items.append({'s': 'unknown', 't': 'archive_ledger 不可读', 'e': str(led[0])})
         sts.append('unknown')
 
-    # 判4 经验复发（≥3 verify 黄）
+    # 判4 经验复发（≥3 verify 黄）——v0.8.73：已闸化登记实证后不再报「须升【阻】或闸化」
     rec_path = os.path.join(repo, 'experience_recurrence.json')
     try:
         rec = _json.load(open(rec_path, encoding='utf-8'))
         hot = [(k, v.get('count', 0)) for k, v in rec.get('counters', {}).items()
                if v.get('count', 0) >= 3 and v.get('status', 'active') != 'retired']
-        if hot:
-            items.append({'s': 'yellow', 't': f'经验复发超限: {len(hot)} 病号≥3次',
-                          'e': '，'.join(f'{k}×{n}' for k, n in hot) + '（须升【阻】或闸化）'})
+        # 闸化登记：ctx 可注入 gate_registry（selftest 用，不污染真账本），否则读映射表
+        reg = ctx.get('gate_registry') if ctx else None
+        if reg is None:
+            try:
+                mp = _json.load(open(os.path.join(repo, 'verify', '病号映射表.json'), encoding='utf-8'))
+                reg = {d.get('id'): d.get('gate') for d in mp.get('diseases', []) if d.get('gate')}
+            except Exception:
+                reg = {}
+        gated, ungated, detail = [], [], []
+        for k, n in hot:
+            g = reg.get(k)
+            if not g:
+                ungated.append((k, n))
+                detail.append(f'{k}: 无闸化登记')
+                continue
+            ok, why = _gate_landed(repo, g)
+            (gated if ok else ungated).append((k, n))
+            detail.append(f'{k}: {"已闸化(" + why + ")" if ok else "登记未落地(" + why + ")"}')
+        if ungated:
+            items.append({'s': 'yellow', 't': f'经验复发超限: {len(ungated)} 病号≥3次未闸化',
+                          'e': '，'.join(f'{k}×{n}' for k, n in ungated) + '（须升【阻】或闸化）'})
             sts.append('yellow')
+        elif gated:
+            items.append({'s': 'green', 't': f'经验复发: {len(gated)} 病号≥3次已闸化',
+                          'e': '；'.join(detail) + '｜落点脚本+selftest 实证，计数不洗绿'})
+            sts.append('green')
         else:
             items.append({'s': 'green', 't': '经验复发: 无超限病号', 'e': '复发计数 hook 自动记账'})
             sts.append('green')

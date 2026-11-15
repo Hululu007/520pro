@@ -713,6 +713,12 @@ else
   no "M12 经验门有红项（无源内容/过期账实脱节）："
   sed 's/^/     /' /tmp/_exp_gate.out | head -9
 fi
+# v0.8.73：闸化登记判据自证接电（判据不在执行路径=挂空）。五形态/六反例/端到端 green-yellow 正反向。
+if exp_st_out=$( python3 "$TARGET/verify/gate_experience.py" --selftest 2>&1 ); then
+  ok "  └ M12 闸化登记 --selftest 正反向全过（五形态+反例+端到端 green/yellow）"
+else
+  no "  └ M12 闸化登记 --selftest 未过：$(printf '%s' "$exp_st_out" | grep -E '✗|FAIL' | head -3 | tr '\n' ' ')"
+fi
 
 # ★ v0.8.25（规则迁移批2）：台账四律——旧生态 M-R75/82/86/93 的判据化落点
 # 为什么要有：这四条原本是旧生态的"教训条目"，只在文档里躺着。docs 不加载

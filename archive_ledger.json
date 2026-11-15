@@ -2323,6 +2323,17 @@
    "result": "ok",
    "event_ref": "commit f34aced",
    "note": "判例文档含事件指针 event_ref=commit f34aced：病15 类名级识别范围≠对象范围，本轮防住未复发、闸化证据；覆盖 D-f34aced-F06"
+  },
+  {
+   "ts": "2026-11-15T15:06:30",
+   "round": "evolve-log 0.8.73",
+   "artifact": "版本演化台账记录 0.8.73",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.73 · VERSION=0.8.73 · 技能快照 4831f09f5a8f · 技能 19 个",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
   }
  ]
 }
