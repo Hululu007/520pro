@@ -1,6 +1,6 @@
 ---
 name: foundry
-version: "1.0.0"
+version: "1.1.0"
 description: "当用户说「逆向工程」「扒 APK」「类源码」「能力迁移」「工具接线」时使用本技能。熔铸司·520 横向工具能力板块：把 jadx MCP 26 个工具、63 份技能目录的能力面完整承接进 520 生态，产出可落库。适用于 APK 逆向侦察、类级源码提取、工具能力盘点、跨项目技能迁移、能力面对照。触发词：逆向工程 / 扒 APK / 类源码 / jadx / 能力迁移 / 工具接线 / 能力面对照 / 横向采集 / 熔铸 / 工具盘点。能力：①jadx 26 工具真调（类/方法/字段/资源/xref 解码）；②63 目录能力面登记与分批补码；③产出经 archive_out 正门接 520进化论与资料库；④env-audit A/B/C 两级验证。不要用于：TVBox 找源/测活/写源（归 probe-hub）；不要用于学习资料整理（归 learn-hub）；不要用于云端建库/搬移（归 space-hub）。正门 scripts/foundry.py，先读 SKILL.md 判据再动手。"
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -30,14 +30,14 @@ allowed-tools: Read, Grep, Glob, Bash
 
 | 命令 | 作用 |
 |---|---|
-| `python3 scripts/foundry.py status` | 打印板块状态：登记工具数、能力面数、当前施工阶段、27 项契约自检摘要 |
-| `python3 scripts/foundry.py tools` | 列出 26 个 jadx MCP 工具及其 inputSchema 摘要（真源 `tools_schema.json`） |
-| `python3 scripts/foundry.py selftest` | 正反向验证：骨架齐全应绿、缺件/坏链/假参数应红 |
+| `python3 scripts/foundry.py status` | 打印板块状态：登记工具数、verified 26/26 转正判定、引擎真源、当前施工阶段、产出落点 |
+| `python3 scripts/foundry.py tools` | 列出 26 个 jadx MCP 工具的 inputSchema / required / 真调参数配方（真源 `tools_schema.json`） |
+| `python3 scripts/foundry.py selftest` | 正反向验证：骨架+转正 26/26 应绿、缺件/坏填法五种后接形态/洗绿造错应红 |
 
 ## 工作流
 
-1. **先验**：`status` 确认骨架与登记齐全，不许凭印象说"接好了"。
-2. **取工具面**：`tools` 读 26 个 schema；调用参数一律取**上一步真实返回**（`items[0]`、解码资源名、构造器 `<init>/<clinit>`），不手敲类名。
+1. **先验**：`status` 确认骨架与 `schema_ok` 转正判定 26/26 绿，不许凭印象说"接好了"。
+2. **取工具面**：`tools` 读 26 个 inputSchema + 真调配方；调用走 `foundry-core/scripts/jadx_engine.py` 的 `call(name, args)`（W2 已上提泛化，能力层 shellcrack 反向复用）；参数一律取**上一步真实返回**（`items[0]`、解码资源名、构造器 `<init>/<clinit>`），不手敲类名。
 3. **能力面**：63 目录先全量登记，再按批补码转正；两件事分离，不许把"登记了"说成"迁移完了"。
 4. **产出**：解码结果、能力对照、判例文档经 `space_hub.archive_out(path, source=..., note=..., target=...)` 落库，回执写 `archive_ledger.json`；失败记 `local_pending(待归档)`，由 `products --retry` 补投，绝不把"没落库"说成"已归档"。
 5. **验证**：`selftest` 正反向通过才允许宣布该阶段完成；`bash verify.sh` 0✗/0⚠ 是阶段收口的硬判据。

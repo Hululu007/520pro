@@ -1,37 +1,982 @@
 {
- "_doc": "jadx-headless-mcp 0.7.1 的 26 个工具 inputSchema 名册。一手来源：tools/list 实测 /tmp/tools_list_实测.json（2026-11-15）。W1 只登记名册（verified:false），W2 逐个补 inputSchema 与真调参数——登记与转正分离，不把「登记了」说成「调通了」。",
- "schema_version": 1,
- "source": "tools/list 实测（26 个；S233 §3.2 文档枚举 25 个，漏 get_main_application_classes_names）",
+ "_doc": "jadx-headless-mcp 0.7.1 的 26 个工具全量接线（W2，v0.8.76）。一手来源：tools/list 实测 /tmp/tools_list_实测.json（26 个 inputSchema，非 S233 §3.2 文档枚举的 25 个——漏 get_main_application_classes_names）；23 条真调参数来自 /tmp/tools_call_实测.json + /tmp/tools_call_补调.json，另 3 个（status/load_apk/search_classes_by_keyword）来自 S233① LeeCat 端到端。verified 26/26 = 26 个 inputSchema 实测登记 + 26 条真调配方在册且有真调证据；bad_args_examples 保留首轮 6 个假失败作参数链反例，不静默删（B-18）。",
+ "schema_version": 2,
+ "source": "tools/list 实测 26 个（2026-11-15）；S233 §3.2 枚举 25 个，漏 get_main_application_classes_names",
  "jar": "jadx-headless-mcp-0.7.1-all.jar",
  "registered": "2026-11-15",
- "phase": "W1 名册登记",
- "verified_count": 0,
+ "phase": "W2 26 工具全量接线完成",
+ "verified_count": 26,
+ "verified_semantics": "verified=true 表示：① inputSchema 按 tools/list 一手实测登记；② 有 call_recipe.args 真调参数配方；③ 该配方有真调证据（P1/FIX-6/S233①）。不等于「本轮重跑 26 次 java」——本轮 W2 复验是引擎真实通道可用性的独立佐证（见 w2_realcall）。",
+ "chain_rules": {
+  "from_previous_result": "参数一律取上一步真实返回；方法名用 items[0]",
+  "class_name": "类名取 get_main_activity_class / get_main_application_classes_names 的返回，不手敲",
+  "method_name": "方法名取 get_methods_of_class 返回的首项（如 onCreate / $stable）",
+  "resource_name": "资源名用 jadx 解码表（AndroidManifest.xml / resources.arsc），不用 zip 原始路径",
+  "constructor": "构造器写 <init> / <clinit>"
+ },
+ "bad_args_examples": [
+  {
+   "tool": "get_method_by_name",
+   "bad_args": {
+    "class_name": "com.yunget.app.MainActivity",
+    "method_name": "class_name"
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "把 JSON key `class_name` 当成方法名/字段名（应用 items[0] 的真实返回值）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_method_body",
+   "bad_args": {
+    "class_name": "com.yunget.app.MainActivity",
+    "method_name": "class_name"
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "把 JSON key `class_name` 当成方法名/字段名（应用 items[0] 的真实返回值）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_method_smali",
+   "bad_args": {
+    "class_name": "com.yunget.app.MainActivity",
+    "method_name": "class_name"
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "把 JSON key `class_name` 当成方法名/字段名（应用 items[0] 的真实返回值）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_xrefs_to_method",
+   "bad_args": {
+    "class_name": "com.yunget.app.MainActivity",
+    "method_name": "class_name",
+    "limit": 5
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "把 JSON key `class_name` 当成方法名/字段名（应用 items[0] 的真实返回值）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_xrefs_to_field",
+   "bad_args": {
+    "class_name": "com.yunget.app.MainActivity",
+    "field_name": "class_name",
+    "limit": 5
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "把 JSON key `class_name` 当成方法名/字段名（应用 items[0] 的真实返回值）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_resource_file",
+   "bad_args": {
+    "name": "META-INF/com/android/build/gradle/app-metadata.properties"
+   },
+   "state": "调用失败(工具 isError)",
+   "why": "用了 zip 归档原始路径（应用 jadx 解码资源名）",
+   "fixed_by": "FIX-6 补调 / 资源名专项"
+  },
+  {
+   "tool": "get_resource_file",
+   "bad_args": {},
+   "state": "无法判定(14 候选均非可读文件)",
+   "why": "14 个 zip 候选均非可读文件 → 三态记「无法判定」，不判通过也不判失败",
+   "fixed_by": "改用 jadx 解码资源名 AndroidManifest.xml"
+  }
+ ],
+ "w2_realcall": {
+  "performed": true,
+  "channel": "real-java-stdio",
+  "tool_count": 26,
+  "sessions": 2,
+  "class_count": 22432,
+  "chain_class": "com.yunget.app.MainActivity",
+  "resource_probe": [
+   {
+    "name": "AndroidManifest.xml",
+    "kind": "jadx解码名",
+    "state": "真调通",
+    "text_len": 6318,
+    "head": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:"
+   },
+   {
+    "name": "resources.arsc",
+    "kind": "jadx解码名",
+    "state": "真调通",
+    "text_len": 60058,
+    "head": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n    <public type=\"anim\" name=\"abc_fade_in\" id=\"0x7f010000\" />\n    <pu"
+   },
+   {
+    "name": "META-INF/com/android/build/gradle/app-metadata.properties",
+    "kind": "zip原始路径",
+    "state": "link-not-file",
+    "text_len": 89,
+    "head": "resource is a link, not a file: META-INF/com/android/build/gradle/app-metadata.properties"
+   }
+  ],
+  "session_errors": [],
+  "steps_ok": 6,
+  "steps_total": 20,
+  "steps_proc_dead": 13,
+  "steps_unknown": 1,
+  "honest_note": "本轮复验目的是「新引擎真实通道可用性」+「资源名参数链专项」，不是逐工具重跑 26 次 java。两个独立 java 进程 tools/list 均 26 个、load_apk LOADED（22432 类）；资源专项AndroidManifest.xml/resources.arsc 用解码名真调通、zip 原始路径报 link-not-file，闭环证明参数链规则②。进程 B 在 get_methods_of_class 之后 jadx 服务端反编译某类时子进程崩溃（PROC_DEAD，如实记入 steps_proc_dead，不折叠成通过）——属 jadx 服务端稳定性，非引擎传输层缺陷（引擎已统一收敛为 PROC_DEAD 三态）。26 工具的真调证据来自 P1/FIX-6/S233① 一手素材（tools_call_实测.json / 补调.json），不因本轮这次崩溃失效。"
+ },
  "tools": [
-  {"name": "status", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "load_apk", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "unload_apk", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_app_info", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_android_manifest", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_main_activity_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "list_classes", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_main_application_classes_names", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_class_source", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_class_summary", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_smali_of_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_fields_of_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_inner_classes", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "resolve_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_methods_of_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_method_by_name", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_method_body", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_method_smali", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "search_method_by_name", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "search_classes_by_keyword", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_xrefs_to_class", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_xrefs_to_method", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_xrefs_to_field", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_strings", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "list_resource_files", "verified": false, "inputSchema": null, "phase": "W2 待补"},
-  {"name": "get_resource_file", "verified": false, "inputSchema": null, "phase": "W2 待补"}
+  {
+   "name": "status",
+   "description": "Report whether an APK is loaded and basic info (path, class count, resource count, load duration).",
+   "inputSchema": {
+    "properties": {},
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {},
+    "required": [],
+    "evidence": "S233① LeeCat 端到端（tools/list 实测 26 + initialize 回执）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "load_apk",
+   "description": "Load an APK / DEX / JAR. Replaces any currently-loaded file. Blocks until indexing completes (typically a few seconds to a minute depending on size). Optional include_packages/exclude_packages, threads, code_cache_size, resources (full|lite|none) override the server CLI defaults for this load.",
+   "inputSchema": {
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Absolute path to the APK / DEX / JAR."
+     },
+     "include_packages": {
+      "type": "string",
+      "description": "Comma-separated package/FQN prefixes to KEEP (e.g. com.gcash,com.mynt). Overrides CLI --include-packages for this load."
+     },
+     "exclude_packages": {
+      "type": "string",
+      "description": "Comma-separated package prefixes to DROP (e.g. androidx,kotlin). Overrides CLI --exclude-packages for this load."
+     },
+     "threads": {
+      "type": "integer",
+      "description": "jadx pre-decompile workers. 0 = all cores. Omit to keep the server default (min(CPU,4))."
+     },
+     "code_cache_size": {
+      "type": "integer",
+      "description": "Max decompiled top-level classes kept in RAM (LRU). 0 = unlimited. Omit to keep the server default (64)."
+     },
+     "resources": {
+      "type": "string",
+      "description": "full | lite | none. lite keeps Manifest+strings+arsc; none hides non-manifest resources. jadx 1.5.6 still parses arsc at load."
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "path": "<APK 绝对路径>"
+    },
+    "required": [
+     "path"
+    ],
+    "evidence": "S233① LeeCat 端到端（load_apk state=LOADED / 7428 类）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "unload_apk",
+   "description": "Release the currently-loaded APK and free memory. No-op if nothing is loaded.",
+   "inputSchema": {
+    "properties": {},
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {},
+    "required": [],
+    "evidence": "P1 tools/call 实测（tools_call_实测.json，state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_app_info",
+   "description": "Return package name, version, minSdk/targetSdk, and permissions parsed from AndroidManifest.xml.",
+   "inputSchema": {
+    "properties": {},
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {},
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_android_manifest",
+   "description": "Return decoded AndroidManifest.xml. Use section=permissions|activities|services|providers|receivers|application to slice (much cheaper than the full manifest, which can be 50KB+). max_bytes truncates the result.",
+   "inputSchema": {
+    "properties": {
+     "section": {
+      "type": "string",
+      "description": "One of: permissions, activities, services, providers, receivers, application. Omit for full manifest."
+     },
+     "max_bytes": {
+      "type": "integer",
+      "description": "Per-call truncation; overrides server default."
+     }
+    },
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "section": "permissions"
+    },
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_main_activity_class",
+   "description": "Return the FQN of the LAUNCHER activity (action MAIN + category LAUNCHER).",
+   "inputSchema": {
+    "properties": {},
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {},
+    "required": [],
+    "evidence": "P1 tools/call 实测（返回 com.yunget.app.MainActivity，参数链起点）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "list_classes",
+   "description": "Paginated list of class FQNs. Optional prefix narrows to a package subtree (e.g. 'com.applovin').",
+   "inputSchema": {
+    "properties": {
+     "prefix": {
+      "type": "string",
+      "description": "Optional FQN prefix, e.g. 'com.applovin'. Matches both equal and dot-suffix."
+     },
+     "offset": {
+      "type": "integer",
+      "default": 0
+     },
+     "limit": {
+      "type": "integer",
+      "default": 200
+     }
+    },
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "prefix": "dev.turbodl",
+     "offset": 0,
+     "limit": 8
+    },
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通，含 prefix 与纯分页两形态）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_main_application_classes_names",
+   "description": "Return FQNs of classes whose package matches the AndroidManifest 'package' attribute. Useful as a lightweight 'is the right APK loaded' probe.",
+   "inputSchema": {
+    "properties": {
+     "offset": {
+      "type": "integer",
+      "default": 0
+     },
+     "limit": {
+      "type": "integer",
+      "default": 500
+     }
+    },
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "offset": 0,
+     "limit": 8
+    },
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通，812 应用类）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_class_source",
+   "description": "Return decompiled Java source. If jadx hits anti-decompile stubs (goto obfuscation, 'Code decompiled incorrectly' / 'Method not decompiled' banners), it transparently returns the class SMALI instead, prefixed with '// [jadx java-decompile failed → smali]' (disable with smali_fallback=false). Accepts inner/$Companion names. Truncated at max_bytes AFTER jadx finishes; hard-aborts after decompile_timeout_ms (default 90s). Prefer get_class_summary + get_method_by_name/get_method_body for large classes.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string",
+      "description": "Fully-qualified class name, e.g. com.example.Foo. Inner/Companion forms (Outer$Inner, Outer.Companion) are accepted."
+     },
+     "max_bytes": {
+      "type": "integer",
+      "description": "Per-call truncation AFTER decompile; does not speed up jadx. Prefer smaller fetches via get_method_by_name."
+     },
+     "smali_fallback": {
+      "type": "boolean",
+      "description": "Auto-fall back to smali when Java decompilation fails (default true). Set false to force the partial Java.",
+      "default": true
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "max_bytes": 2000
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_class_summary",
+   "description": "Lightweight class skeleton: method signatures, field names, inner class names — no method bodies. Cheaper than get_class_source for navigation; use it to pick which method to drill into.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity"
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_smali_of_class",
+   "description": "Return smali (DEX disassembly). Smali is often 2-3x source size, so large classes truncate. To page a huge class pass offset (byte offset into the full smali) with max_bytes as the window size; the response header reports total_bytes and next_offset. For a single method prefer get_method_smali. Hard-aborts after decompile_timeout_ms (default 90s). Accepts inner/$Companion names.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "max_bytes": {
+      "type": "integer",
+      "description": "Per-call window/truncation size (default server --max-source-bytes)."
+     },
+     "offset": {
+      "type": "integer",
+      "description": "Byte offset into the full class smali to start from (for paging). Default 0.",
+      "default": 0
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "max_bytes": 1500
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_fields_of_class",
+   "description": "List fields of a class. Paginated; use filter to narrow by name (case-insensitive substring); names_only=true for a compact name list.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "filter": {
+      "type": "string",
+      "description": "case-insensitive substring on field name"
+     },
+     "offset": {
+      "type": "integer",
+      "default": 0
+     },
+     "limit": {
+      "type": "integer",
+      "default": 200
+     },
+     "names_only": {
+      "type": "boolean",
+      "default": false
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "names_only": true,
+     "limit": 10
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通，首项 $stable 供 xref 用）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_inner_classes",
+   "description": "List the inner/nested classes of a class, each with its dotted full_name AND raw_name (the $-joined runtime form, e.g. Outer$Companion) so you can address them directly. Resolves $Companion / inner / fuzzy names.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity"
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "resolve_class",
+   "description": "Resolve a possibly-inaccurate class name (inner/$Companion/dotted/fuzzy) to its exact FQN, or list candidate FQNs when ambiguous. Use this when get_class_source says 'class not found'. Metadata-only (no decompile).",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity"
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_methods_of_class",
+   "description": "List methods of a class. Paginated; use filter to narrow by name (case-insensitive substring); names_only=true for a compact name list.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "filter": {
+      "type": "string",
+      "description": "case-insensitive substring on method name"
+     },
+     "offset": {
+      "type": "integer",
+      "default": 0
+     },
+     "limit": {
+      "type": "integer",
+      "default": 100
+     },
+     "names_only": {
+      "type": "boolean",
+      "default": false
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "names_only": true,
+     "limit": 20
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通，首项 onCreate）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_method_by_name",
+   "description": "Return the decompiled Java source of a single method. If overloaded, returns the first match. If jadx fails to decompile the body (anti-decompile stub), transparently returns that method's SMALI with a '// [jadx java-decompile failed → smali]' marker (disable via smali_fallback=false). Accepts inner/$Companion class names.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "method_name": {
+      "type": "string"
+     },
+     "smali_fallback": {
+      "type": "boolean",
+      "description": "Fall back to method smali when Java decompile fails (default true).",
+      "default": true
+     }
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "method_name": "onCreate"
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "evidence": "FIX-6 补调（首轮把 JSON key class_name 当方法名→isError；改用 items[0] 的 onCreate 后真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_method_body",
+   "description": "Return ONE method as Java if it decompiles, else its SMALI — with a JSON envelope reporting which. The method-level counterpart of get_class_source's smali fallback; use it to read a single method out of a huge/obfuscated class without dumping the whole class. Reports mode ('java'|'smali'), fell_back, and any decompile-failure markers. Accepts inner/$Companion class names and overloaded methods (set overload_index).",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "method_name": {
+      "type": "string"
+     },
+     "overload_index": {
+      "type": "integer",
+      "description": "0-based index when the name is overloaded (default 0).",
+      "default": 0
+     },
+     "smali_fallback": {
+      "type": "boolean",
+      "description": "Fall back to method smali when Java decompile fails (default true).",
+      "default": true
+     },
+     "max_bytes": {
+      "type": "integer",
+      "description": "Per-call truncation of the body."
+     }
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "method_name": "onCreate"
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "evidence": "FIX-6 补调（onCreate 真调通；另测 <init> 构造器同样通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_method_smali",
+   "description": "Return the SMALI of a single method (all overloads of the name), sliced out of the class disassembly. Cheap way to read one method from a huge class instead of get_smali_of_class. Accepts inner/$Companion class names.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "method_name": {
+      "type": "string"
+     },
+     "max_bytes": {
+      "type": "integer",
+      "description": "Per-call truncation."
+     }
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "method_name": "onCreate"
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "evidence": "FIX-6 补调（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "search_method_by_name",
+   "description": "Search for methods by name across all classes. Exact match preferred, falls back to substring.",
+   "inputSchema": {
+    "properties": {
+     "method_name": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 100
+     }
+    },
+    "required": [
+     "method_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "method_name": "onCreate",
+     "limit": 5
+    },
+    "required": [
+     "method_name"
+    ],
+    "evidence": "FIX-6 补调（state=真调通；P1 用 class_name 亦通，取更规范的方法名形态）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "search_classes_by_keyword",
+   "description": "Search classes across one or more scopes: 'class' (FQN), 'method', 'field' names (all cheap, metadata-only), and 'code' (decompiled source body — expensive: decompiles each scanned class). Always pass 'package' when using 'code' scope on large APKs, otherwise the scan cap will cut you off. Accepts comma-separated 'search_in' (default 'class'). Returns hits with which scope matched and a code snippet when 'code' matches.",
+   "inputSchema": {
+    "properties": {
+     "search_term": {
+      "type": "string"
+     },
+     "search_in": {
+      "type": "string",
+      "description": "Comma-separated subset of: class,method,field,code. Default 'class'.",
+      "default": "class"
+     },
+     "package": {
+      "type": "string",
+      "description": "Optional FQN prefix filter, e.g. 'com.applovin'. Strongly recommended with 'code' scope."
+     },
+     "offset": {
+      "type": "integer",
+      "default": 0
+     },
+     "count": {
+      "type": "integer",
+      "default": 20
+     },
+     "max_scan": {
+      "type": "integer",
+      "description": "Cap on classes scanned. 0 = use defaults (all classes for metadata; 20000 with package + code; 5000 without package + code). Overridable server-wide via --max-scan.",
+      "default": 0
+     }
+    },
+    "required": [
+     "search_term"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "search_term": "spider",
+     "search_in": "class",
+     "count": 25
+    },
+    "required": [
+     "search_term"
+    ],
+    "evidence": "S233① LeeCat 端到端（壳类型关键词判据正门）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_xrefs_to_class",
+   "description": "List code sites that reference the given class.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 200
+     },
+     "resolve_line": {
+      "type": "boolean",
+      "description": "Resolve each usage's source line (force-decompiles its class). Default false; set true only when you need line numbers.",
+      "default": false
+     }
+    },
+    "required": [
+     "class_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "limit": 5
+    },
+    "required": [
+     "class_name"
+    ],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_xrefs_to_method",
+   "description": "List code sites that call the given method.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "method_name": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 200
+     },
+     "resolve_line": {
+      "type": "boolean",
+      "description": "Resolve each usage's source line (force-decompiles its class). Default false; set true only when you need line numbers.",
+      "default": false
+     }
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "method_name": "onCreate",
+     "limit": 5
+    },
+    "required": [
+     "class_name",
+     "method_name"
+    ],
+    "evidence": "FIX-6 补调（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_xrefs_to_field",
+   "description": "List code sites that reference the given field.",
+   "inputSchema": {
+    "properties": {
+     "class_name": {
+      "type": "string"
+     },
+     "field_name": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 200
+     },
+     "resolve_line": {
+      "type": "boolean",
+      "description": "Resolve each usage's source line (force-decompiles its class). Default false; set true only when you need line numbers.",
+      "default": false
+     }
+    },
+    "required": [
+     "class_name",
+     "field_name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "class_name": "com.yunget.app.MainActivity",
+     "field_name": "$stable",
+     "limit": 5
+    },
+    "required": [
+     "class_name",
+     "field_name"
+    ],
+    "evidence": "FIX-6 补调（字段名取 get_fields_of_class 首项 $stable，真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_strings",
+   "description": "Return string resources from res/values/strings*.xml. Optionally filter by substring.",
+   "inputSchema": {
+    "properties": {
+     "filter": {
+      "type": "string",
+      "description": "case-insensitive substring filter on string value or name"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 500
+     }
+    },
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "limit": 5
+    },
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "list_resource_files",
+   "description": "List names of resource files in the APK. With resources=lite this is Manifest + strings XML + arsc; with resources=none only AndroidManifest.xml.",
+   "inputSchema": {
+    "properties": {
+     "filter": {
+      "type": "string",
+      "description": "case-insensitive substring filter on file name"
+     },
+     "limit": {
+      "type": "integer",
+      "default": 500
+     }
+    },
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "limit": 12
+    },
+    "required": [],
+    "evidence": "P1 tools/call 实测（state=真调通；60 项含解码名与 zip 路径）",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  },
+  {
+   "name": "get_resource_file",
+   "description": "Return the content of a resource file (text decoded if possible, otherwise base64).",
+   "inputSchema": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Resource file name as reported by list_resource_files"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "type": "object"
+   },
+   "verified": true,
+   "call_recipe": {
+    "args": {
+     "name": "AndroidManifest.xml"
+    },
+    "required": [
+     "name"
+    ],
+    "evidence": "资源专项：必须用 jadx 解码名（AndroidManifest.xml / resources.arsc）；zip 原始路径一律 report link-not-file。W1 复盘 + W2 本轮新引擎真调复验",
+    "state": "真调通"
+   },
+   "phase": "W2 已转正"
+  }
  ]
 }

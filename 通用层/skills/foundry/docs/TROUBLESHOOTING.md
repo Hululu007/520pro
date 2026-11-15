@@ -46,3 +46,22 @@
 症状：契约机检 C5 在 `--require-mirror` 下红。
 处置：走 `bash install.sh --user-skill` 正门重装通用层，不要手工 cp 单个文件
 （漏一件下次还是红）；运行时态文件在 `runtime_files` 豁免清单里，不要把它算成漂移。
+
+## 8. status 报「转正判定：无法判定」或已验 0/26
+
+症状：仓内 `core.py --selftest` 全绿、`tools_schema.json` 已是 verified 26/26，
+但 `foundry.py status` 显示「已验 0/26」「转正判定：无法判定（AttributeError: module
+'core' has no attribute 'schema_ok'）」，`selftest` 正向红。
+处置：`foundry.py` 的 `_load_core()` **用户级安装副本优先**，命中了上一阶段的旧
+`~/.codebuddy/skills/foundry-core/`。这不是判据或 schema 坏了，是镜像滞后——
+走 `bash install.sh --user-skill` 重装同步后自愈（详见 foundry-core 排障 §8）。
+不要为了让它绿去改 `_load_core` 优先级或手填 `verified`（改判据 ≠ 同步镜像）。
+
+## 9. 参数链把合法 `class_name` 键误判为坏填法（W2 已修）
+
+症状：真实配方 `{"class_name":"com.x.MainActivity","method_name":"onCreate"}` 被
+`chain_ok` 判红，报「参数链含坏填法 class_name」。
+处置：W1 版 `chain_ok` 用 `'class_name' in json.dumps(args)` 判坏，把**键名字符串**
+当成了违例——而 `class_name` 是 26 工具合法必填参数名（病15：识别范围 ≠ 对象范围）。
+W2 改为查参数**值**（`_bad_value`）：JSON key 字面量 / 占位符 / zip 原始路径前缀才判红，
+键名任意合法。若又见此症状说明跑的是旧安装副本，先按 §8 重装。

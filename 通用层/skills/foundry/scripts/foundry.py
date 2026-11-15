@@ -4,8 +4,10 @@
 
 三个子命令：status / tools / selftest。
 selftest 是施工纪律③「正反向验证通过才落地」的执行面：
-  正向 = 真实骨架应绿；反向 = 造四类违例（缺 SKILL.md / 缺 manifest.json /
-  名册非 26 / 描述五组缺项）必须各自翻红。造错用临时目录，不动真文件。
+  正向 = 真实骨架应绿（W2 起含 schema_ok 26/26 转正判定）；
+  反向 = 造多类违例（缺 SKILL.md / 缺 manifest.json / 名册非 26 /
+  描述五组缺项 / 参数链五种后接形态坏填法）必须各自翻红。
+  造错用临时目录 + 内存深拷贝，不动真文件。
 """
 import json
 import os
@@ -92,10 +94,17 @@ def cmd_status():
     print(f'  技能骨架   : {"齐备 6 件" if ok else "缺件 " + ", ".join(miss)}')
     print(f'  描述契约   : {"五组齐备" if dok else "缺 " + ", ".join(dbad)}')
     print(f'  工具名册   : {len(names)} 个 / {"与实测一致" if nok else nmsg}')
-    print(f'  已验工具   : {ver}/26（W1 登记 / W2 补码转正，分离口径）')
-    print('  当前阶段   : W1 骨架登记（W0 锚点 → W1 → W2 引擎上提 → W3 全量迁入 → W4 产出接入 → W5 收口）')
+    print(f'  已验工具   : {ver}/26（W2 全量接线：inputSchema 实测登记 + 真调配方在册）')
+    try:
+        sok, smsg = core.schema_ok(schema)
+        print(f'  转正判定   : {"26/26 齐备（schema+配方+参数链，无洗绿）" if sok else "红 → " + smsg}')
+    except Exception as e:
+        sok = False
+        print(f'  转正判定   : 无法判定（{type(e).__name__}: {e}）')
+    print('  引擎真源   : 通用层 foundry-core/scripts/jadx_engine.py（能力层 shellcrack 反向复用）')
+    print('  当前阶段   : W2 引擎上提与 26 工具全量接线完成（W0→W1→W2 → W3 全量迁入 → W4 产出接入 → W5 收口）')
     print('  产出落点   : 🧬 520进化论/03·04·05 + 📦 产物归档/清单（见 artifacts.json）')
-    return 0 if (ok and dok and nok) else 2
+    return 0 if (ok and dok and nok and sok) else 2
 
 
 def cmd_tools():
@@ -103,10 +112,15 @@ def cmd_tools():
     schema = core.load_schema()
     for i, t in enumerate(schema['tools'], 1):
         s = t.get('inputSchema')
+        req = (s or {}).get('required') or []
+        rc = (t.get('call_recipe') or {}).get('args') or {}
         print(f'  {i:2d}. {t["name"]:36s} '
-              f'{"verified" if t.get("verified") else "W2 待补":10s} '
-              f'schema={"有" if s else "—"}')
-    return 0
+              f'{"verified" if t.get("verified") else "待补":10s} '
+              f'schema={"有" if s else "—"}  req={",".join(req) or "∅"}  '
+              f'args={",".join(rc.keys()) or "{}"}')
+    ok, msg = core.schema_ok(schema)
+    print(f'\n  转正判定：{"26/26 齐备" if ok else msg}')
+    return 0 if ok else 2
 
 
 def cmd_selftest():
@@ -125,17 +139,23 @@ def cmd_selftest():
     dok, dbad = _desc_ok(os.path.join(SKILL_DIR, 'SKILL.md'))
     ck('描述五组 + C9 + C11 齐备', dok, dbad)
     lok, lmiss = core.skeleton_ok()
-    ck('lib 内核骨架 6 件齐全', lok, lmiss)
+    ck('lib 内核骨架（含 jadx_engine.py）齐全', lok, lmiss)
     nok, nmsg = core.names_ok(core.TOOLS_26)
     ck('名册 26 个与 tools/list 实测一致', nok, nmsg)
+    # W2：真实配方含 class_name 键（病15 修正后必须判绿，W1 会误判）
+    cok, cmsg = core.chain_ok({'class_name': 'com.yunget.app.MainActivity',
+                               'method_name': 'onCreate'})
+    ck('真实配方（含 class_name 键）参数链通过', cok, cmsg)
     try:
         d = core.load_schema()
         nok2, nmsg2 = core.names_ok([t['name'] for t in d['tools']])
         ck('tools_schema.json 26 条登记', nok2, nmsg2)
+        sok, smsg = core.schema_ok(d)
+        ck('W2 转正：26 工具 schema+配方+参数链齐备', sok, smsg)
     except Exception as e:
-        ck('tools_schema.json 可读', False, f'{type(e).__name__}: {e}')
+        ck('tools_schema.json 可读 / 转正', False, f'{type(e).__name__}: {e}')
 
-    print('── 反向（四类造错必须各自翻红）──')
+    print('── 反向（多类造错必须各自翻红）──')
     tmp = tempfile.mkdtemp(prefix='foundry-selftest-')
     try:
         # ① 技能缺 SKILL.md
@@ -170,9 +190,30 @@ def cmd_selftest():
         ok4, bad4 = _desc_ok(p4)
         ck('删负边界 → 描述契约判红', not ok4, bad4)
 
-        # ⑤ 参数链坏填法
-        ok5, _ = core.chain_ok({'class': 'class_name'})
-        ck('JSON key 当类名 → 参数链判红', not ok5)
+        # ⑤ 参数链坏填法：五种后接形态各自判红（病15「只认精确锚点会全漏」）
+        bad_forms = [
+            ('JSON key 当类名', {'class': 'class_name'}),
+            ('JSON key 当方法名', {'class_name': 'com.yunget.app.MainActivity',
+                                 'method_name': 'class_name'}),
+            ('猜类名', {'class_name': 'MainActivity.guess'}),
+            ('占位符当资源名', {'name': 'zip_entry_path'}),
+            ('zip 原始路径', {'name': 'META-INF/com/android/build/gradle/app-metadata.properties'}),
+        ]
+        for nm, a in bad_forms:
+            o, _ = core.chain_ok(a)
+            ck(f'参数链判红·{nm}', not o)
+
+        # ⑥ W2 转正判据造错：verified 无 evidence（洗绿）/ inputSchema=null 必须翻红
+        try:
+            import copy
+            _d = copy.deepcopy(core.load_schema())
+            _d['tools'][0]['call_recipe'].pop('evidence', None)
+            ck('洗绿造错：verified 无 evidence → 转正判红', not core.schema_ok(_d)[0])
+            _d2 = copy.deepcopy(core.load_schema())
+            _d2['tools'][0]['inputSchema'] = None
+            ck('W1 残留：inputSchema=null → 转正判红', not core.schema_ok(_d2)[0])
+        except Exception as e:
+            ck('schema 造错用例可读', False, f'{type(e).__name__}: {e}')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

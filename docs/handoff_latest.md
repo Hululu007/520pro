@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.75 熔铸司（foundry）W0→W1 骨架登记已收口：**背景**：用户拍板「按你想法来 / 落通用层 / skill+lib / 按你想法来」并授权施工，新增横向工具能力板块，要求「产出接到 520进化论与资料库」。**做法**：通用层落 `foundry`(skill，平台可路由) + `foundry-core`(lib，无 SKILL.md 不注册) 双件；26 个 jadx MCP 工具名册按 `tools/list` 实测登记（非文档枚举的 25 个），63 目录能力面清单与补码转正分离；`artifacts.json` 声明能力面对照/解码资产/工具清单/板块演进/真调判例五类产出落点，出口复用 `space_hub.archive_out` 正门，不造第三套体系。**四条施工纪律**：①锚点用提交 `Next:` 三段式 + handoff P0 账目，每阶段收口后 `Next:` 前移一格；②问题从机制解决不跳过（W1 已实证：`_front_matter` 参数歧义改 `_fm_of_text` 收成单一语义、造错不彻底补「删净全部负边界词」前提断言）；③正反向 selftest 通过才落地，之后阶段性推 git；④遵守原有施工纪律。**判据**：`foundry.py selftest` 正向 5 项绿 / 反向 5 项全红、`core.py --selftest` 正反全过、契约 C1–C11 全✓、`bash verify.sh` 0✗/0⚠、handoff 机检三齐且 P0 至多 1 条。**遗留**：W2 JadxMCP 引擎上提、W3 63 目录全量迁入、W4 三处登记+端到端落库、W5 收口推送。
+v0.8.76 熔铸司（foundry）W2 引擎上提与 26 工具全量接线已收口：**做法**：`JadxMCP` 从能力层 `shellcrack.py` 上提到通用层 `foundry-core/scripts/jadx_engine.py`（独立命名避开与 `tvbox-core/core.py` 撞名、importlib 按路径加载不塞 sys.path、能力层反向复用调用行零改动，病15 `S233①` 五种后接形态判据保留）；`tools_schema.json` 补 26 个 `inputSchema`（`tools/list` 一手实测）+ 26 条真调配方（3 个 S233① 已用 + 23 个 P1/FIX-6 补调），`verified 26/26`，首轮 6 个假失败作 `bad_args_examples` 保留不删；修正 `core.py` 病15 复发（`chain_ok` 改查参数值不查键名）、新增 `schema_ok`（识别范围=对象范围，反向覆盖五种后接形态 + 洗绿造错）；引擎 `call()` 收敛死进程为 `PROC_DEAD` 三态。**本轮真调复验**：两独立 java 进程 `tools/list` 均 26 个、`load_apk` LOADED（22432 类），资源专项用 jadx 解码名 `AndroidManifest.xml`/`resources.arsc` 真调通、zip 原始路径报 `link-not-file`（闭环证明参数链规则②）；进程 B 反编译某类崩子进程如实记 `PROC_DEAD 13`（6/20 通）不折叠。**四条施工纪律**（沿用）：①`Next:` 三段式 + handoff P0 锚点每阶段前移；②问题从机制解决不跳过；③正反向 selftest 通过才落地、阶段性推 git；④遵守原有施工纪律。**判据**：`core.py`/`jadx_engine.py`/`foundry.py`/`shellcrack.py` 正反向 selftest 全绿、契约 C1–C11 全✓、`bash verify.sh` 0✗/0⚠、handoff 机检三齐且 P0 至多 1 条。**遗留**：W3 63 目录全量迁入、W4 三处登记 + 端到端落库、W5 收口推送。
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.75 熔铸司（foundry）W0→W1 骨架登记已收口：**背景**：用�
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.75
+- 版本：0.8.76
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）
@@ -42,7 +42,7 @@ v0.8.75 熔铸司（foundry）W0→W1 骨架登记已收口：**背景**：用�
 
 | 级别 | 事项 | owner | next | due |
 |---|---|---|---|---|
-| P0 | 熔铸司 W0→W5 施工：W1 骨架登记已落盘（foundry skill + foundry-core lib，26 工具名册已登记 / 0 已验，63 目录待 W3 迁入） | 我 | `bash verify.sh` 全绿后提交 v0.8.75 并推远端；下一阶段 W2：JadxMCP 从 probe-hub/shellcrack.py 上提到 foundry-core，26 schema 与 23 真调参数落盘 | W2 正反向 selftest 通过 + 阶段性 git 推送完成 |
+| P0 | 熔铸司 W3 63 目录全量迁入：W2 已收口（26 工具接线 verified 26/26，引擎已上提通用层）；63 目录能力面清单待 W3 迁入 | 我 | 先全量登记 63 目录能力面（登记与补码转正分离），逐目录补码后 `bash verify.sh` 全绿提交并阶段性推 git | W3 正反向 selftest 通过 + 阶段性 git 推送完成 |
 | P2 | 重采链路批量跑（123 个存活仓库）**挂起**：熔铸司施工期间不并行，原 P0 未收敛不删除 | 我 | W5 收口后由用户决定是否恢复：先跑 10 仓质量复核通过再放全量，成品库留入库回执 | W5 收口后用户重新批准批量 |
 | P2 | 云端收件箱 2 个测试库待删 | 用户 | 在资料库 App 内手动点删 | 用户确认删除即完 |
 | P2 | 26 条内容流旧账已豁免至 2026-12-31（quotepath 盲区期漏账，见病15 第 11 例）；到期由探测器自动转 open | 我 | 到期前复核：能真补的经 `archive` 落库核销，仍不补的重新豁免并写明继续不补的具体原因（不许转成 closed 洗绿） | 2026-12-31 |

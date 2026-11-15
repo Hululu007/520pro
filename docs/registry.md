@@ -43,7 +43,8 @@
 | 路径政策（canonical） | `MANIFEST.json` 的 `path_policy` | 新文档一律 `references/`；`docs/` 为过渡存量 |
 | 技能触发样本 | 各技能 `references/trigger-samples.md` | T/N/B 三组；C6 机检数量 + "第一动作/归属"完整性 |
 | 横向工具能力板块（熔铸司） | `通用层/skills/foundry/`（skill）+ `通用层/skills/foundry-core/`（lib） | 跨业务域的工具能力，不属任何单项业务域；`foundry-core` 无 SKILL.md，只被 import |
-| jadx MCP 26 工具名册与参数链 | `通用层/skills/foundry-core/scripts/tools_schema.json` + `通用层/skills/foundry-core/scripts/core.py` | 一手 `tools/list` 实测 26 个（非文档枚举 25）；W1 登记名册、W2 补 inputSchema 与真调参数，登记与转正分离 |
+| jadx MCP 26 工具名册与参数链 | `通用层/skills/foundry-core/scripts/tools_schema.json` + `通用层/skills/foundry-core/scripts/core.py` | 一手 `tools/list` 实测 26 个（非文档枚举 25）；W2 已补 26 个 inputSchema + 26 条真调配方，verified 26/26（登记与转正分离口径已收敛） |
+| jadx MCP 26 工具泛化传输引擎 | `通用层/skills/foundry-core/scripts/jadx_engine.py` | W2 从能力层 `shellcrack.py` 上提：`call(name,args)` 泛化 + `FakeTransport` 离线注入 + 独立命名避开与 `tvbox-core/core.py` 撞名；能力层 `probe-hub` 反向 import（收件方自持，调用行零改动） |
 | 熔铸司产出归属声明 | `通用层/skills/foundry/artifacts.json` | 声明能力面对照/解码资产/工具清单/板块演进/真调判例五类落点；库务司扫描 `*/artifacts.json` 自动纳入 |
 
 ## 四、运行时登记册（随使用增长，不入 git 或按需提交）

@@ -704,10 +704,42 @@ SHELL_TYPE_SIGNALS = {
     'pycryptodome': (('pycryptodome', 'Crypto.Cipher'), ('pycryptodome-3.21.0',), 'asset'),
 }
 
-JADX_JAR_CANDIDATES = (
-    '/tmp/milk/assets/mcp/jadx-headless-mcp-0.7.1-all.jar',
-    os.path.expanduser('~/.local/share/jadx-headless-mcp-all.jar'),
-)
+# ── W2 引擎上提（v0.8.76）：JadxMCP 真源迁到通用层 foundry-core ──
+# 沿用 v0.8.4「收件方自持、core 中转壳删除、调用方只改 import 来源、调用行零改动」范式。
+# 病15 对象范围坑：probe.py 把 tvbox-core/scripts 插进 sys.path，`from core import http_get`
+# 依赖那里的 core.py；foundry-core 内核也叫 core.py。若把 foundry-core/scripts 塞进 sys.path
+# 或用 `import core`，会劫持该名字。故：① 引擎独立命名 jadx_engine.py；② importlib 按
+# **绝对路径**加载，全程不碰 sys.path、不 import core。三态降级：两路都找不到 → 明确报
+# 「无法判定」，不折叠成通过、不假装引擎可用（B-02）。
+def _load_jadx_engine():
+    import importlib.util
+    here = os.path.dirname(os.path.abspath(__file__))
+    # 能力层 scripts/ → 上溯 5 层到仓根 → 通用层/skills/foundry-core/scripts
+    repo = os.path.normpath(os.path.join(here, '..', '..', '..', '..', '..'))
+    cands = [
+        os.path.expanduser('~/.codebuddy/skills/foundry-core/scripts/jadx_engine.py'),
+        os.path.join(repo, '通用层', 'skills', 'foundry-core', 'scripts', 'jadx_engine.py'),
+    ]
+    for fp in cands:
+        if os.path.isfile(fp):
+            spec = importlib.util.spec_from_file_location('foundry_core_jadx_engine', fp)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+    return None
+
+
+_ENGINE = _load_jadx_engine()
+if _ENGINE is not None:
+    JadxMCP = _ENGINE.JadxMCP
+    _resolve_jadx_jar = _ENGINE.resolve_jadx_jar
+    JADX_JAR_CANDIDATES = _ENGINE.JADX_JAR_CANDIDATES
+else:  # 引擎不可用：三态降级，不假绿
+    JadxMCP = None
+    JADX_JAR_CANDIDATES = ()
+
+    def _resolve_jadx_jar(jar=''):
+        return '', 'foundry-core jadx 引擎不可用（未安装），无法判定'
 
 
 def _seg_tokens(seg):
@@ -742,105 +774,8 @@ def _kw_in_fqn(kw, fqn):
     return False, False
 
 
-def _resolve_jadx_jar(jar=''):
-    """jar 不入 git（40MB，违反产物纪律）：三路解析，都取不到返回「无法判定」。"""
-    import shutil
-    for c in ((jar,) if jar else ()) + (os.environ.get('JADX_MCP_JAR', ''),) + JADX_JAR_CANDIDATES:
-        if c and os.path.isfile(c):
-            if not shutil.which('java'):
-                return '', 'java 不在 PATH（无法判定）'
-            return c, ''
-    return '', 'jadx jar 未找到（--jar / JADX_MCP_JAR / 常见路径三路皆空），无法判定'
-
-
-class JadxMCP:
-    """jadx-headless-mcp 0.7.1 的 stdio JSON-RPC 最小客户端。
-
-    工具名来自 tools/list 实测（S233 §3.3：rea-preset.json 的 24 个名字是上层封装，
-    照抄必 Tool not found）——本客户端只用 load_apk / status / search_classes_by_keyword。
-    transport 可注入（_FakeMCP），供离线 selftest 用，不启动 java。
-    """
-    def __init__(self, jar, timeout=300):
-        self.jar = jar
-        self.timeout = timeout
-        self.proc = None
-        self._id = 0
-        self.tool_names = []
-
-    def start(self):
-        import subprocess
-        self.proc = subprocess.Popen(
-            ['java', '-jar', self.jar, '--transport', 'stdio'],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL, bufsize=0)
-        init = self._call('initialize', {
-            'protocolVersion': '2024-11-05', 'capabilities': {},
-            'clientInfo': {'name': 'probe-hub-shellcrack', 'version': '1'}}, 120)
-        if not init or 'result' not in init:
-            raise RuntimeError('MCP initialize 无响应')
-        self.proc.stdin.write((json.dumps({
-            'jsonrpc': '2.0', 'method': 'notifications/initialized',
-            'params': {}}) + '\n').encode())
-        self.proc.stdin.flush()
-        tl = self._call('tools/list', {}, 60)
-        self.tool_names = [t.get('name') for t in
-                           (((tl or {}).get('result') or {}).get('tools') or [])]
-        return self
-
-    def _call(self, method, params, timeout=None):
-        self._id += 1
-        i = self._id
-        self.proc.stdin.write((json.dumps({
-            'jsonrpc': '2.0', 'id': i, 'method': method,
-            'params': params}) + '\n').encode())
-        self.proc.stdin.flush()
-        t0 = time.time()
-        lim = timeout or self.timeout
-        while time.time() - t0 < lim:
-            line = self.proc.stdout.readline()
-            if not line:
-                return None
-            s = line.decode('utf-8', 'ignore').strip()
-            if not s.startswith('{'):
-                continue
-            try:
-                d = json.loads(s)
-            except Exception:
-                continue
-            if d.get('id') == i:
-                return d
-        return None
-
-    def _text(self, r):
-        if not r or 'error' in r:
-            return ''
-        return '\n'.join(c.get('text', '') for c in
-                         ((r.get('result') or {}).get('content') or []))
-
-    def load_apk(self, path):
-        r = self._call('tools/call', {'name': 'load_apk',
-                                      'arguments': {'path': path}}, 600)
-        try:
-            return json.loads(self._text(r))
-        except Exception:
-            return {'state': 'UNKNOWN'}
-
-    def search(self, term, count=25):
-        r = self._call('tools/call', {
-            'name': 'search_classes_by_keyword',
-            'arguments': {'search_term': term, 'search_in': 'class',
-                          'count': count}}, 180)
-        try:
-            return json.loads(self._text(r))
-        except Exception:
-            return {'items': [], 'count': 0}
-
-    def close(self):
-        if self.proc:
-            try:
-                self.proc.terminate()
-            except Exception:
-                pass
+# W2：JadxMCP 类与 _resolve_jadx_jar 已上提到通用层 jadx_engine.py（见文件上方
+# _load_jadx_engine 绑定）。以下 classify_shell_types / probe_shell_types 调用行零改动。
 
 
 def classify_shell_types(searches):

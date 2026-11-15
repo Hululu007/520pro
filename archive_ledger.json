@@ -2400,6 +2400,17 @@
    "result": "ok",
    "event_ref": "commit b8221ee",
    "note": "v0.8.75 W1 骨架登记逐版交付说明；核销 D-b8221ee-F04；版本 0.8.75；foundry(skill)+foundry-core(lib) 双件套"
+  },
+  {
+   "ts": "2026-11-15T20:44:16",
+   "round": "evolve-log 0.8.76",
+   "artifact": "版本演化台账记录 0.8.76",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.76 · VERSION=0.8.76 · 技能快照 075de5945a99 · 技能 21 个",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
   }
  ]
 }

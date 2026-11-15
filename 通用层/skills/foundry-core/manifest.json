@@ -1,9 +1,10 @@
 {
   "name": "foundry-core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "kind": "lib",
-  "role": "熔铸司共享引擎内核：jadx MCP 26 工具名册、参数链规则、schema 装载。无 SKILL.md，平台不注册不路由，只被 foundry / probe-hub import。",
+  "role": "熔铸司共享引擎内核：jadx MCP 26 工具名册 / inputSchema / 参数链规则 / schema 装载 + scripts/jadx_engine.py 泛化传输引擎。无 SKILL.md，平台不注册不路由，只被 foundry / probe-hub import。",
   "entry": "scripts/core.py",
+  "engine": "scripts/jadx_engine.py",
   "owner_skill": "foundry",
   "layer": "通用层",
   "dependency_direction": "通用层对能力层零依赖；能力层 probe-hub 可 import 本 lib（收件方自持，同 v0.8.4 file_to_janitor 迁入 space-hub 的手法）",

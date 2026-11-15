@@ -1,572 +1,573 @@
 {
- "ecosystem": "520pro",
- "version": "0.8.75",
- "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
- "based_on": [
-  "WorkBuddy 平台运行时",
-  "新生态 v0.1.0",
-  "368817 存活素材"
- ],
- "core_upgrade": "TVBox 技能从项目级（不路由）升至用户级（平台注册可路由、跨项目、云端沙箱执行、手机可触发）",
- "deploy_modes": {
-  "user-skill": "通用层→~/.codebuddy + TVBox→~/.codebuddy（★推荐）",
-  "capability-only": "TVBox→<项目>/.codebuddy（项目隔离）",
-  "generic-only": "只装通用层到 ~/.codebuddy",
-  "all": "通用层→用户级 + 能力层→项目级（默认）"
- },
- "layers": {
-  "通用层": {
-   "scope": "用户级·跨项目",
-   "deploy_to": "~/.codebuddy/",
-   "files": {
-    "rules/core-8.md": {
-     "install_to": "~/.codebuddy/rules/core-8.md",
-     "alwaysApply": true,
-     "role": "16 条通用铁律（B-01~B-16 + M1–M7）"
-    },
-    "rules/zh-style.md": {
-     "install_to": "<项目>/.codebuddy/rules/zh-style.md",
-     "alwaysApply": true,
-     "role": "项目级文档/输出纪律契约（项目隔离模式才装）"
-    },
-    "skills/machine-bootstrap/SKILL.md": {
-     "role": "一键换机/克隆工作副本",
-     "version": "1.0.4"
-    },
-    "skills/artifact-store/SKILL.md": {
-     "role": "本地产物轻量化·防手机卡顿",
-     "version": "1.1.0"
-    },
-    "skills/learn-hub/": {
-     "install_to": "~/.codebuddy/skills/learn-hub/",
-     "role": "学习工坊：资料采集/分类/精炼/质检/入库/监测，13 个模块",
-     "entry": "scripts/learn.py",
-     "contains": "SKILL.md · scripts/learn.py · scripts/pan.py · scripts/flow.json · library/tree.json",
-     "pan": "scripts/pan.py —— 网盘取料（清单/下载/转存/删除）。2026-11-12 自 probe-hub harvest pan 迁入，零外部依赖",
-     "self_check": "python3 scripts/learn.py self-check → 16/16；python3 scripts/pan.py self-check → 2/2",
-     "not_tvbox": "与 TVBox 无关，纯通用层",
-     "version": "1.4.3"
-    },
-    "skills/space-hub/SKILL.md": {
-     "install_to": "~/.codebuddy/skills/space-hub/SKILL.md",
-     "role": "库务司·云端库总管 v2.7.0（清道夫升级）：清理/归纳/建库/搬运正门，四层空间解析不绑账号，拒收带结构化三元组",
-     "version": "2.8.0"
-    },
-    "skills/space-hub/scripts/space_hub.py": {
-     "install_to": "~/.codebuddy/skills/space-hub/scripts/space_hub.py",
-     "role": "引擎：init/classify/create-db/inbox/add/scan/list/restore/move/rename/census"
-    },
-    "skills/space-hub/scripts/classify_rules.json": {
-     "install_to": "~/.codebuddy/skills/space-hub/scripts/classify_rules.json",
-     "role": "归纳登记册（唯一真源，加规则零改代码）"
-    },
-    "skills/inspect-hub/SKILL.md": {
-     "install_to": "~/.codebuddy/skills/inspect-hub/SKILL.md",
-     "role": "巡检司 v1.4.1：520 自家健康 8 面巡检（八卦八门全部转正），景门改集合比对防假红",
-     "version": "1.4.4"
-    },
-    "skills/inspect-hub/scripts/inspect_hub.py": {
-     "install_to": "~/.codebuddy/skills/inspect-hub/scripts/inspect_hub.py",
-     "role": "巡检引擎：run/self-check，检查器失灵报「无法判定」绝不装绿，环比指纹落 findings_history.json"
-    },
-    "skills/inspect-hub/scripts/inspect_registry.json": {
-     "install_to": "~/.codebuddy/skills/inspect-hub/scripts/inspect_registry.json",
-     "role": "巡检登记册：加巡检面零改引擎（先登记占位灰，补码后转正）"
-    },
-    "skills/inspect-hub/scripts/dashboard_template.html": {
-     "install_to": "~/.codebuddy/skills/inspect-hub/scripts/dashboard_template.html",
-     "role": "卦门合阵面板模板（纯 CSS cqw 自适应，单文件零依赖，手机/电脑双端）"
-    },
-    "skills/learn-hub/CHANGELOG.md": {
-     "install_to": "~/.codebuddy/skills/learn-hub/CHANGELOG.md",
-     "role": "学习工坊变更凭证"
-    },
-    "skills/foundry/SKILL.md": {
-     "install_to": "~/.codebuddy/skills/foundry/SKILL.md",
-     "role": "熔铸司 v1.0.0：520 横向工具能力板块（jadx 26 工具名册 / 63 目录能力面 / 产出经 archive_out 落 520进化论）",
-     "entry": "scripts/foundry.py",
-     "self_check": "python3 scripts/foundry.py selftest → 正向绿 / 反向全红",
-     "version": "1.0.0"
-    },
-    "skills/foundry-core/": {
-     "install_to": "~/.codebuddy/skills/foundry-core/",
-     "role": "熔铸司共享引擎内核（lib，无 SKILL.md，不注册不路由）：26 工具名册 / 参数链规则 / schema 装载",
-     "entry": "scripts/core.py",
-     "version": "1.0.0"
-    }
-   }
+  "ecosystem": "520pro",
+  "version": "0.8.76",
+  "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
+  "based_on": [
+    "WorkBuddy 平台运行时",
+    "新生态 v0.1.0",
+    "368817 存活素材"
+  ],
+  "core_upgrade": "TVBox 技能从项目级（不路由）升至用户级（平台注册可路由、跨项目、云端沙箱执行、手机可触发）",
+  "deploy_modes": {
+    "user-skill": "通用层→~/.codebuddy + TVBox→~/.codebuddy（★推荐）",
+    "capability-only": "TVBox→<项目>/.codebuddy（项目隔离）",
+    "generic-only": "只装通用层到 ~/.codebuddy",
+    "all": "通用层→用户级 + 能力层→项目级（默认）"
   },
-  "能力层": {
-   "scope": "TVBox（用户级或项目级，按模式）",
-   "files": {
-    "tvbox/skills/tvbox-core/": {
-     "user_install": "~/.codebuddy/skills/tvbox-core/",
-     "project_install": "<项目>/.codebuddy/skills/",
-     "role": "★共享代码库：core.py / concurrency.py / guard.py / link.py / pipeline.py / blk.py。无 SKILL.md，平台不注册不路由",
-     "not_a_skill": true,
-     "depended_by": [
+  "layers": {
+    "通用层": {
+      "scope": "用户级·跨项目",
+      "deploy_to": "~/.codebuddy/",
+      "files": {
+        "rules/core-8.md": {
+          "install_to": "~/.codebuddy/rules/core-8.md",
+          "alwaysApply": true,
+          "role": "16 条通用铁律（B-01~B-16 + M1–M7）"
+        },
+        "rules/zh-style.md": {
+          "install_to": "<项目>/.codebuddy/rules/zh-style.md",
+          "alwaysApply": true,
+          "role": "项目级文档/输出纪律契约（项目隔离模式才装）"
+        },
+        "skills/machine-bootstrap/SKILL.md": {
+          "role": "一键换机/克隆工作副本",
+          "version": "1.0.4"
+        },
+        "skills/artifact-store/SKILL.md": {
+          "role": "本地产物轻量化·防手机卡顿",
+          "version": "1.1.0"
+        },
+        "skills/learn-hub/": {
+          "install_to": "~/.codebuddy/skills/learn-hub/",
+          "role": "学习工坊：资料采集/分类/精炼/质检/入库/监测，13 个模块",
+          "entry": "scripts/learn.py",
+          "contains": "SKILL.md · scripts/learn.py · scripts/pan.py · scripts/flow.json · library/tree.json",
+          "pan": "scripts/pan.py —— 网盘取料（清单/下载/转存/删除）。2026-11-12 自 probe-hub harvest pan 迁入，零外部依赖",
+          "self_check": "python3 scripts/learn.py self-check → 16/16；python3 scripts/pan.py self-check → 2/2",
+          "not_tvbox": "与 TVBox 无关，纯通用层",
+          "version": "1.4.3"
+        },
+        "skills/space-hub/SKILL.md": {
+          "install_to": "~/.codebuddy/skills/space-hub/SKILL.md",
+          "role": "库务司·云端库总管 v2.7.0（清道夫升级）：清理/归纳/建库/搬运正门，四层空间解析不绑账号，拒收带结构化三元组",
+          "version": "2.8.0"
+        },
+        "skills/space-hub/scripts/space_hub.py": {
+          "install_to": "~/.codebuddy/skills/space-hub/scripts/space_hub.py",
+          "role": "引擎：init/classify/create-db/inbox/add/scan/list/restore/move/rename/census"
+        },
+        "skills/space-hub/scripts/classify_rules.json": {
+          "install_to": "~/.codebuddy/skills/space-hub/scripts/classify_rules.json",
+          "role": "归纳登记册（唯一真源，加规则零改代码）"
+        },
+        "skills/inspect-hub/SKILL.md": {
+          "install_to": "~/.codebuddy/skills/inspect-hub/SKILL.md",
+          "role": "巡检司 v1.4.1：520 自家健康 8 面巡检（八卦八门全部转正），景门改集合比对防假红",
+          "version": "1.4.4"
+        },
+        "skills/inspect-hub/scripts/inspect_hub.py": {
+          "install_to": "~/.codebuddy/skills/inspect-hub/scripts/inspect_hub.py",
+          "role": "巡检引擎：run/self-check，检查器失灵报「无法判定」绝不装绿，环比指纹落 findings_history.json"
+        },
+        "skills/inspect-hub/scripts/inspect_registry.json": {
+          "install_to": "~/.codebuddy/skills/inspect-hub/scripts/inspect_registry.json",
+          "role": "巡检登记册：加巡检面零改引擎（先登记占位灰，补码后转正）"
+        },
+        "skills/inspect-hub/scripts/dashboard_template.html": {
+          "install_to": "~/.codebuddy/skills/inspect-hub/scripts/dashboard_template.html",
+          "role": "卦门合阵面板模板（纯 CSS cqw 自适应，单文件零依赖，手机/电脑双端）"
+        },
+        "skills/learn-hub/CHANGELOG.md": {
+          "install_to": "~/.codebuddy/skills/learn-hub/CHANGELOG.md",
+          "role": "学习工坊变更凭证"
+        },
+        "skills/foundry/SKILL.md": {
+          "install_to": "~/.codebuddy/skills/foundry/SKILL.md",
+          "role": "熔铸司 v1.1.0：520 横向工具能力板块（jadx 26 工具全量接线 / 63 目录能力面 / 产出经 archive_out 落 520进化论）",
+          "entry": "scripts/foundry.py",
+          "self_check": "python3 scripts/foundry.py selftest → 正向绿 / 反向全红",
+          "version": "1.1.0"
+        },
+        "skills/foundry-core/": {
+          "install_to": "~/.codebuddy/skills/foundry-core/",
+          "role": "熔铸司共享引擎内核（lib，无 SKILL.md，不注册不路由）：26 工具 inputSchema + 真调配方 / 参数链规则 / jadx_engine.py 泛化引擎",
+          "entry": "scripts/core.py",
+          "version": "1.1.0"
+        }
+      }
+    },
+    "能力层": {
+      "scope": "TVBox（用户级或项目级，按模式）",
+      "files": {
+        "tvbox/skills/tvbox-core/": {
+          "user_install": "~/.codebuddy/skills/tvbox-core/",
+          "project_install": "<项目>/.codebuddy/skills/",
+          "role": "★共享代码库：core.py / concurrency.py / guard.py / link.py / pipeline.py / blk.py。无 SKILL.md，平台不注册不路由",
+          "not_a_skill": true,
+          "depended_by": [
+            "probe-hub",
+            "tvbox-pipeline"
+          ],
+          "critical": "缺此目录，探源司必报 ModuleNotFoundError: No module named 'core'",
+          "version": "1.0.69"
+        },
+        "tvbox/skills/probe-hub/": {
+          "user_install": "~/.codebuddy/skills/probe-hub/",
+          "role": "探源司本体：monitor/search/harvest/forge(gate/hook)/shellcrack/quality(hls_clean)/repair + 源库查询",
+          "depends_on": [
+            "tvbox-core"
+          ],
+          "entry": "scripts/probe.py",
+          "critical": "单独安装必报 ModuleNotFoundError: No module named 'core'",
+          "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack,atomicio,pushconfig,imgproxy}.py · repair/ · forgekit/ · verify/ · references/",
+          "version": "1.28.9"
+        },
+        "tvbox/skills/tvbox-pipeline/": {
+          "user_install": "~/.codebuddy/skills/tvbox-pipeline/",
+          "role": "出品流水线：A 整包加工（原 tvbox-interface）+ B 配置同步（原 tvbox-config-sync）",
+          "depends_on": [
+            "tvbox-core"
+          ],
+          "entry": "SKILL.md → SOP_整包加工.md",
+          "version": "1.3.11"
+        },
+        "tvbox/fix_paths.py": {
+          "role": "路径适配：把 /root/.codebuddy 改成 os.path.expanduser('~/.codebuddy')，tokenize 精确替换，跳过隐式字符串拼接"
+        },
+        "tvbox/agents/tvbox-agent.md": {
+          "user_install": "~/.codebuddy/agents/",
+          "role": "隔离子代理"
+        },
+        "tvbox/commands/tvbox-sync.md": {
+          "user_install": "~/.codebuddy/commands/",
+          "role": "/tvbox-sync 命令"
+        },
+        "tvbox/scripts/collect_repos.py": {
+          "user_install": "~/.codebuddy/scripts/",
+          "role": "拉仓库抽源"
+        },
+        "tvbox/scripts/check_live.py": {
+          "user_install": "~/.codebuddy/scripts/",
+          "role": "并发测活"
+        },
+        "tvbox/scripts/merge_config.py": {
+          "user_install": "~/.codebuddy/scripts/",
+          "role": "存活源集成"
+        },
+        "tvbox/master_config.example.json": {
+          "user_install": "~/.codebuddy/tvbox/",
+          "role": "主配置模板"
+        },
+        "tvbox/CODEBUDDY.md": {
+          "project_install": "<项目>/.codebuddy/CODEBUDDY.md",
+          "role": "项目级薄壳兜底（用户级模式可不装）"
+        },
+        "tvbox/rules/tvbox-style.md": {
+          "project_install": "<项目>/.codebuddy/rules/",
+          "alwaysApply": true,
+          "role": "TVBox 纪律（项目隔离模式）"
+        },
+        "tvbox/rules/tvbox.paths.md": {
+          "project_install": "<项目>/.codebuddy/rules/",
+          "alwaysApply": false,
+          "paths": [
+            "**/master_config*.json"
+          ],
+          "role": "条件规则示例（实测不注入）"
+        }
+      }
+    }
+  },
+  "rule_dual_track": {
+    "hard": "平台「设置→给 WorkBuddy 的指令」（账号级，跨设备强注入）",
+    "soft": "~/.codebuddy/rules/core-8.md（本地兜底）"
+  },
+  "channels": {
+    "1_user_rule": "~/.codebuddy/rules/core-8.md",
+    "2_project_shell": "<项目>/.codebuddy/CODEBUDDY.md（必注入）",
+    "3_user_skill": "~/.codebuddy/skills/tvbox-pipeline（★平台注册可路由）",
+    "4_mobile_manual": "手机 App 设置→指令，粘贴 手机指令.md"
+  },
+  "verified_reliability": {
+    "user_level_skill_routing": "真阳性（本环境 ~/.codebuddy/skills 技能均在 active 列表）",
+    "CODEBUDDY_md_injection": "真阳性（368817：仅 CODEBUDDY.md 被注入）",
+    "user_core8_load": "一次真阳性；手机历史真阴性 → 双轨兜底",
+    "conditional_paths_injection": "真阴性（不注入，仅示例）",
+    "project_level_skill_routing": "真阴性（不进 active 列表）",
+    "user_skill_cross_device_to_new_phone": "分环境：①持久环境（桌面沙箱/云电脑）装一次长期可用，Skill 工具自动发现加载（云电脑 02:01 实证）；②手机普通聊天会话沙箱每次新建，装了即丢，需每次重装或走账号库",
+    "probe_hub_monitor_status": "真阳性（隔离 HOME 实测：输出 186 个监测目标，带存活/活跃度/判定依据）",
+    "probe_hub_without_core": "真阴性（缺 tvbox-core 必报 ModuleNotFoundError: No module named core）",
+    "probe_hub_single_repo_check_in_sandbox": "无法判定（443 出站受限，单目标常超时无输出）",
+    "phone_channel_account_command": "真阳性·兜底（开场自检自动重装 ~30s + 命令直达；持久环境里 Skill 自动发现是正路）",
+    "mobile_pretooluse_hook": "真阳性（2026-11-12 实测：手机端会话 PreToolUse:Bash 实际拦截并给出拒绝文案）。来源不是平台内建、也不是 520 装的，而是旧生态备份仓 DmaxPro908 的 hooks/chain_guard.py 经 restore.py 还原进该环境；判据见 docs/钩子来源判定.md。旧结论「手机不跑钩子」据此作废",
+    "sandbox_persistence_desktop": "真阳性（桌面沙箱 ~/.codebuddy 跨会话持久）",
+    "sandbox_persistence_phone": "真阴性（手机云沙箱每次会话新建，2026-11-12 实测：~/520pro 与自装 skills 全部消失）",
+    "version_skew_trap": "真阳性教训：方案 C 改造未升版本号，新旧都叫 v1.20.8，手机端误载旧版（probe.py 9,051 行新版 vs 10,319 行旧版，harvest pan 在 9968 行处可判）。已升 probe-hub 1.21.0 / learn-hub 1.2.0 / tvbox-pipeline 1.0.0",
+    "skill_discovery_mechanism": "真阳性·关键修正（2026-11-12 02:31）：Skill 工具扫描的是会话环境里的 ~/.codebuddy/skills/ 目录——文件在就能被发现并加载，不依赖账号技能库。之前『手工件不被检索』的判断错误，真实原因只是沙箱重建后文件消失",
+    "project_rules_always_apply": "真阳性（2026-11-12 03:17 沙箱实测）：项目级 .codebuddy/rules/ + alwaysApply:true，在全新构建的上下文（子代理=新会话等价物）中自动注入，金丝雀 B7X9Q-ALWAYS 被原文引用。此前「项目级规则不注入」的定案作废——旧实验不满足官方两个前置条件（新会话 + 工作目录在项目根）",
+    "project_rules_paths_conditional": "真阳性（2026-11-12 03:18 沙箱实测·含对照组）：paths 命中文件（*.canary）被读取后规则注入；读不匹配文件（README）的对照组无注入。条件机制按官方口径工作。此前「paths 不注入」定案作废",
+    "rules_take_effect_on_new_session": "真阳性（官方文档 + 实测一致）：规则只在会话/上下文构建时注入，本会话中途新建的金丝雀在本会话上下文中不出现——改规则必须新开会话",
+    "probe_hub_repair_checkup": "真阳性（不可达域名报 无法判定/未定·网络/先复验，三态未塌陷）",
+    "probe_hub_hls_clean": "真阳性（--selftest 6 判定样本 + 4 净化场景全过，61 域名载入）",
+    "probe_hub_forge_gate": "真阳性（样例源正确判 size 门禁 FAIL 且 rc=1）",
+    "probe_hub_aes_fallback": "真阳性（NIST 向量通过；--crosscheck 对账 SBOX+明文；变异：改 SBOX 或去填充均翻红）",
+    "probe_hub_db_coord": "真阳性（deliver/domain_cluster 坐标取自 core.SRC_DBS；三态：读失败 rc=2 / 真空库 rc=0 / 有货正常投递）"
+  },
+  "probe_hub": {
+    "display_name": "探源司",
+    "version": "1.26.2",
+    "source": "tvbox342078879/tvbox-skills-eco (master)",
+    "required_set": [
       "probe-hub",
-      "tvbox-pipeline"
-     ],
-     "critical": "缺此目录，探源司必报 ModuleNotFoundError: No module named 'core'",
-     "version": "1.0.69"
-    },
-    "tvbox/skills/probe-hub/": {
-     "user_install": "~/.codebuddy/skills/probe-hub/",
-     "role": "探源司本体：monitor/search/harvest/forge(gate/hook)/shellcrack/quality(hls_clean)/repair + 源库查询",
-     "depends_on": [
       "tvbox-core"
-     ],
-     "entry": "scripts/probe.py",
-     "critical": "单独安装必报 ModuleNotFoundError: No module named 'core'",
-     "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack,atomicio,pushconfig,imgproxy}.py · repair/ · forgekit/ · verify/ · references/",
-     "version": "1.28.9"
+    ],
+    "entry": "python3 ~/.codebuddy/skills/probe-hub/scripts/probe.py <module> <cmd>",
+    "note": "仓库内无 tvbox CLI 实现，`tvbox probe` 仅为别名壳；真实入口是 probe.py",
+    "modules": {
+      "monitor": [
+        "status",
+        "check",
+        "diff",
+        "forecast",
+        "add",
+        "import",
+        "due",
+        "purge-test"
+      ],
+      "search": [
+        "github",
+        "gitee",
+        "gitlab",
+        "rank",
+        "verify"
+      ],
+      "harvest": [
+        "scan",
+        "pull",
+        "filter",
+        "export",
+        "dispatch"
+      ],
+      "extra": [
+        "forge",
+        "livecheck",
+        "decrypt",
+        "quality",
+        "shellcrack",
+        "self-check",
+        "repair",
+        "gate",
+        "hook"
+      ]
     },
-    "tvbox/skills/tvbox-pipeline/": {
-     "user_install": "~/.codebuddy/skills/tvbox-pipeline/",
-     "role": "出品流水线：A 整包加工（原 tvbox-interface）+ B 配置同步（原 tvbox-config-sync）",
-     "depends_on": [
-      "tvbox-core"
-     ],
-     "entry": "SKILL.md → SOP_整包加工.md",
-     "version": "1.3.11"
-    },
-    "tvbox/fix_paths.py": {
-     "role": "路径适配：把 /root/.codebuddy 改成 os.path.expanduser('~/.codebuddy')，tokenize 精确替换，跳过隐式字符串拼接"
-    },
-    "tvbox/agents/tvbox-agent.md": {
-     "user_install": "~/.codebuddy/agents/",
-     "role": "隔离子代理"
-    },
-    "tvbox/commands/tvbox-sync.md": {
-     "user_install": "~/.codebuddy/commands/",
-     "role": "/tvbox-sync 命令"
-    },
-    "tvbox/scripts/collect_repos.py": {
-     "user_install": "~/.codebuddy/scripts/",
-     "role": "拉仓库抽源"
-    },
-    "tvbox/scripts/check_live.py": {
-     "user_install": "~/.codebuddy/scripts/",
-     "role": "并发测活"
-    },
-    "tvbox/scripts/merge_config.py": {
-     "user_install": "~/.codebuddy/scripts/",
-     "role": "存活源集成"
-    },
-    "tvbox/master_config.example.json": {
-     "user_install": "~/.codebuddy/tvbox/",
-     "role": "主配置模板"
-    },
-    "tvbox/CODEBUDDY.md": {
-     "project_install": "<项目>/.codebuddy/CODEBUDDY.md",
-     "role": "项目级薄壳兜底（用户级模式可不装）"
-    },
-    "tvbox/rules/tvbox-style.md": {
-     "project_install": "<项目>/.codebuddy/rules/",
-     "alwaysApply": true,
-     "role": "TVBox 纪律（项目隔离模式）"
-    },
-    "tvbox/rules/tvbox.paths.md": {
-     "project_install": "<项目>/.codebuddy/rules/",
-     "alwaysApply": false,
-     "paths": [
-      "**/master_config*.json"
-     ],
-     "role": "条件规则示例（实测不注入）"
+    "repair": {
+      "entry": "python3 ~/.codebuddy/skills/probe-hub/repair/engine.py <action> <target>",
+      "actions": [
+        "checkup",
+        "route",
+        "drafts",
+        "apply",
+        "repair",
+        "recon",
+        "rewrite"
+      ],
+      "death_causes": [
+        "",
+        "域名层",
+        "接口层",
+        "内容层",
+        "语法层",
+        "结构性",
+        "未定·网络"
+      ],
+      "gates": [
+        "verify/gate_r221_death_taxonomy.py",
+        "verify/gate_r222_repair_contract.py"
+      ],
+      "note": "S221~S227 从旧仓 tvbox-eco 并回；没验过不许说修好；闸门随技能装、进 verify.sh"
     }
-   }
-  }
- },
- "rule_dual_track": {
-  "hard": "平台「设置→给 WorkBuddy 的指令」（账号级，跨设备强注入）",
-  "soft": "~/.codebuddy/rules/core-8.md（本地兜底）"
- },
- "channels": {
-  "1_user_rule": "~/.codebuddy/rules/core-8.md",
-  "2_project_shell": "<项目>/.codebuddy/CODEBUDDY.md（必注入）",
-  "3_user_skill": "~/.codebuddy/skills/tvbox-pipeline（★平台注册可路由）",
-  "4_mobile_manual": "手机 App 设置→指令，粘贴 手机指令.md"
- },
- "verified_reliability": {
-  "user_level_skill_routing": "真阳性（本环境 ~/.codebuddy/skills 技能均在 active 列表）",
-  "CODEBUDDY_md_injection": "真阳性（368817：仅 CODEBUDDY.md 被注入）",
-  "user_core8_load": "一次真阳性；手机历史真阴性 → 双轨兜底",
-  "conditional_paths_injection": "真阴性（不注入，仅示例）",
-  "project_level_skill_routing": "真阴性（不进 active 列表）",
-  "user_skill_cross_device_to_new_phone": "分环境：①持久环境（桌面沙箱/云电脑）装一次长期可用，Skill 工具自动发现加载（云电脑 02:01 实证）；②手机普通聊天会话沙箱每次新建，装了即丢，需每次重装或走账号库",
-  "probe_hub_monitor_status": "真阳性（隔离 HOME 实测：输出 186 个监测目标，带存活/活跃度/判定依据）",
-  "probe_hub_without_core": "真阴性（缺 tvbox-core 必报 ModuleNotFoundError: No module named core）",
-  "probe_hub_single_repo_check_in_sandbox": "无法判定（443 出站受限，单目标常超时无输出）",
-  "phone_channel_account_command": "真阳性·兜底（开场自检自动重装 ~30s + 命令直达；持久环境里 Skill 自动发现是正路）",
-  "mobile_pretooluse_hook": "真阳性（2026-11-12 实测：手机端会话 PreToolUse:Bash 实际拦截并给出拒绝文案）。来源不是平台内建、也不是 520 装的，而是旧生态备份仓 DmaxPro908 的 hooks/chain_guard.py 经 restore.py 还原进该环境；判据见 docs/钩子来源判定.md。旧结论「手机不跑钩子」据此作废",
-  "sandbox_persistence_desktop": "真阳性（桌面沙箱 ~/.codebuddy 跨会话持久）",
-  "sandbox_persistence_phone": "真阴性（手机云沙箱每次会话新建，2026-11-12 实测：~/520pro 与自装 skills 全部消失）",
-  "version_skew_trap": "真阳性教训：方案 C 改造未升版本号，新旧都叫 v1.20.8，手机端误载旧版（probe.py 9,051 行新版 vs 10,319 行旧版，harvest pan 在 9968 行处可判）。已升 probe-hub 1.21.0 / learn-hub 1.2.0 / tvbox-pipeline 1.0.0",
-  "skill_discovery_mechanism": "真阳性·关键修正（2026-11-12 02:31）：Skill 工具扫描的是会话环境里的 ~/.codebuddy/skills/ 目录——文件在就能被发现并加载，不依赖账号技能库。之前『手工件不被检索』的判断错误，真实原因只是沙箱重建后文件消失",
-  "project_rules_always_apply": "真阳性（2026-11-12 03:17 沙箱实测）：项目级 .codebuddy/rules/ + alwaysApply:true，在全新构建的上下文（子代理=新会话等价物）中自动注入，金丝雀 B7X9Q-ALWAYS 被原文引用。此前「项目级规则不注入」的定案作废——旧实验不满足官方两个前置条件（新会话 + 工作目录在项目根）",
-  "project_rules_paths_conditional": "真阳性（2026-11-12 03:18 沙箱实测·含对照组）：paths 命中文件（*.canary）被读取后规则注入；读不匹配文件（README）的对照组无注入。条件机制按官方口径工作。此前「paths 不注入」定案作废",
-  "rules_take_effect_on_new_session": "真阳性（官方文档 + 实测一致）：规则只在会话/上下文构建时注入，本会话中途新建的金丝雀在本会话上下文中不出现——改规则必须新开会话",
-  "probe_hub_repair_checkup": "真阳性（不可达域名报 无法判定/未定·网络/先复验，三态未塌陷）",
-  "probe_hub_hls_clean": "真阳性（--selftest 6 判定样本 + 4 净化场景全过，61 域名载入）",
-  "probe_hub_forge_gate": "真阳性（样例源正确判 size 门禁 FAIL 且 rc=1）",
-  "probe_hub_aes_fallback": "真阳性（NIST 向量通过；--crosscheck 对账 SBOX+明文；变异：改 SBOX 或去填充均翻红）",
-  "probe_hub_db_coord": "真阳性（deliver/domain_cluster 坐标取自 core.SRC_DBS；三态：读失败 rc=2 / 真空库 rc=0 / 有货正常投递）"
- },
- "probe_hub": {
-  "display_name": "探源司",
-  "version": "1.26.2",
-  "source": "tvbox342078879/tvbox-skills-eco (master)",
-  "required_set": [
-   "probe-hub",
-   "tvbox-core"
-  ],
-  "entry": "python3 ~/.codebuddy/skills/probe-hub/scripts/probe.py <module> <cmd>",
-  "note": "仓库内无 tvbox CLI 实现，`tvbox probe` 仅为别名壳；真实入口是 probe.py",
-  "modules": {
-   "monitor": [
-    "status",
-    "check",
-    "diff",
-    "forecast",
-    "add",
-    "import",
-    "due",
-    "purge-test"
-   ],
-   "search": [
-    "github",
-    "gitee",
-    "gitlab",
-    "rank",
-    "verify"
-   ],
-   "harvest": [
-    "scan",
-    "pull",
-    "filter",
-    "export",
-    "dispatch"
-   ],
-   "extra": [
-    "forge",
-    "livecheck",
-    "decrypt",
-    "quality",
-    "shellcrack",
-    "self-check",
-    "repair",
-    "gate",
-    "hook"
-   ]
   },
-  "repair": {
-   "entry": "python3 ~/.codebuddy/skills/probe-hub/repair/engine.py <action> <target>",
-   "actions": [
-    "checkup",
-    "route",
-    "drafts",
-    "apply",
-    "repair",
-    "recon",
-    "rewrite"
-   ],
-   "death_causes": [
-    "",
-    "域名层",
-    "接口层",
-    "内容层",
-    "语法层",
-    "结构性",
-    "未定·网络"
-   ],
-   "gates": [
-    "verify/gate_r221_death_taxonomy.py",
-    "verify/gate_r222_repair_contract.py"
-   ],
-   "note": "S221~S227 从旧仓 tvbox-eco 并回；没验过不许说修好；闸门随技能装、进 verify.sh"
-  }
- },
- "no_hooks_dependency": "强制逻辑落在薄壳/规则/人工指令，不押 hook；不可逆动作在脚本内做保护闸",
- "verify": "bash verify.sh",
- "sync_shape": {
-  "full": [
-   "MANIFEST.json",
-   "install.sh",
-   "bootstrap.sh",
-   "verify.sh",
-   "VERSION",
-   "secret_scan.py",
-   "export_skill_cards.py",
-   "README.md",
-   "TEST.md",
-   "手机指令.md",
-   "通用层/",
-   "能力层/",
-   "docs/",
-   "verify/",
-   "hooks/git_push_safe.sh",
-   "hooks/pre-commit",
-   ".github/workflows/verify.yml"
+  "no_hooks_dependency": "强制逻辑落在薄壳/规则/人工指令，不押 hook；不可逆动作在脚本内做保护闸",
+  "verify": "bash verify.sh",
+  "sync_shape": {
+    "full": [
+      "MANIFEST.json",
+      "install.sh",
+      "bootstrap.sh",
+      "verify.sh",
+      "VERSION",
+      "secret_scan.py",
+      "export_skill_cards.py",
+      "README.md",
+      "TEST.md",
+      "手机指令.md",
+      "通用层/",
+      "能力层/",
+      "docs/",
+      "verify/",
+      "hooks/git_push_safe.sh",
+      "hooks/pre-commit",
+      ".github/workflows/verify.yml"
+    ],
+    "lite": [
+      "MANIFEST.json",
+      "install.sh",
+      "bootstrap.sh",
+      "verify.sh",
+      "VERSION",
+      "secret_scan.py",
+      "通用层/rules/",
+      "通用层/skills/",
+      "能力层/tvbox/skills/probe-hub/",
+      "能力层/tvbox/skills/tvbox-core/",
+      "能力层/tvbox/scripts/",
+      "verify/",
+      "hooks/git_push_safe.sh"
+    ]
+  },
+  "bootstrap": {
+    "script": "bootstrap.sh",
+    "shapes": "full(默认，全量) / lite(探源司最小可跑集)",
+    "idempotent": "目标已存在且含 MANIFEST.json → 跳过 clone，仅 git pull --ff-only + 重设稀疏",
+    "no_plaintext_token": "token 仅从 $GITHUB_TOKEN / gh auth token 读入内存，apply 后立即 unset，不写任何文件、不打印",
+    "usage": "bash bootstrap.sh <repo_url_or_path> [shape] [target] [--dry-run] [--install]"
+  },
+  "plan_c": "2026-11-12：5 技能合为 2 入口 + 1 库（tvbox-core 无 SKILL.md，不路由）",
+  "changelog_0_5_0": "learn-hub 迁入（含 pan.py 网盘模块，源自 probe-hub harvest pan，probe.py -1268 行）",
+  "changelog_0_6_0": "space-hub 库务司迁入：tvbox-janitor v1.2.12 去 TVBox 化升级；四层空间解析（init/classify/create-db 三新命令）；坐标修正（空间 RYUDZM，旧 8w5cnq/gZ4x 均亡）；实测建库端到端+回读",
+  "changelog_0_7_0": [
+    "件① secret_scan.py 迁入仓库根（tvbox-eco verify 正本去 kill-switch 改造）：PAT/user:pass/api_key/拼接拆解四类明文 + .git/config 兜底复查；is_placeholder_concat 改整行分段（修中段起匹配截歪引号的漏报，2026-11-12 实测）",
+    "verify.sh 第 27 项：密钥安全扫描，红=发现明文即不绿（落实 core-8 规则 5 零明文凭证）",
+    "件② inspect-hub 巡检司 v1.0.0：8 门（开规则/生技能/杜密钥/景文档/伤结构/死遗留/休新鲜/惊触发词待补码），单文件 dashboard.html 八卦八门面板，造脏五门实测全部抓到、清脏清零",
+    "docs/遗留登记.md 新建：巡检司死门数据源，【待】黄【阻】红，闭环删行自动消色",
+    "旧仓 archive 盘点定案：legacy-diagnostics 化石不迁；tvbox-inspect/legacy-watchdog 原代码死引用不迁、机制（登记册可成长/健康预检/报告环比）由 inspect-hub 继承；ecosys-conductor 仅 secret_scan 迁"
   ],
-  "lite": [
-   "MANIFEST.json",
-   "install.sh",
-   "bootstrap.sh",
-   "verify.sh",
-   "VERSION",
-   "secret_scan.py",
-   "通用层/rules/",
-   "通用层/skills/",
-   "能力层/tvbox/skills/probe-hub/",
-   "能力层/tvbox/skills/tvbox-core/",
-   "能力层/tvbox/scripts/",
-   "verify/",
-   "hooks/git_push_safe.sh"
-  ]
- },
- "bootstrap": {
-  "script": "bootstrap.sh",
-  "shapes": "full(默认，全量) / lite(探源司最小可跑集)",
-  "idempotent": "目标已存在且含 MANIFEST.json → 跳过 clone，仅 git pull --ff-only + 重设稀疏",
-  "no_plaintext_token": "token 仅从 $GITHUB_TOKEN / gh auth token 读入内存，apply 后立即 unset，不写任何文件、不打印",
-  "usage": "bash bootstrap.sh <repo_url_or_path> [shape] [target] [--dry-run] [--install]"
- },
- "plan_c": "2026-11-12：5 技能合为 2 入口 + 1 库（tvbox-core 无 SKILL.md，不路由）",
- "changelog_0_5_0": "learn-hub 迁入（含 pan.py 网盘模块，源自 probe-hub harvest pan，probe.py -1268 行）",
- "changelog_0_6_0": "space-hub 库务司迁入：tvbox-janitor v1.2.12 去 TVBox 化升级；四层空间解析（init/classify/create-db 三新命令）；坐标修正（空间 RYUDZM，旧 8w5cnq/gZ4x 均亡）；实测建库端到端+回读",
- "changelog_0_7_0": [
-  "件① secret_scan.py 迁入仓库根（tvbox-eco verify 正本去 kill-switch 改造）：PAT/user:pass/api_key/拼接拆解四类明文 + .git/config 兜底复查；is_placeholder_concat 改整行分段（修中段起匹配截歪引号的漏报，2026-11-12 实测）",
-  "verify.sh 第 27 项：密钥安全扫描，红=发现明文即不绿（落实 core-8 规则 5 零明文凭证）",
-  "件② inspect-hub 巡检司 v1.0.0：8 门（开规则/生技能/杜密钥/景文档/伤结构/死遗留/休新鲜/惊触发词待补码），单文件 dashboard.html 八卦八门面板，造脏五门实测全部抓到、清脏清零",
-  "docs/遗留登记.md 新建：巡检司死门数据源，【待】黄【阻】红，闭环删行自动消色",
-  "旧仓 archive 盘点定案：legacy-diagnostics 化石不迁；tvbox-inspect/legacy-watchdog 原代码死引用不迁、机制（登记册可成长/健康预检/报告环比）由 inspect-hub 继承；ecosys-conductor 仅 secret_scan 迁"
- ],
- "changelog_0_7_1": [
-  "inspect-hub v1.1.0：adversarial 对抗自测子命令（临时 clone 逐门造脏断言必翻红，8/8 实测）+ 死门带过执法（待办必须带负责人+期限，复发自动升红，借 tvbox-eco carryover_guard/adversarial_suite 思想）",
-  "secret_scan 自指豁免扩展：inspect_hub.py 对抗用例构造行行级豁免（实测自指误报即修）",
-  "docs/遗留登记.md 四条目补齐负责人+期限（新判据生效基线）",
-  "本轮借鉴范围盘点定案：A(对抗自测)+B(带过执法) 本轮落地；C(脚本冒烟)/E(环境巡检)/G(闸篡改探针)/D(依赖契约) 已评估在案后补；F/H 及 hooks 类明确不借"
- ],
- "changelog_0_8_0": [
-  "版本化迁移机制（借 tvbox-eco upgrade.sh 思想）：VERSION 文件 + 本地已部署标记 ~/.codebuddy/.520_state/version + migrate_to_<ver> 一次性动作表（0.6.0/0.7.0/0.7.1/0.8.0），幂等 + dry-run 支持 + VERSION 不可读不瞎迁",
-  "install.sh cp_bak 机制级修复：备份只留最近一份（此前每次安装堆一个 .bak.$TS 永不清理，实测顶层堆 7 个）",
-  "bootstrap 断言补 VERSION 与 inspect-hub/SKILL.md；sync_shape 补 VERSION（稀疏检出集合，缺它断言必失败——实测抓到）",
-  "sync_shape 补 secret_scan.py（v0.7.0 引入仓库根但漏登记稀疏清单，--target 自检会因缺扫描器记红——实测抓到）"
- ],
- "changelog_0_8_1": [
-  "修复探源司→清道夫投递链改名断链（实查 2026-11-12）：清道夫改名 space-hub 后，core.py file_to_janitor 仍写死 ~/.codebuddy/skills/tvbox-janitor + import janitor → import 必失败恒返回 False，投递从未成功且 quiet 静默（旁路设计下最危险失效形态）。改为 space-hub 优先/tvbox-janitor 兜底双探测",
-  "probe.py _eco_linked_probe 同步：探针仍探旧路径 → space-hub 装着也报「下游未装」；改新名优先旧名兜底。实测三态：假 id 拒收 ✓ / 投递链路走 space_hub（mock 不动云端）✓ / 探针 (True, None) ✓（None=监察司未迁 520，如实报无法判定）",
-  "bootstrap 迁移表 +migrate_to_0.8.1（同步 tvbox-core/probe-hub 副本）；VERSION 0.8.1"
- ],
- "changelog_0_8_2": [
-  "库务司 space-hub v2.1.0：新增 auto_file_local 本地欠账登记（learn-hub 旧门面投本地路径被 S156 node_id 护栏拒收——名义联动，投递从未成功，实证 2026-11-12）；list 本地欠账单独成节（云端陈旧剔除逻辑会误剔本地路径）；local-rm 销账（前缀匹配/未命中拒销 exit 2/纯本地不过空间解析）",
-  "学习工坊 learn-hub v1.3.0：_to_janitor→_to_spacehub 改道本地欠账；解耦能力层 tvbox-core 依赖",
-  "classify_rules +「学习与资料」类：learn-hub 产业认主（云端 dry-run 实测引擎按登记册跑通）",
-  "实测：记账/幂等/空路径拒收/前缀销账/未命中 exit 2/learn 门面全链 ✓；副本陈旧时门面报「需 ≥2.1.0」明确失败而非静默",
-  "bootstrap 迁移表 +0.8.2（同步 space-hub/learn-hub 副本）"
- ],
- "changelog_0_8_3": [
-  "core-8 新增 B-09 产物纪律（规则真源 通用层/rules/core-8.md）：产出默认不落产物区，点名例外（落产物/生成文件/拉面板），归宿=文本呈现或经库务司 archive 落库；连带 4 指针点（M4 编号范围 B-01…B-09、tvbox 薄壳、手机指令、MANIFEST role）同步改",
-  "space-hub v2.2.0：archive 落库正门（📦 产物归档夹+📦 产物索引库五字段+本地清理，全步 library 正门+回读）+ products --scan/--search-box（盘点+单文件搜索框）",
-  "实测修三 bug：KS 行空格分隔解析；新建节点目录索引传播延迟（S200 带间隔重试）；_find_parent 残留 ROOT（v2.0.0 漏改）→ NameError 致 add 从未真正投递（今天实测投递现场踩到，历史 add 全部只登记未移动）",
-  "inspect-hub v1.2.0：伤门复合 chk_structure（结构完整性+产物纪律 chk_products），八卦 8 位固定不新增第 9 卦",
-  "bootstrap 迁移表 +0.8.3（同步 space-hub/inspect-hub/rules 副本）"
- ],
- "changelog_0_8_4": [
-  "架构重规划 A「总线归目标方」：file_to_janitor 迁入 space-hub v2.3.0（收件方自持，core 中转壳删除，调用方 probe/link/newlib/blk 改 import 来源、调用行零改动）；register_monitor 迁入 inspect-hub v1.3.0（原探旧生态 tvbox-inspect 恒失败，现真登记 monitors.json）",
-  "依赖方向修正：space_hub 核库不再 import 能力层 tvbox-core（就地内联 _run_lib 直调 library 正门）——通用层对能力层零依赖",
-  "实测抓缺陷并修：① 核库对照组硬编码 id 随空间重建失效（permission denied）→ 三级动态解析 + 无对照如实报无法判定；② 生门把运行时数据 findings_history/monitors/*_state 当正本对账 → 永久误报副本漂移，已排除；③ learn-hub learn.py 副本陈旧（v0.8.2 手工同步漏 scripts）已同步",
-  "tvbox-pipeline v1.1.0 清残留：SKILL.md frontmatter YAML 截断致一半触发词未进 description（路由缺陷）已修；SOP 旧身份 frontmatter 改 doc 元信息；死引用 ecosys-conductor/user_habit_brief 改指 core-8；/root/.codebuddy 硬编码 10 处改 $HOME；CHANGELOG-interface.md 合并",
-  "tvbox-core README 定位收窄为「纯 TVBox 数据域共享库」，明确不再中转通用层能力",
-  "bootstrap 迁移表 +0.8.4（同步 tvbox-core/probe-hub/space-hub/inspect-hub/learn-hub/tvbox-pipeline 副本）"
- ],
- "changelog_0_8_11": [
-  "★库房自举 space-hub v2.4.0：base_blueprint.json（📦 产物归档/<类别>、🧬 生态演化）做基础蓝图，各技能 artifacts.json 的 blueprint 分片追加自己的根，ensure 按蓝图收敛——认领已有/补建缺失/每步回读，幂等；仅零可写空间时自动建空间，多个未登记则报错让人选",
-  "★产出自动跟随：archive_out(path, source, note) 门面，能力层出口一行调用即落库+写索引，永不抛异常，失败记 pending 由 products --retry 补投；probe-hub livecheck 已接线（实测落到「🔍 探源产出/测活报告」并生成可检索索引）",
-  "★生态演化台账：「🧬 生态演化/版本演化台账」（版本/日期/类型/新增能力/变更摘要/证据），evolve-log 用已装技能快照差集回答「这版增加了什么」，同版本同快照去重；install.sh 收尾自动记账；evolve-view 出时间线",
-  "能力声明：probe-hub/artifacts.json（测活报告→🔍 探源产出/测活报告）、learn-hub/artifacts.json（学习产出→📚 学习资料/成品）；未声明产出落「未归类」并点名提示，加技能即跟随、清道夫零改动",
-  "实测修四坑：date 字段写 {\"text\":...} 被静默丢弃（须 {\"date\":...}）；select 写 text 同样静默丢（按 schema 类型写，未知类别降级其他并保留真类别）；drive 拒收 .md（按类型分流 doc/drive）；products 扫 /workspace 全盘把 50+ 无关文件算产物（收窄为声明可识别）"
- ],
- "changelog_0_8_12": [
-  "★账号接管 adopt（space-hub v2.5.0）：三态判定 fresh/hybrid/foreign/unknown——空空间按蓝图建 17 单元；老账号认领已有+登记存量（**只登记不搬**，15 条历史进索引，业务分类写说明、类别按节点类型）；别人的空间拒绝接管（exit 3，需 --force）；枚举失败报 unknown，绝不折叠成 fresh 去乱建",
-  "★分发净化：探源司 5 个运行时刻度册（monitor_targets 186 条/domains/pubsources/dead_repos/shellcrack_cands）退出 git 并 gitignore，各留 .example.json 模板；新机器首次运行自动建空册，shellcrack 缺件不再抛 FileNotFoundError（实测 rc=0 并给出 --in 用法）。**安装器同步剥离**：gitignore 只挡 git clone，挡不住\"从仓库目录 cp 到别人机器\"——实测空机安装后探源司出现 185 个目标，故 cp_bak 拷完即删源带来的运行时文件，再回填现场那份（实测：空机 0 目标自建空册 / 本机 5 册 sha 不变）",
-  "★学习资料出口接线（learn-hub v1.4.0）：learn store put 收尾自动进「📚 学习资料/成品」——主文档（index.md>README.md>唯一 md）单建文档节点可读可检索，整目录打 zip 兜底；索引只记一条（zip 走 write_index=False），说明含「N 文件｜主文档｜整包名」；无主文档时如实写「未识别到主文档」并改走整包",
-  "★修复 v0.8.11 潜伏缺陷：archive_out 在「当天已自举」分支跳过空间解析，新进程里 SPACE=None，建夹时 subprocess 收到 None 抛 TypeError 导致归档全挂；现入口显式 resolve_space，_create_folder 加 None 守卫",
-  "★classify 落点统一：登记册 target 由根层级旧名（归档·报告与交付）改为路径（📦 产物归档/文档），与 archive 共用 _ensure_path；实测 10 项存量归入 2 个夹，根层级不再新建同名夹",
-  "实测修：drive 上传 md 被拒（按类型分流已在上版）、doc 标题曾用文件名致云端一堆「index」文档（改用记录名）、索引「类别」写入业务分类导致清一色「其他」（改为按节点类型：doc→文档/web→面板/database→数据）"
- ],
- "changelog_0_8_13": [
-  "★库务司数据保全四件套（space-hub v2.6.0，机制借鉴 Memory Palace）：①state 写前快照（同资源同进程幂等，snapshots/ 目录，gitignore 不随分发）；②原子写 tmpfile+fsync+os.replace（半截写不可能落盘）；③轮换 GC KEEP=20（env SPACE_HUB_SNAPSHOT_KEEP 可调，当前进程快照绝不删）；④快照索引自愈（损坏从快照文件重建，数据本体不丢）",
-  "★ensure 迁移锁：flock 跨进程互斥，超时报结构化 {\"error\":\"ensure_lock_timeout\"}——两会话并发自举不再撞半成品蓝图",
-  "★--force 审计留痕：add/adopt 的 --force 必须配 --reason（校验在一切云端调用之前），绕行动作写进 state audit 节（上限 50 条）",
-  "修复：快照文件名同秒相撞（加 pid+序号唯一化，实测 T4 用例发现）",
-  "实测：正向 11/11（隔离环境）；反向变异 V1-V5 全翻红；verify.sh 48✓0✗ 零回归"
- ],
- "changelog_0_8_14": [
-  "★工程B 发布卫生闸（secret_scan.py 扩展）：B1 九类密钥形态（私钥块/AKIA/ASIA/xox/AIza/sk-/ghp_/github_pat_）；B2 个人绝对路径动态扫描（换机断链根治，文档实抓 38 处）；B3 本地 endpoint 模式（6 处）；B4 WARN/FAIL 分级（卫生问题⚠不阻断，--strict 升级为红）；B5 模板真值检查（.example.json 出现真实节点 id 即 FAIL）",
-  "★B6 基线文件跟踪判据（verify.sh）：MANIFEST/VERSION/secret_scan/verify/install+全部 SKILL.md 必须被 git 跟踪，漏跟踪即红",
-  "★B7 回执模板加「发布前自检命令」节（用户手也能跑的 rg/grep 清单）",
-  "实测：正反向 7 项全过（AKIA/模板id/路径/endpoint/strict/基线 各翻红证实）；verify.sh 49✓0✗1⚠"
- ],
- "changelog_0_8_15": [
-  "★工程C 技能契约机检（新 verify/skill_contract_check.py + verify/skill_contracts.json）：C1 结构契约（required_files 缺件即红）；C2 头部契约（name==目录名、version 必须 semver）；C3 描述五组（D1 触发声明 / D2 能力枚举 / D3 正门锚点 / D4 自省锚点 / D5 负边界）；C4 版本四处对账（contracts==SKILL/manifest==CHANGELOG 首条==MANIFEST 登记）；C5 镜像 sha（仓内源↔安装副本逐文件，运行时态豁免，装副本多余文件也报）；C6 触发样本（有则查 T/N/B 阈值，无则 WARN 待工程D）",
-  "★补齐 520 真实缺项（工程C 首跑 19 项红全部修真）：4 个裸技能补 version/CHANGELOG/能力枚举/负边界/自省锚点；inspect-hub 补 D2/D3/D4/D5 四组；space-hub 补负边界；learn-hub/probe-hub 补正门锚点；tvbox-pipeline 版本 1.1.0→1.3.7 对齐 CHANGELOG（并补能力枚举）",
-  "★修 MANIFEST 分发元数据过期：space-hub role 写 v2.0.0（实际 2.6.0）、inspect-hub 写 v1.0.0（实际 1.3.1）；全部技能条目新增 version 字段，纳入 C4 四处对账",
-  "★修 tvbox-core manifest 1.0.54→1.0.66（与 CHANGELOG 首条对齐）",
-  "★三态防假绿：安装副本整体不存在时默认记「无法判定」（不折算通过），verify.sh/装后自检用 --require-mirror 硬闸；MANIFEST 解析失败记红不记「未登记」",
-  "★接线：verify.sh 新增 2 条判据（技能契约机检 + 运行时豁免清单两处同源 M5）；install.sh 加 check_contract（装完即校验，dry-run 也跑，只告警不中断）",
-  "实测：变异测试 8/8 翻红（C1 缺件/C2 坏版本/C3 删负边界/C4 改 contracts 版本/C4 MANIFEST 过期/C4 MANIFEST 坏 JSON/C5 改字节不同步/C6 只有 T 组）；三态用例（未装目录）不折算通过；正反向闭环后 49✓0✗9⚠2·，verify.sh 51✓0✗",
-  "修复：install.sh 契约自检在 --capability-only 模式下仍比用户级目录（能力层装在项目级时永远「未装」→静默跳过镜像闸）；改为按 SCOPE 选 USER_DIR/PROJ_DIR"
- ],
- "changelog_0_8_16": [
-  "★工程D 触发样本集：9 个技能各新增 `references/trigger-samples.md`（T8-T10 / N6-N7 / B4-B5，阈值 T≥8 N≥6 B≥3）。T 组每条带「预期第一动作」（指向真实正门命令）、N 组每条带「应归谁」，B 组写边界与正确处置。样本用真实案例：space-hub B01 直接采用 2026-11-12「01·数据源总库 名字带库但内容已移空该不该 force 删」现场；probe-hub 反例覆盖「404 ≠ 死」「用户自测 ≠ 司测活」「能播 ≠ 好源」",
-  "★C6 判据增强：原先只数条数——只写 prompt 的样本也能通过，证明不了「触发后做对」。现加两项完整性：T 组必须含「预期第一动作」、N 组必须含「应归谁」，缺失即红",
-  "★新增 `verify/terminology_check.py`（core-8 M5 声称的机检落点，此前**不存在**）：T1 M4 编号连续（九条须带 B-01…B-09 且与序号对齐）、T2 元规则 M1…M7 连续、T3 引用断链（按技能根→仓根两级解析，跳过 CHANGELOG/测试记录，豁免须写理由）。覆盖 152 处仓内路径引用",
-  "★core-8 九条补 B-01…B-09 标注：此前全生态到处引用「B-05 零明文凭证」「B-02 三态诚实」，但真源正文只有 1…9 数字编号、**搜不到 B-xx 标签**（悬空引用）。补标注后编号可机检、引用有落点",
-  "★新建 `docs/registry.md`（M1 唯一真源登记表）：core-8 M1 写着「登记表见 docs/registry.md」，实查本仓无此文件。表中登记 6 类事实源（版本/规则/技能/运行时册/施工验收）+ 明确不登记清单（M7 有意例外）",
-  "★修 7 处文档断链：machine-bootstrap 命令段（原文称「脚本未搬入」并给 ${CODEBUDDY_SKILL_DIR}/scripts/bootstrap.sh --repo --sparse——脚本实际在仓库根且无此参数，照抄必失败）；pipeline SOP 的 pipeline.py（真身 tvbox-core/scripts/pipeline.py）；core-8/zh-style/S227/eco_unified_entry 指向旧仓未随迁文档的 4 处；2 处运行时/外部引用登记豁免并写理由",
-  "★修 install.sh 分发净化遗漏（工程A 补）：RUNTIME_DIRS=snapshots。快照是 state 写前回滚基线，属本机运行时数据；原先只顾「文件」不顾「目录」，安装时整目录被 cp 进装副本（C5 镜像闸报「装副本多余」抓出）。空机实测：源仓造 2 份快照 → 装完装副本 0 份；拆掉清理分支 → 泄露 2 份（分支承载证实）",
-  "★contracts.json 加 runtime_dirs + verify.sh 同源判据扩为「文件+目录」，两处清单漂移即红（M5）；C5 从契约读跳过目录，不硬编码在脚本里",
-  "实测：契约 58✓0✗0⚠；全程变异 8 项全翻红（C6 四项：删第一动作/删归属/减条数/删样本；口径四项：删 B 标注/序号跳号/造假引用/删 core-8 记无法判定）；verify.sh 52✓0✗1⚠"
- ],
- "changelog_0_8_17": [
-  "★工程E 行为规则补丁（借鉴 Memory Palace AGENTS.md / 9 条 Non-negotiable / guard 三元组）：",
-  "core-8 扩到 B-01…B-10——新增 B-10「拦截即停止」（拒收/NOOP/UPDATE 是停止信号，绕行必须 --force+reason；降级必须报因，静默降级按隐藏故障处理）；B-04 补「同一 state/云端库/受管文件的写入属共享资源，跨会话串行」；每条尾注 ｜验证 V-xxx（E10）",
-  "space-hub v2.7.0：拒收/失败统一 _reject 输出 {error,reason,target,method}（11 个机器码），add/move/rename 全接入；SPACE_HUB_JSON=1 时 stdout 只出 JSON；铁律 +2 条（写前必读 / 拦截即停止）",
-  "skill-evolution v1.1.0：经验入库三问（更新/NOOP/新增+既有条目指针）；脚手架降级必须列 degrade_reasons",
-  "新增 verify/rule_map.json（10 条规则 → 4 机检 + 6 人工判据）与 terminology_check.py T4 双向互引判据（映射缺项/锚点漂移/尾注缺失/kind 错 四类翻红）",
-  "新增 docs/模板_阶段完工交付报告.md（九节，含「回滚路径」必填）与 docs/派活提示模板.md（子代理五段固定基线）；手机指令补第 9 条拦截即停止",
-  "实测：space_hub 拒收 mock 正反向 10/10；变异（吞结构化输出）5 项翻红；T4 四类破坏全红、恢复全绿；口径机检 4✓，引用 155 处无断链"
- ],
- "changelog_0_8_18": [
-  "★工程F-0 卫生清理（A 口径）：活文档 22 处改文本（个人绝对路径→中性表述/占位；本地端点→<壳端口>占位并保留\"默认 9978\"信息），历史档案 23 处按 M7 登记豁免",
-  "secret_scan.py 新增 HYGIENE_EXEMPT（只按文件名模式：CHANGELOG.md / legacy_ / references/S，各带理由）+ 豁免计数可见输出；活文档埋点仍 WARN，--strict 仍 rc=2（正反向 4 项实测）",
-  "实测：verify.sh 首次 51✓ 0✗ 0⚠ 3·（此前 45 处 WARN 全部有去向：22 改 + 23 豁免，无\"没管\"项）；契约 58✓",
-  "★工程F-5 测活报告「怎么读这组数据」：livecheck 每条加 elapsed_ms；汇总后固定输出 通过率(分母只算有结论条数)/p95与中位/死因分布 三句人话；样本<5 不报 p95、全无法判定不说 0%；probe-hub v1.26.5 + SKILL §3.11.1 对照表；回归 verify/tests/test_reading_guide.py 7 项，变异(分母含无法判定) 2 项翻红",
-  "★工程F-1/F-2 路径政策与细则索引：MANIFEST 新增 path_policy（canonical=references/，docs/=过渡存量，新文档一律 references/）；新增 pipeline docs/manual_索引.md 与 probe-hub docs/外置_索引.md（按\"你会问什么\"排，各 10 条）；SKILL 改为先查索引；verify/tests/test_doc_index.py 机检\"索引集合=目录集合\"（6 项，增删各翻红）；pipeline 1.3.9 / probe-hub 1.26.6",
-  "★工程F-3 每技能故障排查：10 个技能各新增 docs/TROUBLESHOOTING.md（按\"症状→先查什么→怎么办→别做什么\"排，共 57 条（实测 `grep -c \"^## \"` 统计），5-7 条/技能）；新增 verify/tests/test_troubleshoot.py 三态机检（<5 条或含占位判红，缺文件记在册待补不算通过；增/删/占位三种破坏实测翻红）；inspect-hub v1.3.3 自检节接线",
-  "★工程F-4 交接摘要：新增 docs/handoff_latest.md（必载三项：当前主线/版本与位置/习惯快照指针）+ verify/tests/test_handoff.py（三项齐全 + 版本==VERSION，过期即红），已挂 verify.sh",
-  "★工程F-6 语言门：verify/tests/test_language.py 窄口径扫 11 份中文文档（连续≥6行无中文且非命令/代码才算残留），埋 8 行英文实测翻红、正常文档 0 误报",
-  "★工程F-7 三通道受检：verify.sh 新增\"手机指令.md 在位且跟到 B-10 / 薄壳指向 core-8 / 交接摘要不过期\"三组判据；反向（删 B-10、改回 B-09）两项翻红",
-  "★工程F-8 保留域写保护：terminology_check 新增 T5——规则真源里的 X-NN 前缀必须在 M4 白名单（B/M-R/V），自造 C-01 实测翻红",
-  "verify.sh 新增「扩展回归」节（5 个行为测试随全量自检跑）；最终 62✓ 0✗ 0⚠ 3·"
- ],
- "path_policy": {
-  "canonical": "references/",
-  "transition": "docs/",
-  "rule": "新文档一律放 references/；docs/ 存量保留，改名必须同步 SKILL 指针与索引（verify/tests/test_doc_index.py 兜底）",
-  "indexes": [
-   "能力层/tvbox/skills/tvbox-pipeline/docs/manual_索引.md",
-   "能力层/tvbox/skills/probe-hub/docs/外置_索引.md"
-  ]
- },
- "changelog_0_8_20": [
-  "★工程H：从「靠模型自觉」改成「靠判定点」（用户「开始吧」授权）。四道判定点：① CI（.github/workflows/verify.yml，远端跑，模型绕不过）② 装机自检（bootstrap/install 末尾，rc≠0 不打印成功）③ 提交闸（hooks/pre-commit，密钥+仓检）④ 判据自证（--selftest，注入必红项验证 rc 联动）。",
-  "H1 副本完整性基线：verify.sh 开头打印 HEAD/文件数，工作区文件数 < git 索引 85% 直接 exit 2 并告知「后续判据不可信」。动机：2026-11-12 连出两次误判（13 红、7 处假断链），根因都是拿半份克隆跑判据。",
-  "H3 CI 不直接跑 verify：干净 runner 无 ~/.codebuddy 会整片红（恒红=没 CI），改为先 install --user-skill 到临时 HOME 再跑，顺带验证「新机装得上」。",
-  "干净 clone 自检当场抓出三处真缺陷并修：sync_shape 漏 verify/（换机后 verify.sh 必崩）、漏 bootstrap.sh 与 export_skill_cards.py（换机副本自断入口）、T3 把 RUNTIME_FILES 当断链（本机有这些未跟踪文件所以一直假绿，干净仓必红）。",
-  "H6-H10 止血：channels 技能名 tvbox-config-sync→tvbox-pipeline；handoff 删「未推送远端」；手机钩子结论由「不跑」改「分环境，实测可跑」并新增 mobile_pretooluse_hook；新增 docs/钩子来源判定.md（钩子=DmaxPro908/hooks/chain_guard.py:18-26 + ecosys-conductor 规则册:4334/4451，与 520 无关）；install.sh 默认 all→user-skill（项目级技能不路由）。"
- ],
- "changelog_0_8_19": [
-  "★工程G 历史遗留治理 + 发布门加严（本轮由用户「都做」授权）：",
-  "G-1 惊门（M8）转正：实现 chk_triggers——跨技能同词判红／技能内重复判黄／未声明触发词判黄（冲突无从判定≠无冲突）；4 个通用层技能补触发词 40 个（从各自 trigger-samples 的 T 组提炼），覆盖 5/9→9/9、238 词、0 撞车；**八门建库以来首次全部转正**。判据只查字面：负边界交叉包含实测 6 候选全假阳性（中文\"归X管\"与\"不要X\"共用字面词），不做",
-  "G-2 景门改集合比对：旧判据用写死 declared 比代码（space-hub 登记 14 / 代码 19，连续几轮假红）；现两边现读、报\"多哪个少哪个\"；分级：文档有代码无=红（吹牛），代码有文档无=黄（仅 check_missing=true）；只在代码块内抽命令且不跨行（正文\"probe tvbox\"曾误抓）",
-  "G-2b 顺手修三处真缺陷：space_hub._node_parent 对 database 类型恒返空（致 add 报成功/回读说不符自相矛盾）→ 改 parentId 优先；删 space_hub render 空壳桩（无调用方、文档未列，假成功比报错危险）；inspect-hub CHANGELOG 标题被 v1.3.3 段落挤到下方",
-  "G-3 发布门默认 --strict：verify.sh 的 secret_scan 默认开启严格模式（卫生问题从\"提示\"升级为\"必须清或显式豁免\"），SECRET_STRICT=0 可临时关闭且会明说已降级",
-  "G-3b **verify.sh 补退出码**（最严重的假绿）：原实现只打印不 exit，恒返回 0，自动化拿不到失败信号；现 ✗ 计 FAILS 并 exit 2、· 记 UNKNOWNS 不阻断、末尾打汇总行；实测埋路径/埋 endpoint 均 rc=2，恢复 rc=0",
-  "G-4 手机端导入材料：新增 export_skill_cards.py（从 SKILL.md 现读现出 9 张卡片，坏技能整条不输出）",
-  "新增回归 4 个：test_triggers(13)/test_docsync(8)/test_skill_cards(16)/test_node_parent(6)/test_verify_exit(5，不挂 verify.sh 防递归)；verify.sh 扩展回归 8 项全跑",
-  "实测：verify.sh 65✓ 0✗ 0⚠ 2·（rc=0）；契约 58✓；口径机检 5✓；巡检健康分 84、红门 0、八门无在册待补",
-  "遗留登记 4 条 → 2 条：惊门闭环删除；tvbox-inspect 瘦身移除（520 本体无此物，存于旧仓 archive，属旧仓事项）；2 个测试库已投收件箱（待用户手动删）；手机端导入材料已备（App 内导入格式仍待确认）"
- ],
- "changelog_0_8_21": [
-  "★S228 落地（用户指令：把 git 推送规则从文档变成执行体）。hooks/git_push_safe.sh 自旧生态 tvbox-eco 随迁适配：5 次指数退避(3s/factor=2)+jitter、瞬时错误白名单(443/SSL/RPC/429/503,认证类不重试)、per-attempt timeout 300s(超时=未确认不算成功)、rev-parse 终验(退出码不可信)、SSH over 443 兜底、GitHub 平台降级、三态退出码+--status。",
-  "推送纪律成文：向 GitHub 推送一律走 hooks/git_push_safe.sh，禁止裸 git push。S228 调研件头部加落地登记（M2 引用不复制）；machine-bootstrap TROUBLESHOOTING 第 6 条补正本入口指针；verify.sh 新增脚本在位+语法检查（缺失即红）。",
-  "sync_shape 补 hooks/ 与 .github/workflows/verify.yml（否则换机副本缺推送工具与远端闸）。",
-  "反向实测：假仓地址→第1次 port 443 判瞬时退避重试、第2次 repository not found 判非瞬时拒绝重试（✗ 不再尝试），行为与 S228 设计一致；--status 无记录 rc=2 三态不折叠。测试命令自身一处测量笔误（$? 误当 $rc）如实记录，脚本无缺陷。"
- ],
- "changelog_0_8_22": [
-  "工程J：core-8 扩到 B-16（新增 B-11 后台与落盘、B-12 回合收敛、B-13 完成态凭落点、B-14 账目三齐、B-15 孤例还是模式、B-16 双核必保）；三源纪律去重后只立增量，与既有 10 条重合的 M-R 条目不重复立",
-  "B-14 机检化：test_handoff.py 新增账目三齐判据（owner/next/due 三列非空 + 禁「待跟进/后续优化/有空再说」）；handoff_latest.md 新增第 4 段待办账目",
-  "B-16 机检化：verify.sh 新增双核必保存在性判据（probe-hub / tvbox-core·core.py / learn-hub），变异测试用临时移走目录验证会翻红",
-  "M-R77 借用：skill_contract_check.py 新增 C7 体积项（SKILL.md ≤40KB，超限 WARN 不阻断；probe-hub 52KB 现记 WARN，瘦身归 MP-D4）",
-  "判据去硬编码：verify.sh 的手机指令编号范围检查改为从 core-8 动态取最大 B 编号，避免扩条后判据自身过期",
-  "同步全部编号范围指针（zh-style / CODEBUDDY / SOP / registry / 手机指令 / MANIFEST）到 B-01…B-16；core-8 代号沿用不改名（M7 登记，改名会断全仓引用）",
-  "MP-D4：probe-hub SKILL 50.8KB→40.0KB（-21.4%）——§3 命令清单外置 references/命令手册.md、§3.5.0 字段范本与 §8 归档表外置，§3.13/3.14 压重复；判据/正门命令/触发词零删除；probe-hub 1.26.6→1.27.0（四处一致）",
-  "MP-D5：巡检司惊门新增「触发回归」面——抽全部 N/B 样本，校验「应归谁」指向的技能真实存在（95 组 / 0 异常）；首跑抓出自己判据过严（B 组无归属字段是设计），已修正并做变异验证",
-  "MP-B7：交付模板「四、验证结果」补「自检命令」节（5 条可直接复跑的命令 + 必须写预期输出的判据）"
- ],
- "changelog_0_8_23": [
-  "手机硬轨扩到 12 条：新增 B-11 长命令后台跑（云沙箱会掐断前台死等）、B-13 说完成要凭落点、B-16 双核必保（手机装的是完整仓库，存在顺手清理风险）",
-  "五条有意不入硬轨并逐条登记理由（B-04 并行/B-09 产物纪律/B-12 回合收敛/B-14 账目三齐/B-15 孤例还是模式），按 M7 显式登记为有意例外，不按漏项处理",
-  "verify.sh 手机硬轨判据升级：从「抽查 B-10 一条 + 比范围字符串」改为结构化对账——hard-rail ∪ hard-rail-exempt 必须不重不漏等于 core-8 全部编号，必入五项（B-02/10/11/13/16）必须在 rail 内；四变异全翻红（扩条未决定去向/必入项漏放/编号写错/同时进两队）",
-  "修一处自己写出的断链：第 12 条初稿写 `scripts/core.py` 被判 T3 断链命中（真阳性，判据没错），改全路径 能力层/tvbox/skills/tvbox-core/scripts/core.py"
- ],
- "changelog_0_8_24": [
-  "space-hub v2.7.2「回执≠回读」闭环：cmd_add 幂等命中回读核实（过期记录清掉放行重投，不再静默 return 0）+ 移动回执后落地回读（未落地 rc=3，对齐 cmd_move）+ _nodes_or_none 翻页（单页 50 上限漏读 81 项的实战教训）",
-  "回归测试 verify/tests/test_space_hub_add.py：分页收全 / 过期登记重投 / 真幂等短路 / 未落地不当作成功 / 失败→None 三态不塌，16 断言；三处变异各自精确翻红",
-  "TROUBLESHOOTING 第 4 条补充：手写 list-nodes 调用漏翻页的绕坑口径（列子节点一律复用 _kids / _nodes_or_none）",
-  "修正昨日错误记录：「_kids() 单页不翻页」是误认——_kids 本就是翻页版，单页的是 _nodes_or_none（判账号形态用）；B-15 判定：模式（脚本缺陷 ×2 + 模型侧绕过正门 ×1），机制=回读判据进 cmd_add + 正本入口教训进 TROUBLESHOOTING"
- ],
- "changelog_0_8_25": [
-  "基座扩到 B-18：B-17「代号与常用词即确认」（短代号/都做/继续/按顺序来/从根源解决直接映射执行，仅真歧义或不可逆动作先澄清）、B-18「产出可溯源」（正文每处事实须指回文件:行或原文段落，交付报「N 有出处/M 无出处」，无出处单列不许删）；手机硬轨 11→13 条、豁免 5 条不变（并集=18，机检逼出来的账）",
-  "B-05 补例外口径（实证冲突）：probe.py:6360 的 token --set 会写 SELF_DIR/.gh_token，而 SELF_DIR 在仓内、.gitignore 此前无此条 → 一次 --set + add -A 即把 PAT 推上公网。现改为「代码可代写本机 0600，但必须被 .gitignore 覆盖、不得出现在 git ls-files、不得回显」，.gitignore 补 .gh_token/.git-credentials/.netrc",
-  "secret_scan.py 新增凭据文件名扫描：内容扫描对无扩展名的 .gh_token 天生失效（过不了 SCAN_EXT），故按文件名 + git 状态三态判（已追踪=红 / 未追踪未忽略=红 / 未追踪已忽略=合法留痕）",
-  "新增 verify/ledger_laws.py「台账四律」判据：L1 状态终态化（M-R75）/ L2 指纹对账（M-R82，90% 为防恶化线非达标线）/ L3 已结区幂等（M-R86）/ L4 退出码不驻全局（M-R93）；配 verify/tests/test_ledger_laws.py 六用例（4 红 1 不误报 1 基线）变异回归",
-  "新增 docs 三件：工程纪律.md（7 条机器判不了的人工复核项，每条带「怎么查」）、通病台账.md（病1 检查器自指 / 病4 凭印象转正 / 病8 单信号判不存在 / 病9 概率证据下死结论，后两条解除不存在的 M-R214 依赖）、规则迁移映射_193条.md（A56/B17/C28/D92 逐条去向）",
-  "判据自证三例入档（docs/工程纪律.md §7）：L4 首版子串匹配把 _SEARCH_BOX_TPL 判中（误报 7）；_code_only 首版抹平行结构致 C4 变异不翻红（判据形同虚设）；判据扫到自身反例文本（自指）",
-  "M-R305 判定修正：其五机制之③「nodeId 引用须实取禁手敲」已被 B-08 覆盖 → 记 A（附注），不整体判 D"
- ],
- "changelog_0_8_26": [
-  "手机指令云端副本改为自动同步：新增 sync_phone_directive.py（幂等：sha 一致直接 NOOP）+ hooks/pre-commit 第②步（仅当 手机指令.md 进本次提交时触发，同步成功自动 git add 状态文件）+ verify.sh 离线过期判据 + docs/手机指令云端副本.json 记 nodeId/sha/条数",
-  "回读通道实证换路：export_node.py 的导出下载在沙箱被判「下载地址无效」（COS 域名/IP 校验挡掉预签名地址），改用 space.workspace.get-doc-review 直接取块结构；create-doc --node-block-id 实测可原地全量覆盖（version 2→6，节点数仍 1，不新建重复节点）",
-  "新增 verify/tests/test_phone_directive_sync.py 11 用例变异回归：提取（剥注释/只取标记间）/ 缺起止标记必须抛错 / 回读三形态（少一条、换首句、小标题串改）/ --check 三态（FRESH 0、STALE 1、无状态 1）/ 幂等短路在\"未装库\"环境里仍 NOOP 通过",
-  "判据自证第四例入档：回读校验首版不剥有序列表编号，末句恰为列表项时比对假红——由 T4 正例抓出，_fold 补剥行首 `N. `",
-  "手机指令.md 说明段补「云端副本自动同步」指针；docs/registry.md 登记该副本状态文件为真源（手改即伪造已同步）",
-  "触发器修复（同批自查）：pre-commit 首版用 `git diff --cached --name-only | grep -qx 手机指令.md`，git 默认把中文名转义成 \"\\346\\211\\213...\"，条件永远为假——打印「本次提交未改该文件，跳过」，看着在工作、实际一次都没同步过。加 -c core.quotepath=false，并实测走通（改词→SYNCED v7→还原→SYNCED v8）"
- ],
- "changelog_0_8_27": [
-  "B-07 补上执行面：原文只说\"接手须先对齐习惯+业务上下文\"，没说靠什么对齐——等于把动作留给模型自由发挥。现写死\"第一动作是读 docs/handoff_latest.md（唯一真源）\"，并明确\"读不到就说本会话未对齐，不许装懂\"",
-  "同一句话落三通道（M2 只写指针不复制）：core-8 B-07（真源扩写，不开新号）/ 项目薄壳 CODEBUDDY.md（无条件三条→四条）/ 手机指令.md（开场自检后一句）。三通道缺一就有一种会话形态拿不到这个动作：手机端不读项目薄壳、桌面端不读手机指令",
-  "test_handoff.py 新增三通道\"读摘要动作句\"判据（存在性判据，docstring 里明写它不证明\"agent 真读了\"）",
-  "判据自证第 5 例：首版只 grep 文件名 handoff_latest.md，被手机指令第 69 行\"交接账目在桌面 docs/handoff_latest.md 维护\"这句**理由**蹭成假绿——删掉真动作句判据照样绿。改为要求「读」与文件名同行相邻（前后 60 字符）",
-  "薄壳顺带修断链：正文写 B-01~B-16（实际已到 B-18），标题\"无条件三条\"同步改为四条",
-  "手机指令云端副本已同步 v9（4668 字节 / 14 条，回读通过）"
- ],
- "changelog_0_8_28": [
-  "G6 联动索引落轻量版（908 老方案三个缺口里唯一值得补的一个）：新增 verify/linkage_notice.py，pre-commit 检出\"本次改了 registry.md 登记的真源\"时自动列全仓引用方清单，把 M5 连带从\"靠人记\"变成\"机器提醒\"（advisory 不阻断；脚本异常显式出声，不许静默）",
-  "真源清单唯一来源是 docs/registry.md 表格第 2 列反引号路径 + 存在性过滤（运行时登记册不存在的路径自动滤掉），不在脚本里复制清单（M1）",
-  "匹配口径两条实证教训写进测试：P3 中文名真源（quotepath 教训直测）、P4 裸文件名引用——首版只认反引号，被 shell 引号/正文裸写的现实用法漏报，测出后改为\"带路径真源完整路径或裸名都算，无路径裸名只认反引号\"（宁多报不漏报）",
-  "7 用例 + 1 过滤项变异回归挂进 verify.sh 扩展回归；hooks/pre-commit 插为第 ③ 步（跳过/命中/异常三态都出声）；G5 强化衰减与 golden_eval 评估后明确不建（入口限流已控规模、V-MANUAL 人工问法即人工版行为断言）"
- ],
- "changelog_0_8_29": [
-  "借 908 换机说明两条可取处：① 根目录新增 sync.sh 一行收尾（verify → fetch 对账 → git_push_safe，不做自动提交/强制推送/内嵌令牌——与 908 版三个有意差异写进头部注释）；② machine-bootstrap SKILL.md 新增「诚实边界」表",
-  "908 方案三条路线经评估拒绝并写明理由：URL 内嵌令牌（token 明文落 .git/config，违 B-05）、60+ 全局钩子合并（手机/云端不跑钩子实测定论）、强制推送（毁历史，git_push_safe 重试式替代）",
-  "IPv4 固定 IP 修复实测不成立：强制解析 12.7s vs 默认 5.6s（本沙箱 DNS 更快），且写死 IP 会漂移——不采纳，push 抖动由 git_push_safe 重试兜底",
-  "换机司 SKILL.md 修第 31 行语义过期（手机通道仍写已被实测证伪的 App 入口，bbbe8a2 回写漏网的第 6 处）；全仓 grep 复核为孤例，其余 2 处命中均为带定论注解的正确写法"
- ],
- "changelog_0_8_30": [
-  "借 908 重做蓝图 §4.5 两条：① secret_scan.py 新增大文件闸——git 视角下任何文件 >10MB 即 FAIL（与密钥同一 candidate_files 视角，add -A 会带走的未追踪大文件也算），现状最大文件 probe.py 仅 0.5MB、余量 20 倍；② docs/工程纪律.md 增第 8 条「状态进 git 前过四条件」（低频写/读多/小文件/结构化，违反任一必须分层），标题七条改八条",
-  "verify/tests/test_secret_scan_size.py 4 用例变异回归挂进扩展回归（C1 超限翻红 / C2 全小放行 / C3a 边界 10MB 放行 / C3b 10MB+1 翻红——闸位精确）",
-  "蓝图 8 步清单对账：6 步已完成或被更优方案取代（520pro 即私有状态仓/sync.sh/secret_scan 兼自检），2 步不采纳并记理由（orphan 分支当前规模不必、last_seq 游标 9MB 仓全量拉无压力）"
- ],
- "changelog_0_8_31": [
-  "技能触发可命中性工程（借 Memory Palace 的 description 契约思想 + 本会话实测）：平台只把 name+description 编成截断预览给模型（实测约 120–250 字，长度随条目浮动），触发词写在第 397/479/1174 位的四个技能等于没写——9 个技能 description 首句统一改为「当用户说「…」「…」时使用本技能」，5 个高频口语说法进前 80 字，原内容一字未删只前置",
-  "新增 C9 触发前置：前 40 字须有「当用户」句式、前 80 字须命中 ≥3 个触发词（「」引号词 ∪ 触发词清单，且只算「触发词：」标签之前的前段，防清单自己把判据测成假绿）",
-  "新增 C10 样本词桥：触发样本 T 组每条须能在 description 里找到词桥（非泛用二字词 / 英文数字词），找不到即红并报出样本编号——抓「样本说会触发、描述里根本没这说法」",
-  "verify/tests/test_trigger_frontload.py 8 用例变异回归（F2 真实形态「触发词埋 400 字后」、F4 第 41 字边界、B3 只重合泛用词必须翻红）；挂进 verify.sh 扩展回归",
-  "连带修两处：① inspect-hub 前置句与原句重复 4 词，惊门（test_triggers）判黄 → 去重；② test_triggers 反例② 前提更新——v0.8.31 起触发词有两个来源，只删正文段造不出「缺词」，改为两处都删光（不变量未变：没有触发词才判黄）"
- ],
- "changelog_0_8_58": "Stop 拽回协议定版：stop_guard.py 输出由 exit 2+stderr 改为 JSON decision:block（两次对照实测：前者拽不回、后者能拽回）；回归加一条防回退；MANIFEST.version 与 VERSION 对齐并加机检",
- "changelog_0_8_59": "gate_scan 增两道闸：hook-registered（install.sh 声明的「脚本→事件」与 settings.json 实况对账，补病13「写了没挂」）、case-count（测试例数必须 N[0] 自增，压病12 复发）；4 个测试文件同步改为自增，暴露真实例数 25/13/38/20",
- "changelog_0_8_60": "B-05 硬化：guard_cmd 增 G5（add 凭据名）/G6（Write/Edit 到仓内凭据路径），next_anchor 加 matcher=Write|Edit 第二条注册；补 .gitignore 与 secret_scan.CRED_NAMES 的 .env 缺口（批量 add 拦不住的那条）；矩阵 B-05 改 S1 已落地",
- "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）",
- "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账",
- "changelog_0_8_70": "S231 六层全落地：通道三件代码化（atomicio 原子写+内容不变不重写／pushconfig FongMi 推送三态端口／imgproxy wsrv.nl 图代理默认 dry-run）；第 7 条金律升判据（bdb 46 个真实 py 源实测出 5 处原文缺口，最刺眼是苹果CMS player_aaaa 字段是 link 不是 url，原文对标准模板恒失败且无声）；bdb 包立项 S232（第二种写源范式：JSON 模板 DSL，与 S231 代码生成并行；但仓内铁律 §3.12③ 明写不做配置驱动自动生成源，故吸收方向是「认形态判路线」的侦察而非施工）；订正 S231 过期标注（六层总账原全标待移植而代码早已落地）；修三个真缺陷（金律用例只断言 url 致摘层级也不红→改断言层名／imgproxy 三态折叠把「没这行」与「读不了」混成一个 None／install.sh 引号提前闭合致 search_results.json 被当命令执行、每次覆盖安装丢一次搜索候选）；SKILL.md 40.8→39.96KB 消掉长期 C7 WARN",
- "changelog_0_8_71": "第二立项 四壳逐个深入：LeeCat 实测四种源语言（新发现 PHP8.4 WASM 26MB + libfjs 8.2MB；py 协议=CatVod+drpy 双方言故 forge 生成的源可直接跑；自带 pycryptodome 故 AES 应按壳分档）；云取纠正——不是壳而是 QuickJS 插件化下载器（catvod/tvbox/spider/drpy 全 0 命中，turbodl 190 处）；MilkCode 的 42MB jadx jar 抽出并实测可用（26 工具，load_apk 云取 22432 类 14.8s），但不入 git；Muse 除名确认并订正 S231 的 dex 计数口径（43588/765/19）；S231 壳矩阵同步订正四处",
- "changelog_0_8_72": "S233 §六 两件事收口：①jadx MCP 类名级壳侦察接入 shellcrack apk-types（LeeCat 真壳 7428 类给出 python/quickjs/catvod 类名级证据，assets 脚本层 0 命中记无法判定不判不支持，词边界+8 形态 selftest 防子串误命中）；②写源按壳分档 choose_aes_variant 三态（未知保守兜底 B-02），判据落 SKILL.md §3.12.3 且 selftest 覆盖两分支；补 43570e8 两条落库欠账核销；SKILL.md 41.0→39.74KB 按 M2 指针化消 C7 WARN；存证 S234",
- "changelog_0_8_73": "M12 经验门 yellow 机制级闸化消解：chk_contentflow 判4 采信「已闸化登记」并实证落点（病号映射表病15 加结构化 gate → _selftest_landed 用 ast 认 selftest 函数定义+接电+锚点，注释/docstring 天然排除，五种后接形态 selftest 全覆盖）；不改复发计数（hook 真源不洗绿），登记不落地仍报 yellow；判4 明细不再出现「须升【阻】或闸化」；存证 S235",
- "changelog_0_8_74": "闸化登记推广（B-15 同类排查）：destination=闸化 共 5 病号，全仓 122 个 .py 用 _gate_landed 实扫，病1/病10/病11/病12 均无「落点脚本+selftest」可实证（闸本体 gate_scan.py 无 selftest、test_*.py 由 verify.sh 直接执行未接电、verify.sh grep 段非 Python），台账文首集中登记「暂不登记」具体原因并保持 gate 缺失=保留 yellow；不拿 delivery_probe.selftest_quotepath 同型脚本冒充（识别范围≠对象范围）、不改判据迁就、不洗绿；gate_experience.py --selftest 补多病号混合用例（部分有/部分无/含 retired），A/B/C yellow、D green；判据明细无「须升【阻】或闸化」",
- "changelog_0_8_75": "熔铸司（foundry）W1 骨架登记：通用层落 foundry(skill) + foundry-core(lib) 双件，26 个 jadx MCP 工具名册按 tools/list 实测登记（S233 §3.2 文档枚举 25 个，漏 get_main_application_classes_names），63 目录能力面清单待 W3 迁入；产出经 artifacts.json 声明接 🧬 520进化论 03/04/05 与 📦 产物归档；skill_contracts.json 加两行、MANIFEST 通用层登记两件、registry 登记新真源、test_troubleshoot.py 的 SKILL_DIRS 纳入两件（登记即监测范围，不留盲区）；foundry.py selftest 与 core.py --selftest 正反向全绿。版本四处对齐 0.8.75。"
+  "changelog_0_7_1": [
+    "inspect-hub v1.1.0：adversarial 对抗自测子命令（临时 clone 逐门造脏断言必翻红，8/8 实测）+ 死门带过执法（待办必须带负责人+期限，复发自动升红，借 tvbox-eco carryover_guard/adversarial_suite 思想）",
+    "secret_scan 自指豁免扩展：inspect_hub.py 对抗用例构造行行级豁免（实测自指误报即修）",
+    "docs/遗留登记.md 四条目补齐负责人+期限（新判据生效基线）",
+    "本轮借鉴范围盘点定案：A(对抗自测)+B(带过执法) 本轮落地；C(脚本冒烟)/E(环境巡检)/G(闸篡改探针)/D(依赖契约) 已评估在案后补；F/H 及 hooks 类明确不借"
+  ],
+  "changelog_0_8_0": [
+    "版本化迁移机制（借 tvbox-eco upgrade.sh 思想）：VERSION 文件 + 本地已部署标记 ~/.codebuddy/.520_state/version + migrate_to_<ver> 一次性动作表（0.6.0/0.7.0/0.7.1/0.8.0），幂等 + dry-run 支持 + VERSION 不可读不瞎迁",
+    "install.sh cp_bak 机制级修复：备份只留最近一份（此前每次安装堆一个 .bak.$TS 永不清理，实测顶层堆 7 个）",
+    "bootstrap 断言补 VERSION 与 inspect-hub/SKILL.md；sync_shape 补 VERSION（稀疏检出集合，缺它断言必失败——实测抓到）",
+    "sync_shape 补 secret_scan.py（v0.7.0 引入仓库根但漏登记稀疏清单，--target 自检会因缺扫描器记红——实测抓到）"
+  ],
+  "changelog_0_8_1": [
+    "修复探源司→清道夫投递链改名断链（实查 2026-11-12）：清道夫改名 space-hub 后，core.py file_to_janitor 仍写死 ~/.codebuddy/skills/tvbox-janitor + import janitor → import 必失败恒返回 False，投递从未成功且 quiet 静默（旁路设计下最危险失效形态）。改为 space-hub 优先/tvbox-janitor 兜底双探测",
+    "probe.py _eco_linked_probe 同步：探针仍探旧路径 → space-hub 装着也报「下游未装」；改新名优先旧名兜底。实测三态：假 id 拒收 ✓ / 投递链路走 space_hub（mock 不动云端）✓ / 探针 (True, None) ✓（None=监察司未迁 520，如实报无法判定）",
+    "bootstrap 迁移表 +migrate_to_0.8.1（同步 tvbox-core/probe-hub 副本）；VERSION 0.8.1"
+  ],
+  "changelog_0_8_2": [
+    "库务司 space-hub v2.1.0：新增 auto_file_local 本地欠账登记（learn-hub 旧门面投本地路径被 S156 node_id 护栏拒收——名义联动，投递从未成功，实证 2026-11-12）；list 本地欠账单独成节（云端陈旧剔除逻辑会误剔本地路径）；local-rm 销账（前缀匹配/未命中拒销 exit 2/纯本地不过空间解析）",
+    "学习工坊 learn-hub v1.3.0：_to_janitor→_to_spacehub 改道本地欠账；解耦能力层 tvbox-core 依赖",
+    "classify_rules +「学习与资料」类：learn-hub 产业认主（云端 dry-run 实测引擎按登记册跑通）",
+    "实测：记账/幂等/空路径拒收/前缀销账/未命中 exit 2/learn 门面全链 ✓；副本陈旧时门面报「需 ≥2.1.0」明确失败而非静默",
+    "bootstrap 迁移表 +0.8.2（同步 space-hub/learn-hub 副本）"
+  ],
+  "changelog_0_8_3": [
+    "core-8 新增 B-09 产物纪律（规则真源 通用层/rules/core-8.md）：产出默认不落产物区，点名例外（落产物/生成文件/拉面板），归宿=文本呈现或经库务司 archive 落库；连带 4 指针点（M4 编号范围 B-01…B-09、tvbox 薄壳、手机指令、MANIFEST role）同步改",
+    "space-hub v2.2.0：archive 落库正门（📦 产物归档夹+📦 产物索引库五字段+本地清理，全步 library 正门+回读）+ products --scan/--search-box（盘点+单文件搜索框）",
+    "实测修三 bug：KS 行空格分隔解析；新建节点目录索引传播延迟（S200 带间隔重试）；_find_parent 残留 ROOT（v2.0.0 漏改）→ NameError 致 add 从未真正投递（今天实测投递现场踩到，历史 add 全部只登记未移动）",
+    "inspect-hub v1.2.0：伤门复合 chk_structure（结构完整性+产物纪律 chk_products），八卦 8 位固定不新增第 9 卦",
+    "bootstrap 迁移表 +0.8.3（同步 space-hub/inspect-hub/rules 副本）"
+  ],
+  "changelog_0_8_4": [
+    "架构重规划 A「总线归目标方」：file_to_janitor 迁入 space-hub v2.3.0（收件方自持，core 中转壳删除，调用方 probe/link/newlib/blk 改 import 来源、调用行零改动）；register_monitor 迁入 inspect-hub v1.3.0（原探旧生态 tvbox-inspect 恒失败，现真登记 monitors.json）",
+    "依赖方向修正：space_hub 核库不再 import 能力层 tvbox-core（就地内联 _run_lib 直调 library 正门）——通用层对能力层零依赖",
+    "实测抓缺陷并修：① 核库对照组硬编码 id 随空间重建失效（permission denied）→ 三级动态解析 + 无对照如实报无法判定；② 生门把运行时数据 findings_history/monitors/*_state 当正本对账 → 永久误报副本漂移，已排除；③ learn-hub learn.py 副本陈旧（v0.8.2 手工同步漏 scripts）已同步",
+    "tvbox-pipeline v1.1.0 清残留：SKILL.md frontmatter YAML 截断致一半触发词未进 description（路由缺陷）已修；SOP 旧身份 frontmatter 改 doc 元信息；死引用 ecosys-conductor/user_habit_brief 改指 core-8；/root/.codebuddy 硬编码 10 处改 $HOME；CHANGELOG-interface.md 合并",
+    "tvbox-core README 定位收窄为「纯 TVBox 数据域共享库」，明确不再中转通用层能力",
+    "bootstrap 迁移表 +0.8.4（同步 tvbox-core/probe-hub/space-hub/inspect-hub/learn-hub/tvbox-pipeline 副本）"
+  ],
+  "changelog_0_8_11": [
+    "★库房自举 space-hub v2.4.0：base_blueprint.json（📦 产物归档/<类别>、🧬 生态演化）做基础蓝图，各技能 artifacts.json 的 blueprint 分片追加自己的根，ensure 按蓝图收敛——认领已有/补建缺失/每步回读，幂等；仅零可写空间时自动建空间，多个未登记则报错让人选",
+    "★产出自动跟随：archive_out(path, source, note) 门面，能力层出口一行调用即落库+写索引，永不抛异常，失败记 pending 由 products --retry 补投；probe-hub livecheck 已接线（实测落到「🔍 探源产出/测活报告」并生成可检索索引）",
+    "★生态演化台账：「🧬 生态演化/版本演化台账」（版本/日期/类型/新增能力/变更摘要/证据），evolve-log 用已装技能快照差集回答「这版增加了什么」，同版本同快照去重；install.sh 收尾自动记账；evolve-view 出时间线",
+    "能力声明：probe-hub/artifacts.json（测活报告→🔍 探源产出/测活报告）、learn-hub/artifacts.json（学习产出→📚 学习资料/成品）；未声明产出落「未归类」并点名提示，加技能即跟随、清道夫零改动",
+    "实测修四坑：date 字段写 {\"text\":...} 被静默丢弃（须 {\"date\":...}）；select 写 text 同样静默丢（按 schema 类型写，未知类别降级其他并保留真类别）；drive 拒收 .md（按类型分流 doc/drive）；products 扫 /workspace 全盘把 50+ 无关文件算产物（收窄为声明可识别）"
+  ],
+  "changelog_0_8_12": [
+    "★账号接管 adopt（space-hub v2.5.0）：三态判定 fresh/hybrid/foreign/unknown——空空间按蓝图建 17 单元；老账号认领已有+登记存量（**只登记不搬**，15 条历史进索引，业务分类写说明、类别按节点类型）；别人的空间拒绝接管（exit 3，需 --force）；枚举失败报 unknown，绝不折叠成 fresh 去乱建",
+    "★分发净化：探源司 5 个运行时刻度册（monitor_targets 186 条/domains/pubsources/dead_repos/shellcrack_cands）退出 git 并 gitignore，各留 .example.json 模板；新机器首次运行自动建空册，shellcrack 缺件不再抛 FileNotFoundError（实测 rc=0 并给出 --in 用法）。**安装器同步剥离**：gitignore 只挡 git clone，挡不住\"从仓库目录 cp 到别人机器\"——实测空机安装后探源司出现 185 个目标，故 cp_bak 拷完即删源带来的运行时文件，再回填现场那份（实测：空机 0 目标自建空册 / 本机 5 册 sha 不变）",
+    "★学习资料出口接线（learn-hub v1.4.0）：learn store put 收尾自动进「📚 学习资料/成品」——主文档（index.md>README.md>唯一 md）单建文档节点可读可检索，整目录打 zip 兜底；索引只记一条（zip 走 write_index=False），说明含「N 文件｜主文档｜整包名」；无主文档时如实写「未识别到主文档」并改走整包",
+    "★修复 v0.8.11 潜伏缺陷：archive_out 在「当天已自举」分支跳过空间解析，新进程里 SPACE=None，建夹时 subprocess 收到 None 抛 TypeError 导致归档全挂；现入口显式 resolve_space，_create_folder 加 None 守卫",
+    "★classify 落点统一：登记册 target 由根层级旧名（归档·报告与交付）改为路径（📦 产物归档/文档），与 archive 共用 _ensure_path；实测 10 项存量归入 2 个夹，根层级不再新建同名夹",
+    "实测修：drive 上传 md 被拒（按类型分流已在上版）、doc 标题曾用文件名致云端一堆「index」文档（改用记录名）、索引「类别」写入业务分类导致清一色「其他」（改为按节点类型：doc→文档/web→面板/database→数据）"
+  ],
+  "changelog_0_8_13": [
+    "★库务司数据保全四件套（space-hub v2.6.0，机制借鉴 Memory Palace）：①state 写前快照（同资源同进程幂等，snapshots/ 目录，gitignore 不随分发）；②原子写 tmpfile+fsync+os.replace（半截写不可能落盘）；③轮换 GC KEEP=20（env SPACE_HUB_SNAPSHOT_KEEP 可调，当前进程快照绝不删）；④快照索引自愈（损坏从快照文件重建，数据本体不丢）",
+    "★ensure 迁移锁：flock 跨进程互斥，超时报结构化 {\"error\":\"ensure_lock_timeout\"}——两会话并发自举不再撞半成品蓝图",
+    "★--force 审计留痕：add/adopt 的 --force 必须配 --reason（校验在一切云端调用之前），绕行动作写进 state audit 节（上限 50 条）",
+    "修复：快照文件名同秒相撞（加 pid+序号唯一化，实测 T4 用例发现）",
+    "实测：正向 11/11（隔离环境）；反向变异 V1-V5 全翻红；verify.sh 48✓0✗ 零回归"
+  ],
+  "changelog_0_8_14": [
+    "★工程B 发布卫生闸（secret_scan.py 扩展）：B1 九类密钥形态（私钥块/AKIA/ASIA/xox/AIza/sk-/ghp_/github_pat_）；B2 个人绝对路径动态扫描（换机断链根治，文档实抓 38 处）；B3 本地 endpoint 模式（6 处）；B4 WARN/FAIL 分级（卫生问题⚠不阻断，--strict 升级为红）；B5 模板真值检查（.example.json 出现真实节点 id 即 FAIL）",
+    "★B6 基线文件跟踪判据（verify.sh）：MANIFEST/VERSION/secret_scan/verify/install+全部 SKILL.md 必须被 git 跟踪，漏跟踪即红",
+    "★B7 回执模板加「发布前自检命令」节（用户手也能跑的 rg/grep 清单）",
+    "实测：正反向 7 项全过（AKIA/模板id/路径/endpoint/strict/基线 各翻红证实）；verify.sh 49✓0✗1⚠"
+  ],
+  "changelog_0_8_15": [
+    "★工程C 技能契约机检（新 verify/skill_contract_check.py + verify/skill_contracts.json）：C1 结构契约（required_files 缺件即红）；C2 头部契约（name==目录名、version 必须 semver）；C3 描述五组（D1 触发声明 / D2 能力枚举 / D3 正门锚点 / D4 自省锚点 / D5 负边界）；C4 版本四处对账（contracts==SKILL/manifest==CHANGELOG 首条==MANIFEST 登记）；C5 镜像 sha（仓内源↔安装副本逐文件，运行时态豁免，装副本多余文件也报）；C6 触发样本（有则查 T/N/B 阈值，无则 WARN 待工程D）",
+    "★补齐 520 真实缺项（工程C 首跑 19 项红全部修真）：4 个裸技能补 version/CHANGELOG/能力枚举/负边界/自省锚点；inspect-hub 补 D2/D3/D4/D5 四组；space-hub 补负边界；learn-hub/probe-hub 补正门锚点；tvbox-pipeline 版本 1.1.0→1.3.7 对齐 CHANGELOG（并补能力枚举）",
+    "★修 MANIFEST 分发元数据过期：space-hub role 写 v2.0.0（实际 2.6.0）、inspect-hub 写 v1.0.0（实际 1.3.1）；全部技能条目新增 version 字段，纳入 C4 四处对账",
+    "★修 tvbox-core manifest 1.0.54→1.0.66（与 CHANGELOG 首条对齐）",
+    "★三态防假绿：安装副本整体不存在时默认记「无法判定」（不折算通过），verify.sh/装后自检用 --require-mirror 硬闸；MANIFEST 解析失败记红不记「未登记」",
+    "★接线：verify.sh 新增 2 条判据（技能契约机检 + 运行时豁免清单两处同源 M5）；install.sh 加 check_contract（装完即校验，dry-run 也跑，只告警不中断）",
+    "实测：变异测试 8/8 翻红（C1 缺件/C2 坏版本/C3 删负边界/C4 改 contracts 版本/C4 MANIFEST 过期/C4 MANIFEST 坏 JSON/C5 改字节不同步/C6 只有 T 组）；三态用例（未装目录）不折算通过；正反向闭环后 49✓0✗9⚠2·，verify.sh 51✓0✗",
+    "修复：install.sh 契约自检在 --capability-only 模式下仍比用户级目录（能力层装在项目级时永远「未装」→静默跳过镜像闸）；改为按 SCOPE 选 USER_DIR/PROJ_DIR"
+  ],
+  "changelog_0_8_16": [
+    "★工程D 触发样本集：9 个技能各新增 `references/trigger-samples.md`（T8-T10 / N6-N7 / B4-B5，阈值 T≥8 N≥6 B≥3）。T 组每条带「预期第一动作」（指向真实正门命令）、N 组每条带「应归谁」，B 组写边界与正确处置。样本用真实案例：space-hub B01 直接采用 2026-11-12「01·数据源总库 名字带库但内容已移空该不该 force 删」现场；probe-hub 反例覆盖「404 ≠ 死」「用户自测 ≠ 司测活」「能播 ≠ 好源」",
+    "★C6 判据增强：原先只数条数——只写 prompt 的样本也能通过，证明不了「触发后做对」。现加两项完整性：T 组必须含「预期第一动作」、N 组必须含「应归谁」，缺失即红",
+    "★新增 `verify/terminology_check.py`（core-8 M5 声称的机检落点，此前**不存在**）：T1 M4 编号连续（九条须带 B-01…B-09 且与序号对齐）、T2 元规则 M1…M7 连续、T3 引用断链（按技能根→仓根两级解析，跳过 CHANGELOG/测试记录，豁免须写理由）。覆盖 152 处仓内路径引用",
+    "★core-8 九条补 B-01…B-09 标注：此前全生态到处引用「B-05 零明文凭证」「B-02 三态诚实」，但真源正文只有 1…9 数字编号、**搜不到 B-xx 标签**（悬空引用）。补标注后编号可机检、引用有落点",
+    "★新建 `docs/registry.md`（M1 唯一真源登记表）：core-8 M1 写着「登记表见 docs/registry.md」，实查本仓无此文件。表中登记 6 类事实源（版本/规则/技能/运行时册/施工验收）+ 明确不登记清单（M7 有意例外）",
+    "★修 7 处文档断链：machine-bootstrap 命令段（原文称「脚本未搬入」并给 ${CODEBUDDY_SKILL_DIR}/scripts/bootstrap.sh --repo --sparse——脚本实际在仓库根且无此参数，照抄必失败）；pipeline SOP 的 pipeline.py（真身 tvbox-core/scripts/pipeline.py）；core-8/zh-style/S227/eco_unified_entry 指向旧仓未随迁文档的 4 处；2 处运行时/外部引用登记豁免并写理由",
+    "★修 install.sh 分发净化遗漏（工程A 补）：RUNTIME_DIRS=snapshots。快照是 state 写前回滚基线，属本机运行时数据；原先只顾「文件」不顾「目录」，安装时整目录被 cp 进装副本（C5 镜像闸报「装副本多余」抓出）。空机实测：源仓造 2 份快照 → 装完装副本 0 份；拆掉清理分支 → 泄露 2 份（分支承载证实）",
+    "★contracts.json 加 runtime_dirs + verify.sh 同源判据扩为「文件+目录」，两处清单漂移即红（M5）；C5 从契约读跳过目录，不硬编码在脚本里",
+    "实测：契约 58✓0✗0⚠；全程变异 8 项全翻红（C6 四项：删第一动作/删归属/减条数/删样本；口径四项：删 B 标注/序号跳号/造假引用/删 core-8 记无法判定）；verify.sh 52✓0✗1⚠"
+  ],
+  "changelog_0_8_17": [
+    "★工程E 行为规则补丁（借鉴 Memory Palace AGENTS.md / 9 条 Non-negotiable / guard 三元组）：",
+    "core-8 扩到 B-01…B-10——新增 B-10「拦截即停止」（拒收/NOOP/UPDATE 是停止信号，绕行必须 --force+reason；降级必须报因，静默降级按隐藏故障处理）；B-04 补「同一 state/云端库/受管文件的写入属共享资源，跨会话串行」；每条尾注 ｜验证 V-xxx（E10）",
+    "space-hub v2.7.0：拒收/失败统一 _reject 输出 {error,reason,target,method}（11 个机器码），add/move/rename 全接入；SPACE_HUB_JSON=1 时 stdout 只出 JSON；铁律 +2 条（写前必读 / 拦截即停止）",
+    "skill-evolution v1.1.0：经验入库三问（更新/NOOP/新增+既有条目指针）；脚手架降级必须列 degrade_reasons",
+    "新增 verify/rule_map.json（10 条规则 → 4 机检 + 6 人工判据）与 terminology_check.py T4 双向互引判据（映射缺项/锚点漂移/尾注缺失/kind 错 四类翻红）",
+    "新增 docs/模板_阶段完工交付报告.md（九节，含「回滚路径」必填）与 docs/派活提示模板.md（子代理五段固定基线）；手机指令补第 9 条拦截即停止",
+    "实测：space_hub 拒收 mock 正反向 10/10；变异（吞结构化输出）5 项翻红；T4 四类破坏全红、恢复全绿；口径机检 4✓，引用 155 处无断链"
+  ],
+  "changelog_0_8_18": [
+    "★工程F-0 卫生清理（A 口径）：活文档 22 处改文本（个人绝对路径→中性表述/占位；本地端点→<壳端口>占位并保留\"默认 9978\"信息），历史档案 23 处按 M7 登记豁免",
+    "secret_scan.py 新增 HYGIENE_EXEMPT（只按文件名模式：CHANGELOG.md / legacy_ / references/S，各带理由）+ 豁免计数可见输出；活文档埋点仍 WARN，--strict 仍 rc=2（正反向 4 项实测）",
+    "实测：verify.sh 首次 51✓ 0✗ 0⚠ 3·（此前 45 处 WARN 全部有去向：22 改 + 23 豁免，无\"没管\"项）；契约 58✓",
+    "★工程F-5 测活报告「怎么读这组数据」：livecheck 每条加 elapsed_ms；汇总后固定输出 通过率(分母只算有结论条数)/p95与中位/死因分布 三句人话；样本<5 不报 p95、全无法判定不说 0%；probe-hub v1.26.5 + SKILL §3.11.1 对照表；回归 verify/tests/test_reading_guide.py 7 项，变异(分母含无法判定) 2 项翻红",
+    "★工程F-1/F-2 路径政策与细则索引：MANIFEST 新增 path_policy（canonical=references/，docs/=过渡存量，新文档一律 references/）；新增 pipeline docs/manual_索引.md 与 probe-hub docs/外置_索引.md（按\"你会问什么\"排，各 10 条）；SKILL 改为先查索引；verify/tests/test_doc_index.py 机检\"索引集合=目录集合\"（6 项，增删各翻红）；pipeline 1.3.9 / probe-hub 1.26.6",
+    "★工程F-3 每技能故障排查：10 个技能各新增 docs/TROUBLESHOOTING.md（按\"症状→先查什么→怎么办→别做什么\"排，共 57 条（实测 `grep -c \"^## \"` 统计），5-7 条/技能）；新增 verify/tests/test_troubleshoot.py 三态机检（<5 条或含占位判红，缺文件记在册待补不算通过；增/删/占位三种破坏实测翻红）；inspect-hub v1.3.3 自检节接线",
+    "★工程F-4 交接摘要：新增 docs/handoff_latest.md（必载三项：当前主线/版本与位置/习惯快照指针）+ verify/tests/test_handoff.py（三项齐全 + 版本==VERSION，过期即红），已挂 verify.sh",
+    "★工程F-6 语言门：verify/tests/test_language.py 窄口径扫 11 份中文文档（连续≥6行无中文且非命令/代码才算残留），埋 8 行英文实测翻红、正常文档 0 误报",
+    "★工程F-7 三通道受检：verify.sh 新增\"手机指令.md 在位且跟到 B-10 / 薄壳指向 core-8 / 交接摘要不过期\"三组判据；反向（删 B-10、改回 B-09）两项翻红",
+    "★工程F-8 保留域写保护：terminology_check 新增 T5——规则真源里的 X-NN 前缀必须在 M4 白名单（B/M-R/V），自造 C-01 实测翻红",
+    "verify.sh 新增「扩展回归」节（5 个行为测试随全量自检跑）；最终 62✓ 0✗ 0⚠ 3·"
+  ],
+  "path_policy": {
+    "canonical": "references/",
+    "transition": "docs/",
+    "rule": "新文档一律放 references/；docs/ 存量保留，改名必须同步 SKILL 指针与索引（verify/tests/test_doc_index.py 兜底）",
+    "indexes": [
+      "能力层/tvbox/skills/tvbox-pipeline/docs/manual_索引.md",
+      "能力层/tvbox/skills/probe-hub/docs/外置_索引.md"
+    ]
+  },
+  "changelog_0_8_20": [
+    "★工程H：从「靠模型自觉」改成「靠判定点」（用户「开始吧」授权）。四道判定点：① CI（.github/workflows/verify.yml，远端跑，模型绕不过）② 装机自检（bootstrap/install 末尾，rc≠0 不打印成功）③ 提交闸（hooks/pre-commit，密钥+仓检）④ 判据自证（--selftest，注入必红项验证 rc 联动）。",
+    "H1 副本完整性基线：verify.sh 开头打印 HEAD/文件数，工作区文件数 < git 索引 85% 直接 exit 2 并告知「后续判据不可信」。动机：2026-11-12 连出两次误判（13 红、7 处假断链），根因都是拿半份克隆跑判据。",
+    "H3 CI 不直接跑 verify：干净 runner 无 ~/.codebuddy 会整片红（恒红=没 CI），改为先 install --user-skill 到临时 HOME 再跑，顺带验证「新机装得上」。",
+    "干净 clone 自检当场抓出三处真缺陷并修：sync_shape 漏 verify/（换机后 verify.sh 必崩）、漏 bootstrap.sh 与 export_skill_cards.py（换机副本自断入口）、T3 把 RUNTIME_FILES 当断链（本机有这些未跟踪文件所以一直假绿，干净仓必红）。",
+    "H6-H10 止血：channels 技能名 tvbox-config-sync→tvbox-pipeline；handoff 删「未推送远端」；手机钩子结论由「不跑」改「分环境，实测可跑」并新增 mobile_pretooluse_hook；新增 docs/钩子来源判定.md（钩子=DmaxPro908/hooks/chain_guard.py:18-26 + ecosys-conductor 规则册:4334/4451，与 520 无关）；install.sh 默认 all→user-skill（项目级技能不路由）。"
+  ],
+  "changelog_0_8_19": [
+    "★工程G 历史遗留治理 + 发布门加严（本轮由用户「都做」授权）：",
+    "G-1 惊门（M8）转正：实现 chk_triggers——跨技能同词判红／技能内重复判黄／未声明触发词判黄（冲突无从判定≠无冲突）；4 个通用层技能补触发词 40 个（从各自 trigger-samples 的 T 组提炼），覆盖 5/9→9/9、238 词、0 撞车；**八门建库以来首次全部转正**。判据只查字面：负边界交叉包含实测 6 候选全假阳性（中文\"归X管\"与\"不要X\"共用字面词），不做",
+    "G-2 景门改集合比对：旧判据用写死 declared 比代码（space-hub 登记 14 / 代码 19，连续几轮假红）；现两边现读、报\"多哪个少哪个\"；分级：文档有代码无=红（吹牛），代码有文档无=黄（仅 check_missing=true）；只在代码块内抽命令且不跨行（正文\"probe tvbox\"曾误抓）",
+    "G-2b 顺手修三处真缺陷：space_hub._node_parent 对 database 类型恒返空（致 add 报成功/回读说不符自相矛盾）→ 改 parentId 优先；删 space_hub render 空壳桩（无调用方、文档未列，假成功比报错危险）；inspect-hub CHANGELOG 标题被 v1.3.3 段落挤到下方",
+    "G-3 发布门默认 --strict：verify.sh 的 secret_scan 默认开启严格模式（卫生问题从\"提示\"升级为\"必须清或显式豁免\"），SECRET_STRICT=0 可临时关闭且会明说已降级",
+    "G-3b **verify.sh 补退出码**（最严重的假绿）：原实现只打印不 exit，恒返回 0，自动化拿不到失败信号；现 ✗ 计 FAILS 并 exit 2、· 记 UNKNOWNS 不阻断、末尾打汇总行；实测埋路径/埋 endpoint 均 rc=2，恢复 rc=0",
+    "G-4 手机端导入材料：新增 export_skill_cards.py（从 SKILL.md 现读现出 9 张卡片，坏技能整条不输出）",
+    "新增回归 4 个：test_triggers(13)/test_docsync(8)/test_skill_cards(16)/test_node_parent(6)/test_verify_exit(5，不挂 verify.sh 防递归)；verify.sh 扩展回归 8 项全跑",
+    "实测：verify.sh 65✓ 0✗ 0⚠ 2·（rc=0）；契约 58✓；口径机检 5✓；巡检健康分 84、红门 0、八门无在册待补",
+    "遗留登记 4 条 → 2 条：惊门闭环删除；tvbox-inspect 瘦身移除（520 本体无此物，存于旧仓 archive，属旧仓事项）；2 个测试库已投收件箱（待用户手动删）；手机端导入材料已备（App 内导入格式仍待确认）"
+  ],
+  "changelog_0_8_21": [
+    "★S228 落地（用户指令：把 git 推送规则从文档变成执行体）。hooks/git_push_safe.sh 自旧生态 tvbox-eco 随迁适配：5 次指数退避(3s/factor=2)+jitter、瞬时错误白名单(443/SSL/RPC/429/503,认证类不重试)、per-attempt timeout 300s(超时=未确认不算成功)、rev-parse 终验(退出码不可信)、SSH over 443 兜底、GitHub 平台降级、三态退出码+--status。",
+    "推送纪律成文：向 GitHub 推送一律走 hooks/git_push_safe.sh，禁止裸 git push。S228 调研件头部加落地登记（M2 引用不复制）；machine-bootstrap TROUBLESHOOTING 第 6 条补正本入口指针；verify.sh 新增脚本在位+语法检查（缺失即红）。",
+    "sync_shape 补 hooks/ 与 .github/workflows/verify.yml（否则换机副本缺推送工具与远端闸）。",
+    "反向实测：假仓地址→第1次 port 443 判瞬时退避重试、第2次 repository not found 判非瞬时拒绝重试（✗ 不再尝试），行为与 S228 设计一致；--status 无记录 rc=2 三态不折叠。测试命令自身一处测量笔误（$? 误当 $rc）如实记录，脚本无缺陷。"
+  ],
+  "changelog_0_8_22": [
+    "工程J：core-8 扩到 B-16（新增 B-11 后台与落盘、B-12 回合收敛、B-13 完成态凭落点、B-14 账目三齐、B-15 孤例还是模式、B-16 双核必保）；三源纪律去重后只立增量，与既有 10 条重合的 M-R 条目不重复立",
+    "B-14 机检化：test_handoff.py 新增账目三齐判据（owner/next/due 三列非空 + 禁「待跟进/后续优化/有空再说」）；handoff_latest.md 新增第 4 段待办账目",
+    "B-16 机检化：verify.sh 新增双核必保存在性判据（probe-hub / tvbox-core·core.py / learn-hub），变异测试用临时移走目录验证会翻红",
+    "M-R77 借用：skill_contract_check.py 新增 C7 体积项（SKILL.md ≤40KB，超限 WARN 不阻断；probe-hub 52KB 现记 WARN，瘦身归 MP-D4）",
+    "判据去硬编码：verify.sh 的手机指令编号范围检查改为从 core-8 动态取最大 B 编号，避免扩条后判据自身过期",
+    "同步全部编号范围指针（zh-style / CODEBUDDY / SOP / registry / 手机指令 / MANIFEST）到 B-01…B-16；core-8 代号沿用不改名（M7 登记，改名会断全仓引用）",
+    "MP-D4：probe-hub SKILL 50.8KB→40.0KB（-21.4%）——§3 命令清单外置 references/命令手册.md、§3.5.0 字段范本与 §8 归档表外置，§3.13/3.14 压重复；判据/正门命令/触发词零删除；probe-hub 1.26.6→1.27.0（四处一致）",
+    "MP-D5：巡检司惊门新增「触发回归」面——抽全部 N/B 样本，校验「应归谁」指向的技能真实存在（95 组 / 0 异常）；首跑抓出自己判据过严（B 组无归属字段是设计），已修正并做变异验证",
+    "MP-B7：交付模板「四、验证结果」补「自检命令」节（5 条可直接复跑的命令 + 必须写预期输出的判据）"
+  ],
+  "changelog_0_8_23": [
+    "手机硬轨扩到 12 条：新增 B-11 长命令后台跑（云沙箱会掐断前台死等）、B-13 说完成要凭落点、B-16 双核必保（手机装的是完整仓库，存在顺手清理风险）",
+    "五条有意不入硬轨并逐条登记理由（B-04 并行/B-09 产物纪律/B-12 回合收敛/B-14 账目三齐/B-15 孤例还是模式），按 M7 显式登记为有意例外，不按漏项处理",
+    "verify.sh 手机硬轨判据升级：从「抽查 B-10 一条 + 比范围字符串」改为结构化对账——hard-rail ∪ hard-rail-exempt 必须不重不漏等于 core-8 全部编号，必入五项（B-02/10/11/13/16）必须在 rail 内；四变异全翻红（扩条未决定去向/必入项漏放/编号写错/同时进两队）",
+    "修一处自己写出的断链：第 12 条初稿写 `scripts/core.py` 被判 T3 断链命中（真阳性，判据没错），改全路径 能力层/tvbox/skills/tvbox-core/scripts/core.py"
+  ],
+  "changelog_0_8_24": [
+    "space-hub v2.7.2「回执≠回读」闭环：cmd_add 幂等命中回读核实（过期记录清掉放行重投，不再静默 return 0）+ 移动回执后落地回读（未落地 rc=3，对齐 cmd_move）+ _nodes_or_none 翻页（单页 50 上限漏读 81 项的实战教训）",
+    "回归测试 verify/tests/test_space_hub_add.py：分页收全 / 过期登记重投 / 真幂等短路 / 未落地不当作成功 / 失败→None 三态不塌，16 断言；三处变异各自精确翻红",
+    "TROUBLESHOOTING 第 4 条补充：手写 list-nodes 调用漏翻页的绕坑口径（列子节点一律复用 _kids / _nodes_or_none）",
+    "修正昨日错误记录：「_kids() 单页不翻页」是误认——_kids 本就是翻页版，单页的是 _nodes_or_none（判账号形态用）；B-15 判定：模式（脚本缺陷 ×2 + 模型侧绕过正门 ×1），机制=回读判据进 cmd_add + 正本入口教训进 TROUBLESHOOTING"
+  ],
+  "changelog_0_8_25": [
+    "基座扩到 B-18：B-17「代号与常用词即确认」（短代号/都做/继续/按顺序来/从根源解决直接映射执行，仅真歧义或不可逆动作先澄清）、B-18「产出可溯源」（正文每处事实须指回文件:行或原文段落，交付报「N 有出处/M 无出处」，无出处单列不许删）；手机硬轨 11→13 条、豁免 5 条不变（并集=18，机检逼出来的账）",
+    "B-05 补例外口径（实证冲突）：probe.py:6360 的 token --set 会写 SELF_DIR/.gh_token，而 SELF_DIR 在仓内、.gitignore 此前无此条 → 一次 --set + add -A 即把 PAT 推上公网。现改为「代码可代写本机 0600，但必须被 .gitignore 覆盖、不得出现在 git ls-files、不得回显」，.gitignore 补 .gh_token/.git-credentials/.netrc",
+    "secret_scan.py 新增凭据文件名扫描：内容扫描对无扩展名的 .gh_token 天生失效（过不了 SCAN_EXT），故按文件名 + git 状态三态判（已追踪=红 / 未追踪未忽略=红 / 未追踪已忽略=合法留痕）",
+    "新增 verify/ledger_laws.py「台账四律」判据：L1 状态终态化（M-R75）/ L2 指纹对账（M-R82，90% 为防恶化线非达标线）/ L3 已结区幂等（M-R86）/ L4 退出码不驻全局（M-R93）；配 verify/tests/test_ledger_laws.py 六用例（4 红 1 不误报 1 基线）变异回归",
+    "新增 docs 三件：工程纪律.md（7 条机器判不了的人工复核项，每条带「怎么查」）、通病台账.md（病1 检查器自指 / 病4 凭印象转正 / 病8 单信号判不存在 / 病9 概率证据下死结论，后两条解除不存在的 M-R214 依赖）、规则迁移映射_193条.md（A56/B17/C28/D92 逐条去向）",
+    "判据自证三例入档（docs/工程纪律.md §7）：L4 首版子串匹配把 _SEARCH_BOX_TPL 判中（误报 7）；_code_only 首版抹平行结构致 C4 变异不翻红（判据形同虚设）；判据扫到自身反例文本（自指）",
+    "M-R305 判定修正：其五机制之③「nodeId 引用须实取禁手敲」已被 B-08 覆盖 → 记 A（附注），不整体判 D"
+  ],
+  "changelog_0_8_26": [
+    "手机指令云端副本改为自动同步：新增 sync_phone_directive.py（幂等：sha 一致直接 NOOP）+ hooks/pre-commit 第②步（仅当 手机指令.md 进本次提交时触发，同步成功自动 git add 状态文件）+ verify.sh 离线过期判据 + docs/手机指令云端副本.json 记 nodeId/sha/条数",
+    "回读通道实证换路：export_node.py 的导出下载在沙箱被判「下载地址无效」（COS 域名/IP 校验挡掉预签名地址），改用 space.workspace.get-doc-review 直接取块结构；create-doc --node-block-id 实测可原地全量覆盖（version 2→6，节点数仍 1，不新建重复节点）",
+    "新增 verify/tests/test_phone_directive_sync.py 11 用例变异回归：提取（剥注释/只取标记间）/ 缺起止标记必须抛错 / 回读三形态（少一条、换首句、小标题串改）/ --check 三态（FRESH 0、STALE 1、无状态 1）/ 幂等短路在\"未装库\"环境里仍 NOOP 通过",
+    "判据自证第四例入档：回读校验首版不剥有序列表编号，末句恰为列表项时比对假红——由 T4 正例抓出，_fold 补剥行首 `N. `",
+    "手机指令.md 说明段补「云端副本自动同步」指针；docs/registry.md 登记该副本状态文件为真源（手改即伪造已同步）",
+    "触发器修复（同批自查）：pre-commit 首版用 `git diff --cached --name-only | grep -qx 手机指令.md`，git 默认把中文名转义成 \"\\346\\211\\213...\"，条件永远为假——打印「本次提交未改该文件，跳过」，看着在工作、实际一次都没同步过。加 -c core.quotepath=false，并实测走通（改词→SYNCED v7→还原→SYNCED v8）"
+  ],
+  "changelog_0_8_27": [
+    "B-07 补上执行面：原文只说\"接手须先对齐习惯+业务上下文\"，没说靠什么对齐——等于把动作留给模型自由发挥。现写死\"第一动作是读 docs/handoff_latest.md（唯一真源）\"，并明确\"读不到就说本会话未对齐，不许装懂\"",
+    "同一句话落三通道（M2 只写指针不复制）：core-8 B-07（真源扩写，不开新号）/ 项目薄壳 CODEBUDDY.md（无条件三条→四条）/ 手机指令.md（开场自检后一句）。三通道缺一就有一种会话形态拿不到这个动作：手机端不读项目薄壳、桌面端不读手机指令",
+    "test_handoff.py 新增三通道\"读摘要动作句\"判据（存在性判据，docstring 里明写它不证明\"agent 真读了\"）",
+    "判据自证第 5 例：首版只 grep 文件名 handoff_latest.md，被手机指令第 69 行\"交接账目在桌面 docs/handoff_latest.md 维护\"这句**理由**蹭成假绿——删掉真动作句判据照样绿。改为要求「读」与文件名同行相邻（前后 60 字符）",
+    "薄壳顺带修断链：正文写 B-01~B-16（实际已到 B-18），标题\"无条件三条\"同步改为四条",
+    "手机指令云端副本已同步 v9（4668 字节 / 14 条，回读通过）"
+  ],
+  "changelog_0_8_28": [
+    "G6 联动索引落轻量版（908 老方案三个缺口里唯一值得补的一个）：新增 verify/linkage_notice.py，pre-commit 检出\"本次改了 registry.md 登记的真源\"时自动列全仓引用方清单，把 M5 连带从\"靠人记\"变成\"机器提醒\"（advisory 不阻断；脚本异常显式出声，不许静默）",
+    "真源清单唯一来源是 docs/registry.md 表格第 2 列反引号路径 + 存在性过滤（运行时登记册不存在的路径自动滤掉），不在脚本里复制清单（M1）",
+    "匹配口径两条实证教训写进测试：P3 中文名真源（quotepath 教训直测）、P4 裸文件名引用——首版只认反引号，被 shell 引号/正文裸写的现实用法漏报，测出后改为\"带路径真源完整路径或裸名都算，无路径裸名只认反引号\"（宁多报不漏报）",
+    "7 用例 + 1 过滤项变异回归挂进 verify.sh 扩展回归；hooks/pre-commit 插为第 ③ 步（跳过/命中/异常三态都出声）；G5 强化衰减与 golden_eval 评估后明确不建（入口限流已控规模、V-MANUAL 人工问法即人工版行为断言）"
+  ],
+  "changelog_0_8_29": [
+    "借 908 换机说明两条可取处：① 根目录新增 sync.sh 一行收尾（verify → fetch 对账 → git_push_safe，不做自动提交/强制推送/内嵌令牌——与 908 版三个有意差异写进头部注释）；② machine-bootstrap SKILL.md 新增「诚实边界」表",
+    "908 方案三条路线经评估拒绝并写明理由：URL 内嵌令牌（token 明文落 .git/config，违 B-05）、60+ 全局钩子合并（手机/云端不跑钩子实测定论）、强制推送（毁历史，git_push_safe 重试式替代）",
+    "IPv4 固定 IP 修复实测不成立：强制解析 12.7s vs 默认 5.6s（本沙箱 DNS 更快），且写死 IP 会漂移——不采纳，push 抖动由 git_push_safe 重试兜底",
+    "换机司 SKILL.md 修第 31 行语义过期（手机通道仍写已被实测证伪的 App 入口，bbbe8a2 回写漏网的第 6 处）；全仓 grep 复核为孤例，其余 2 处命中均为带定论注解的正确写法"
+  ],
+  "changelog_0_8_30": [
+    "借 908 重做蓝图 §4.5 两条：① secret_scan.py 新增大文件闸——git 视角下任何文件 >10MB 即 FAIL（与密钥同一 candidate_files 视角，add -A 会带走的未追踪大文件也算），现状最大文件 probe.py 仅 0.5MB、余量 20 倍；② docs/工程纪律.md 增第 8 条「状态进 git 前过四条件」（低频写/读多/小文件/结构化，违反任一必须分层），标题七条改八条",
+    "verify/tests/test_secret_scan_size.py 4 用例变异回归挂进扩展回归（C1 超限翻红 / C2 全小放行 / C3a 边界 10MB 放行 / C3b 10MB+1 翻红——闸位精确）",
+    "蓝图 8 步清单对账：6 步已完成或被更优方案取代（520pro 即私有状态仓/sync.sh/secret_scan 兼自检），2 步不采纳并记理由（orphan 分支当前规模不必、last_seq 游标 9MB 仓全量拉无压力）"
+  ],
+  "changelog_0_8_31": [
+    "技能触发可命中性工程（借 Memory Palace 的 description 契约思想 + 本会话实测）：平台只把 name+description 编成截断预览给模型（实测约 120–250 字，长度随条目浮动），触发词写在第 397/479/1174 位的四个技能等于没写——9 个技能 description 首句统一改为「当用户说「…」「…」时使用本技能」，5 个高频口语说法进前 80 字，原内容一字未删只前置",
+    "新增 C9 触发前置：前 40 字须有「当用户」句式、前 80 字须命中 ≥3 个触发词（「」引号词 ∪ 触发词清单，且只算「触发词：」标签之前的前段，防清单自己把判据测成假绿）",
+    "新增 C10 样本词桥：触发样本 T 组每条须能在 description 里找到词桥（非泛用二字词 / 英文数字词），找不到即红并报出样本编号——抓「样本说会触发、描述里根本没这说法」",
+    "verify/tests/test_trigger_frontload.py 8 用例变异回归（F2 真实形态「触发词埋 400 字后」、F4 第 41 字边界、B3 只重合泛用词必须翻红）；挂进 verify.sh 扩展回归",
+    "连带修两处：① inspect-hub 前置句与原句重复 4 词，惊门（test_triggers）判黄 → 去重；② test_triggers 反例② 前提更新——v0.8.31 起触发词有两个来源，只删正文段造不出「缺词」，改为两处都删光（不变量未变：没有触发词才判黄）"
+  ],
+  "changelog_0_8_58": "Stop 拽回协议定版：stop_guard.py 输出由 exit 2+stderr 改为 JSON decision:block（两次对照实测：前者拽不回、后者能拽回）；回归加一条防回退；MANIFEST.version 与 VERSION 对齐并加机检",
+  "changelog_0_8_59": "gate_scan 增两道闸：hook-registered（install.sh 声明的「脚本→事件」与 settings.json 实况对账，补病13「写了没挂」）、case-count（测试例数必须 N[0] 自增，压病12 复发）；4 个测试文件同步改为自增，暴露真实例数 25/13/38/20",
+  "changelog_0_8_60": "B-05 硬化：guard_cmd 增 G5（add 凭据名）/G6（Write/Edit 到仓内凭据路径），next_anchor 加 matcher=Write|Edit 第二条注册；补 .gitignore 与 secret_scan.CRED_NAMES 的 .env 缺口（批量 add 拦不住的那条）；矩阵 B-05 改 S1 已落地",
+  "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）",
+  "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账",
+  "changelog_0_8_70": "S231 六层全落地：通道三件代码化（atomicio 原子写+内容不变不重写／pushconfig FongMi 推送三态端口／imgproxy wsrv.nl 图代理默认 dry-run）；第 7 条金律升判据（bdb 46 个真实 py 源实测出 5 处原文缺口，最刺眼是苹果CMS player_aaaa 字段是 link 不是 url，原文对标准模板恒失败且无声）；bdb 包立项 S232（第二种写源范式：JSON 模板 DSL，与 S231 代码生成并行；但仓内铁律 §3.12③ 明写不做配置驱动自动生成源，故吸收方向是「认形态判路线」的侦察而非施工）；订正 S231 过期标注（六层总账原全标待移植而代码早已落地）；修三个真缺陷（金律用例只断言 url 致摘层级也不红→改断言层名／imgproxy 三态折叠把「没这行」与「读不了」混成一个 None／install.sh 引号提前闭合致 search_results.json 被当命令执行、每次覆盖安装丢一次搜索候选）；SKILL.md 40.8→39.96KB 消掉长期 C7 WARN",
+  "changelog_0_8_71": "第二立项 四壳逐个深入：LeeCat 实测四种源语言（新发现 PHP8.4 WASM 26MB + libfjs 8.2MB；py 协议=CatVod+drpy 双方言故 forge 生成的源可直接跑；自带 pycryptodome 故 AES 应按壳分档）；云取纠正——不是壳而是 QuickJS 插件化下载器（catvod/tvbox/spider/drpy 全 0 命中，turbodl 190 处）；MilkCode 的 42MB jadx jar 抽出并实测可用（26 工具，load_apk 云取 22432 类 14.8s），但不入 git；Muse 除名确认并订正 S231 的 dex 计数口径（43588/765/19）；S231 壳矩阵同步订正四处",
+  "changelog_0_8_72": "S233 §六 两件事收口：①jadx MCP 类名级壳侦察接入 shellcrack apk-types（LeeCat 真壳 7428 类给出 python/quickjs/catvod 类名级证据，assets 脚本层 0 命中记无法判定不判不支持，词边界+8 形态 selftest 防子串误命中）；②写源按壳分档 choose_aes_variant 三态（未知保守兜底 B-02），判据落 SKILL.md §3.12.3 且 selftest 覆盖两分支；补 43570e8 两条落库欠账核销；SKILL.md 41.0→39.74KB 按 M2 指针化消 C7 WARN；存证 S234",
+  "changelog_0_8_73": "M12 经验门 yellow 机制级闸化消解：chk_contentflow 判4 采信「已闸化登记」并实证落点（病号映射表病15 加结构化 gate → _selftest_landed 用 ast 认 selftest 函数定义+接电+锚点，注释/docstring 天然排除，五种后接形态 selftest 全覆盖）；不改复发计数（hook 真源不洗绿），登记不落地仍报 yellow；判4 明细不再出现「须升【阻】或闸化」；存证 S235",
+  "changelog_0_8_74": "闸化登记推广（B-15 同类排查）：destination=闸化 共 5 病号，全仓 122 个 .py 用 _gate_landed 实扫，病1/病10/病11/病12 均无「落点脚本+selftest」可实证（闸本体 gate_scan.py 无 selftest、test_*.py 由 verify.sh 直接执行未接电、verify.sh grep 段非 Python），台账文首集中登记「暂不登记」具体原因并保持 gate 缺失=保留 yellow；不拿 delivery_probe.selftest_quotepath 同型脚本冒充（识别范围≠对象范围）、不改判据迁就、不洗绿；gate_experience.py --selftest 补多病号混合用例（部分有/部分无/含 retired），A/B/C yellow、D green；判据明细无「须升【阻】或闸化」",
+  "changelog_0_8_75": "熔铸司（foundry）W1 骨架登记：通用层落 foundry(skill) + foundry-core(lib) 双件，26 个 jadx MCP 工具名册按 tools/list 实测登记（S233 §3.2 文档枚举 25 个，漏 get_main_application_classes_names），63 目录能力面清单待 W3 迁入；产出经 artifacts.json 声明接 🧬 520进化论 03/04/05 与 📦 产物归档；skill_contracts.json 加两行、MANIFEST 通用层登记两件、registry 登记新真源、test_troubleshoot.py 的 SKILL_DIRS 纳入两件（登记即监测范围，不留盲区）；foundry.py selftest 与 core.py --selftest 正反向全绿。版本四处对齐 0.8.75。",
+  "changelog_0_8_76": "熔铸司（foundry）W2 引擎上提与 26 工具全量接线：JadxMCP 从能力层 shellcrack.py 上提到通用层 foundry-core/scripts/jadx_engine.py（独立命名避开与 tvbox-core/core.py 撞名、importlib 按路径加载不塞 sys.path、能力层反向复用、调用行零改动、病15 S233① 五种后接形态判据保留）；tools_schema.json 补 26 个 inputSchema （tools/list 一手实测）+ 26 条真调配方（3 个 S233① 已用 + 23 个 P1/FIX-6 补调），verified 26/26，首轮 6 个假失败作参数链反例保留不删；修正 core.py 的病15 复发（chain_ok 旧版扫 json.dumps 把合法键名 class_name 误判为坏填法，改为查参数值），新增 schema_ok 判据（识别范围=对象范围，反向覆盖五种后接形态+洗绿造错）；引擎 call() 收敛死进程为 PROC_DEAD 三态；本轮真调复验两独立 java 进程 tools/list 均 26 个、load_apk LOADED，资源专项用 jadx 解码名 AndroidManifest.xml/resources.arsc 真调通、zip 原始路径报 link-not-file（闭环证明参数链规则②），进程 B 反编译某类崩子进程如实记 PROC_DEAD 不折叠；skill_contracts.json foundry-core 登记 jadx_engine.py 入监测范围。core.py/jadx_engine.py/foundry.py/shellcrack.py 正反向 selftest 全绿、bash verify.sh 0✗/0⚠。版本四处对齐 0.8.76。"
 }
