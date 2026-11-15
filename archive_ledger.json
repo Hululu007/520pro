@@ -2213,6 +2213,39 @@
    "result": "ok",
    "event_ref": "commit cddd15d",
    "note": "回填 0.8.67 批3 探测器链演进记录，核销 commit 10d0f35 的 F04 欠账（quotepath 盲区期漏账）"
+  },
+  {
+   "ts": "2026-11-15T12:28:45",
+   "round": "evolve-log 0.8.70",
+   "artifact": "版本演化台账记录 0.8.70",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.70 · VERSION=0.8.70 · 技能快照 7911cbf06d92 · 技能 19 个",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
+  },
+  {
+   "ts": "2026-11-15T12:31:10",
+   "round": "archive 方法论_判不存在之前先交出判据与正样本.md @d193bcd",
+   "artifact": "方法论_判不存在之前先交出判据与正样本.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "T5adY2KxhAf6KAupOeOJ82",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit d193bcd",
+   "note": "病15 第12例方法论：判「不存在」前先交出判据与正样本；覆盖 commit d193bcd 的 F02 欠账"
+  },
+  {
+   "ts": "2026-11-15T12:31:17",
+   "round": "archive 判例_扫不到不等于没有_S232包鉴定_20261115.md @d193bcd",
+   "artifact": "判例_扫不到不等于没有_S232包鉴定_20261115.md",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "5OQzW71zHL3XFYgVeYlobt",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit d193bcd",
+   "note": "判例：扫不到不等于没有（S232 包鉴定误判）；覆盖 commit d193bcd 的 F06 欠账"
   }
  ]
 }
