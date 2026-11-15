@@ -1740,6 +1740,23 @@
    "note": "机器核销：ledger 回执已现"
   },
   {
+   "id": "D-1b829d9-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "1b829d9",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(foundry): W7 阶段A — 26 工具链真跑通判据（real-java-stdio 实证 + 三态接电）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 真跑通判据必须与离线 selftest 分层、且识别范围=对象范围（病15）：「起进程成功」只是前提不算跑通，须 26 名册齐 + status 真结构化响应全",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "archive 方法论_真跑通判据三态分层.md @1b829d9 @ 2026-11-16",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
    "id": "D-b1b1430-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",

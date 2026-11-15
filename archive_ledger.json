@@ -2510,6 +2510,17 @@
    "result": "ok",
    "event_ref": "commit 0071c05",
    "note": "F02 方法论：中性摆出不替用户定边界（形态+修法+实例坐标）；commit 0071c05"
+  },
+  {
+   "ts": "2026-11-16T00:46:18",
+   "round": "archive 方法论_真跑通判据三态分层.md @1b829d9",
+   "artifact": "方法论_真跑通判据三态分层.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "VJOo2j2zaqLZBA0CLwgoBD",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 1b829d9",
+   "note": "F02 方法论：真跑通判据三态分层 + 识别范围=对象范围（形态+修法+实例坐标）；commit 1b829d9"
   }
  ]
 }
