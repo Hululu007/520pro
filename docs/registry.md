@@ -42,6 +42,9 @@
 | 外置文档索引 | `能力层/tvbox/skills/tvbox-pipeline/docs/manual_索引.md`、`能力层/tvbox/skills/probe-hub/docs/外置_索引.md` | 条目集合必须等于目录集合（`verify/tests/test_doc_index.py`） |
 | 路径政策（canonical） | `MANIFEST.json` 的 `path_policy` | 新文档一律 `references/`；`docs/` 为过渡存量 |
 | 技能触发样本 | 各技能 `references/trigger-samples.md` | T/N/B 三组；C6 机检数量 + "第一动作/归属"完整性 |
+| 横向工具能力板块（熔铸司） | `通用层/skills/foundry/`（skill）+ `通用层/skills/foundry-core/`（lib） | 跨业务域的工具能力，不属任何单项业务域；`foundry-core` 无 SKILL.md，只被 import |
+| jadx MCP 26 工具名册与参数链 | `通用层/skills/foundry-core/scripts/tools_schema.json` + `通用层/skills/foundry-core/scripts/core.py` | 一手 `tools/list` 实测 26 个（非文档枚举 25）；W1 登记名册、W2 补 inputSchema 与真调参数，登记与转正分离 |
+| 熔铸司产出归属声明 | `通用层/skills/foundry/artifacts.json` | 声明能力面对照/解码资产/工具清单/板块演进/真调判例五类落点；库务司扫描 `*/artifacts.json` 自动纳入 |
 
 ## 四、运行时登记册（随使用增长，不入 git 或按需提交）
 

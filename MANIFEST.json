@@ -1,6 +1,6 @@
 {
  "ecosystem": "520pro",
- "version": "0.8.74",
+ "version": "0.8.75",
  "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
  "based_on": [
   "WorkBuddy 平台运行时",
@@ -80,6 +80,19 @@
     "skills/learn-hub/CHANGELOG.md": {
      "install_to": "~/.codebuddy/skills/learn-hub/CHANGELOG.md",
      "role": "学习工坊变更凭证"
+    },
+    "skills/foundry/SKILL.md": {
+     "install_to": "~/.codebuddy/skills/foundry/SKILL.md",
+     "role": "熔铸司 v1.0.0：520 横向工具能力板块（jadx 26 工具名册 / 63 目录能力面 / 产出经 archive_out 落 520进化论）",
+     "entry": "scripts/foundry.py",
+     "self_check": "python3 scripts/foundry.py selftest → 正向绿 / 反向全红",
+     "version": "1.0.0"
+    },
+    "skills/foundry-core/": {
+     "install_to": "~/.codebuddy/skills/foundry-core/",
+     "role": "熔铸司共享引擎内核（lib，无 SKILL.md，不注册不路由）：26 工具名册 / 参数链规则 / schema 装载",
+     "entry": "scripts/core.py",
+     "version": "1.0.0"
     }
    }
   },
@@ -554,5 +567,6 @@
  "changelog_0_8_71": "第二立项 四壳逐个深入：LeeCat 实测四种源语言（新发现 PHP8.4 WASM 26MB + libfjs 8.2MB；py 协议=CatVod+drpy 双方言故 forge 生成的源可直接跑；自带 pycryptodome 故 AES 应按壳分档）；云取纠正——不是壳而是 QuickJS 插件化下载器（catvod/tvbox/spider/drpy 全 0 命中，turbodl 190 处）；MilkCode 的 42MB jadx jar 抽出并实测可用（26 工具，load_apk 云取 22432 类 14.8s），但不入 git；Muse 除名确认并订正 S231 的 dex 计数口径（43588/765/19）；S231 壳矩阵同步订正四处",
  "changelog_0_8_72": "S233 §六 两件事收口：①jadx MCP 类名级壳侦察接入 shellcrack apk-types（LeeCat 真壳 7428 类给出 python/quickjs/catvod 类名级证据，assets 脚本层 0 命中记无法判定不判不支持，词边界+8 形态 selftest 防子串误命中）；②写源按壳分档 choose_aes_variant 三态（未知保守兜底 B-02），判据落 SKILL.md §3.12.3 且 selftest 覆盖两分支；补 43570e8 两条落库欠账核销；SKILL.md 41.0→39.74KB 按 M2 指针化消 C7 WARN；存证 S234",
  "changelog_0_8_73": "M12 经验门 yellow 机制级闸化消解：chk_contentflow 判4 采信「已闸化登记」并实证落点（病号映射表病15 加结构化 gate → _selftest_landed 用 ast 认 selftest 函数定义+接电+锚点，注释/docstring 天然排除，五种后接形态 selftest 全覆盖）；不改复发计数（hook 真源不洗绿），登记不落地仍报 yellow；判4 明细不再出现「须升【阻】或闸化」；存证 S235",
- "changelog_0_8_74": "闸化登记推广（B-15 同类排查）：destination=闸化 共 5 病号，全仓 122 个 .py 用 _gate_landed 实扫，病1/病10/病11/病12 均无「落点脚本+selftest」可实证（闸本体 gate_scan.py 无 selftest、test_*.py 由 verify.sh 直接执行未接电、verify.sh grep 段非 Python），台账文首集中登记「暂不登记」具体原因并保持 gate 缺失=保留 yellow；不拿 delivery_probe.selftest_quotepath 同型脚本冒充（识别范围≠对象范围）、不改判据迁就、不洗绿；gate_experience.py --selftest 补多病号混合用例（部分有/部分无/含 retired），A/B/C yellow、D green；判据明细无「须升【阻】或闸化」"
+ "changelog_0_8_74": "闸化登记推广（B-15 同类排查）：destination=闸化 共 5 病号，全仓 122 个 .py 用 _gate_landed 实扫，病1/病10/病11/病12 均无「落点脚本+selftest」可实证（闸本体 gate_scan.py 无 selftest、test_*.py 由 verify.sh 直接执行未接电、verify.sh grep 段非 Python），台账文首集中登记「暂不登记」具体原因并保持 gate 缺失=保留 yellow；不拿 delivery_probe.selftest_quotepath 同型脚本冒充（识别范围≠对象范围）、不改判据迁就、不洗绿；gate_experience.py --selftest 补多病号混合用例（部分有/部分无/含 retired），A/B/C yellow、D green；判据明细无「须升【阻】或闸化」",
+ "changelog_0_8_75": "熔铸司（foundry）W1 骨架登记：通用层落 foundry(skill) + foundry-core(lib) 双件，26 个 jadx MCP 工具名册按 tools/list 实测登记（S233 §3.2 文档枚举 25 个，漏 get_main_application_classes_names），63 目录能力面清单待 W3 迁入；产出经 artifacts.json 声明接 🧬 520进化论 03/04/05 与 📦 产物归档；skill_contracts.json 加两行、MANIFEST 通用层登记两件、registry 登记新真源、test_troubleshoot.py 的 SKILL_DIRS 纳入两件（登记即监测范围，不留盲区）；foundry.py selftest 与 core.py --selftest 正反向全绿。版本四处对齐 0.8.75。"
 }

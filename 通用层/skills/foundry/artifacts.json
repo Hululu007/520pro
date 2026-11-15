@@ -1,0 +1,59 @@
+{
+ "_doc": "熔铸司产出声明（能力层→资料库的接入口）。库务司扫描 ~/.codebuddy/skills/*/artifacts.json 自动纳入：本文件声明『产出什么、归到哪个夹、索引来源写什么』。与 space-hub base_blueprint.json 的 📦 产物归档 / 🧬 520进化论 两根对齐，不自建第三套体系。",
+ "artifacts": [
+  {
+   "name": "能力面对照",
+   "match": ["能力面对照", "milk63", "capability_matrix"],
+   "category": "清单",
+   "target": "🧬 520进化论/04-侦察资产",
+   "source": "熔铸司·能力面",
+   "note_from": "result_summary",
+   "doc": "63 目录逐份深读后的能力域对照（工具/引擎/证据分层/产出形态），一手在 /tmp/milk63_deep.json；索引说明写『N 目录 / N 工具 / N 脚本 / N refs』。"
+  },
+  {
+   "name": "解码资产",
+   "match": ["class_source", "method_body", "解码", "smali_", "xrefs_"],
+   "category": "数据",
+   "target": "🧬 520进化论/04-侦察资产",
+   "source": "熔铸司·jadx 真调",
+   "note_from": "result_summary",
+   "doc": "26 工具真调出的类源码 / 方法体 / smali / xref / 解码资源；正本在仓 Git，云端为可浏览副本。"
+  },
+  {
+   "name": "工具清单",
+   "match": ["tools_schema", "call_recipes", "工具清单"],
+   "category": "清单",
+   "target": "📦 产物归档/清单",
+   "source": "熔铸司·工具接线",
+   "note_from": "result_summary",
+   "doc": "26 个 inputSchema 与 23 个真调参数形态（上一步真实返回链 / items[0] / 解码资源名 / 构造器）；索引说明写工具数与真调通过数。"
+  },
+  {
+   "name": "板块演进文档",
+   "match": ["演进时间线", "熔铸司", "foundry"],
+   "category": "文档",
+   "target": "🧬 520进化论/03-子项目演进",
+   "source": "熔铸司·演进",
+   "note_from": "result_summary",
+   "doc": "foundry v1.x 每轮 W 阶段交付与亮点（CHANGELOG 人读版）；核销锚是 commit message 中的版本号（F04 msg_version）。"
+  },
+  {
+   "name": "真调判例",
+   "match": ["真调判例", "踩坑", "假失败"],
+   "category": "文档",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "source": "熔铸司·复盘",
+   "note_from": "result_summary",
+   "doc": "参数链错配 / 资源名误用 / isError 假失败等实证病历，含 event_ref 指回 commit。"
+  }
+ ],
+ "blueprint": {
+  "roots": [
+   {
+    "title": "🔧 熔铸产出",
+    "doc": "熔铸司的横向工具资产：能力面对照、工具清单、真调证据。人读交付按上表分别归 520进化论 03/04/05 与产物归档。",
+    "children": ["能力面对照", "工具清单", "真调证据"]
+   }
+  ]
+ }
+}

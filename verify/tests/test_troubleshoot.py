@@ -26,6 +26,7 @@ SKILL_DIRS = [
     '通用层/skills/inspect-hub', '通用层/skills/learn-hub',
     '通用层/skills/machine-bootstrap', '通用层/skills/skill-evolution',
     '通用层/skills/space-hub',
+    '通用层/skills/foundry', '通用层/skills/foundry-core',
     '能力层/tvbox/skills/probe-hub', '能力层/tvbox/skills/tvbox-pipeline',
     '能力层/tvbox/skills/tvbox-core',
 ]
