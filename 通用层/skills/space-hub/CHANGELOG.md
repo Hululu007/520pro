@@ -1,3 +1,19 @@
+## v2.8.0 — 落库正门 archive 自动写仓级回执（2026-11-15）
+- **缺陷**（批4 施工时探测器照出，真阳性）：`archive`（产物落库正门）**从不写仓级 `archive_ledger.json`**，
+  只有 `evolve-log` 会写。后果是**走 archive 落库的交付永远核销不了欠账**——内容流探测器
+  (`verify/delivery_probe.py`) 靠这张账核销「该产未产」，回执不落账 → 探测器一路红 →
+  人会开始手工补行（批2 就是这么过的），账彻底失去约束力。
+  与 v2.7.9 修的「evolve-log 只写云端不写仓级账」是**同一模式**（落库动作与回执脱钩），
+  上轮只补了 evolve-log 一条出口，正门 archive 漏了——B-15 说的「改一处要回头看同类还有几处」。
+- **落地**：`_archive_file()` 落库回读确认成功后调 `write_ledger()` 写一行；
+  新增 `_git_short_sha()` 取 HEAD 短 sha 填进 `round` / `event_ref`——
+  核销判据要求回执**能指回本 commit**（病15 第 8 例的教训）。
+- **三态纪律**：`_git_short_sha()` 取不到（纯云端装机）→ 返回空串，回执写 `archive <landing>`
+  而**不写猜测的 commit 引用**；写假的 sha 会把别人的账销掉。
+- **实测**：单元正反向（首次写入 True / 幂等重写不重复 / 无 sha 时 event_ref 不含 commit）；
+  真实链路——批4 的 0.8.68 方法论条目经 archive 落库后，探测器 `D-5acf706-F02` 由红转绿自动核销。
+- **判据**：`bash verify.sh` 0 ✗；`python3 verify/skill_contract_check.py --require-mirror` 无 ✗。
+
 ## v2.7.9 — 2026-11-15
 - **落库回执自动写仓级账**：新增 `write_ledger()` / `_evolve_ledger_row()`（幂等，按 round+artifact 去重）。
   `evolve-log` 成功写入云端台账后自动追加一行 `archive_ledger.json`（target 用**实际根名**，不沿用常量）；

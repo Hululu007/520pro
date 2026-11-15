@@ -100,7 +100,12 @@ finally:
 print('【⑥】导出内容跟仓库同步（抓"手改文档"的老路）')
 # 取一个改动过触发词的技能，确认卡片里有新词
 sh = [c for c in d['cards'] if c['name'] == 'space-hub'][0]
-check('space-hub 卡片含 2.7.x 版本', sh['version'].startswith('2.7'), True)
+# ★ 判据口径（2026-11-15 修·病15 同型）：原来写死 `startswith('2.7')`——
+#   那是把「版本号」当被测对象，改成「卡片版本 == 契约登记版本」（真源对账），
+#   否则每次 bump 都要来改这条测试，而真该防的是「卡片与真源脱节」。
+_want_sh = json.load(open(os.path.join(REPO, 'verify', 'skill_contracts.json'),
+                          encoding='utf-8'))['skills']['space-hub']['version']
+check(f'space-hub 卡片版本与契约一致（{_want_sh}）', sh['version'], _want_sh)
 
 print()
 if fails:

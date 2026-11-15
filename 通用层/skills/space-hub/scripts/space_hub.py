@@ -1776,6 +1776,21 @@ def _archive_file(p, category='', source='', note='', keep=False, quiet=False,
         entry['indexed'] = '（附件·随主记录）'
     st.setdefault('archive_log', []).append(entry)
     save_state(st)
+    # ②b ★v2.8.0：落库回执**写仓级账**（此前只有 evolve-log 写，archive 不写）。
+    #   为什么必须写：内容流探测器（verify/delivery_probe.py）靠 archive_ledger 核销
+    #   「该产未产」欠账，回执不落账 → 走 archive 正门落库的交付**永远核销不了**，
+    #   探测器一路红，人会开始手工补行（批2 就是这样），账就废了。
+    #   与 v2.7.9 修的「evolve-log 只写云端」同型：**落库正门必须自带回执**。
+    #   round 含 commit 短 sha（能取到时）——核销判据要求回执能**指回本 commit**。
+    _sha = _git_short_sha()
+    write_ledger({
+        'ts': time.strftime('%Y-%m-%dT%H:%M:%S'),
+        'round': f'archive {name}' + (f' @{_sha}' if _sha else ''),
+        'artifact': name, 'target': landing, 'node_id': node_id,
+        'idx_row': '', 'result': 'ok',
+        'event_ref': f'commit {_sha}' if _sha else f'archive {landing}',
+        'note': note or 'archive 正门写入（v2.8.0 起自动回执）',
+    })
     # ③ 本地处置：落库成功才清理；失败路径根本走不到这里
     if keep:
         say('  📎 --keep：本地文件保留')
@@ -2956,6 +2971,21 @@ def _ledger_root():
                 return p
             p = os.path.dirname(p)
     return None
+
+
+def _git_short_sha():
+    """当前仓 HEAD 短 sha（用于落库回执指回 commit）；取不到返回 ''（纯云端装机正常态）。
+
+    三态纪律：取不到就是取不到，返回空串让调用方**不写假的 commit 引用**——
+    回执若写一个猜的 sha，核销判据就会把别人的账销掉（病15 第 8 例同型）。
+    """
+    try:
+        out = subprocess.run(['git', 'rev-parse', '--short=7', 'HEAD'],
+                             capture_output=True, text=True, timeout=5)
+        s = (out.stdout or '').strip()
+        return s if re.fullmatch(r'[0-9a-f]{7,}', s or '') else ''
+    except Exception:
+        return ''
 
 
 def write_ledger(row):

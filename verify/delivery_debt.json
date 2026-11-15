@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "31a0e643be22cac4507e62fbff3be9169abf36a9",
-  "last_scan_ts": "2026-11-15T11:31:06"
+  "last_sha": "5acf706f08be92c496d3cff87323b93e2a7a5975",
+  "last_scan_ts": "2026-11-15T11:40:46"
  },
  "debts": [
   {
@@ -747,6 +747,40 @@
    "closed_by": "判据修正销账（非落库）",
    "waived_until": "",
    "note": "2026-11-15 误报：F08 判据原「提到落库即命中」，普通提交也命中；已收窄为需 M9-M12/监测面等具体词"
+  },
+  {
+   "id": "D-5acf706-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "5acf706",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.68-批4 S231四项代码级移植 + 全量复盘收口",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 判据对「合法形态」的枚举总有遗漏——ID 是 1 位也算合法（病15 第 10 例）。每条新判据都要问「合法形态枚举全了吗」，并把最窄的那一形态写成反向用例；判",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "archive 方法论_判据合法形态枚举.md @5acf706 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-5acf706-F09",
+   "flow": "F09",
+   "folder": "🧬 520进化论/版本演化台账",
+   "commit": "5acf706",
+   "commit_date": "2026-11-15",
+   "target_version": "0.8.68",
+   "title": "v0.8.68-批4 S231四项代码级移植 + 全量复盘收口",
+   "expect": "版本台账记录一条（版本/日期/类型/摘要/证据）",
+   "evidence": "VERSION 0.8.67 → 0.8.68",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "evolve-log 0.8.68 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
   },
   {
    "id": "D-6735a4b-F02",

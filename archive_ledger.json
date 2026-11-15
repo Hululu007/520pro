@@ -2113,6 +2113,28 @@
    "result": "ok",
    "event_ref": "commit 6735a4b",
    "note": "销欠账 D-6735a4b-F02：文本提及≠发生"
+  },
+  {
+   "ts": "2026-11-15T11:40:29",
+   "round": "evolve-log 0.8.68",
+   "artifact": "版本演化台账记录 0.8.68",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.68 · commit 5acf706 · 12 files +820/-61",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
+  },
+  {
+   "ts": "2026-11-15T11:52:00",
+   "round": "archive 方法论_判据合法形态枚举.md @5acf706",
+   "artifact": "方法论_判据合法形态枚举.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "XYBmTgMrRIl5Pyc2BR5IjX",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 5acf706",
+   "note": "销欠账 D-5acf706-F02：判据合法形态枚举遗漏（病15 第10例）；本条为 v2.8.0 修 archive 回执前的存量补登"
   }
  ]
 }
