@@ -63,6 +63,18 @@ def _load_ledger():
     return 'ok', d['entries']
 
 
+def _load_debt():
+    """欠账账本（v0.8.67）：三态 None=文件缺失（退回窗口快检）/ [] = 无欠账 / [rows] = 有欠账。"""
+    fp = os.path.join(REPO, 'verify', 'delivery_debt.json')
+    if not os.path.isfile(fp):
+        return None
+    try:
+        d = json.load(open(fp, encoding='utf-8'))
+        return [x for x in (d.get('debts') or []) if x.get('status') == 'open']
+    except Exception:
+        return None
+
+
 def check(now=None):
     st, payload = _load_ledger()
     if st == 'missing':
@@ -72,6 +84,29 @@ def check(now=None):
     if st == 'corrupt':
         print(f'  ✗ [archive-ledger] ledger 损坏不折叠（{payload}）——数据基座塌陷（M-R58）')
         return 2
+
+    # ① 主判据：欠账账本（v0.8.67 起并入）。欠账不随 3 天窗口消失——
+    #    旧判据只看"近 3 天 bump"，超窗即洗白，历史断流（版本台账 36 版）因此长期不可见。
+    op = _load_debt()
+    if op is not None and os.environ.get('WB_PROBE_NO_SCAN') != '1':
+        try:                      # 先探一遍，保证账本是"现在"的（HEAD 未变时零写盘）
+            sys.path.insert(0, os.path.join(REPO, 'verify'))
+            from delivery_probe import scan as _probe_scan
+            _probe_scan(quiet=True)
+            op = _load_debt()
+        except Exception as ex:
+            print(f'  · [archive-ledger] 探测器不可用（{str(ex)[:50]}），按账本现状判')
+    if op:
+        print(f'  ✗ [archive-ledger] 落库欠账 {len(op)} 条未还（账本制，不随窗口消失）：')
+        for d in op[:8]:
+            print(f'       {d.get("id")}  {d.get("folder", "").split("/")[-1]}'
+                  f'  ← {d.get("commit")}  龄 {d.get("age_commits", 0)}  应为「{(d.get("expect") or "")[:26]}」')
+        if len(op) > 8:
+            print(f'       …另 {len(op) - 8} 条（python3 verify/delivery_probe.py --list）')
+        print('     修法：把该轮交付经 space-hub archive / evolve-log 正门落库 → 探测器自动核销')
+        return 2
+
+    # ② 兜底快检：账本缺失时的窗口判据（保留，防账本未生成时彻底失守）
     bumps = _recent_bumps(now)
     if not bumps:
         print(f'  ✓ [archive-ledger] 近 {WINDOW_DAYS} 天无版本 bump，无可判对象（绿）')
@@ -94,20 +129,41 @@ def check(now=None):
 
 
 def selftest():
-    """正反向：正向=当前真实状态；反向=用注入的未来 bump 造违例，闸必须红。"""
+    """正反向：正向=真实状态；反向=往欠账账本塞一条假账，闸必须红。
+
+    （v0.8.67 起反向改法：原「把窗口拉大到覆盖历史 bump」造不出违例了——历史债
+    已全量清偿，旧 bump 现在都有回执。反向必须对准**新主判据**（账本制）。）
+    """
+    import shutil, tempfile
     print('── 正向（真实状态）──')
     rc1 = check()
-    print('── 反向（造违例：把窗口推大到覆盖旧 bump → 无回执必红）──')
-    # 造违例：临时把 WINDOW_DAYS 拉大，使历史 bump 进入窗口但它们没回执
-    global WINDOW_DAYS
-    old = WINDOW_DAYS
-    WINDOW_DAYS = 400
-    rc2 = check()
-    WINDOW_DAYS = old
+    print('── 反向（造违例：账本里塞一条 open 欠账 → 必红）──')
+    fp = os.path.join(REPO, 'verify', 'delivery_debt.json')
+    bak = tempfile.mktemp()
+    have = os.path.isfile(fp)
+    if have:
+        shutil.copy(fp, bak)
+    rc2 = None
+    try:
+        d = json.load(open(fp, encoding='utf-8')) if have else {'debts': []}
+        d.setdefault('debts', []).append({
+            'id': 'D-selftest-F02', 'flow': 'F02', 'folder': '🧬 520进化论/01-方法论',
+            'commit': 'selftest', 'commit_date': '2026-11-15', 'target_version': '',
+            'title': 'selftest 假账', 'expect': '方法论条目', 'evidence': 'selftest',
+            'status': 'open', 'age_commits': 0, 'first_seen': '2026-11-15',
+            'closed_by': '', 'waived_until': '', 'note': 'selftest'})
+        json.dump(d, open(fp, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+        rc2 = check()
+    finally:
+        if have:
+            shutil.copy(bak, fp)
+            os.remove(bak)
+        elif os.path.isfile(fp):
+            os.remove(fp)
     if rc2 == 2:
-        print('  ✓ 反向验证通过：无回执 bump 被判红（闸活着）')
+        print('  ✓ 反向验证通过：账本欠账被判红（闸活着）')
         return 0 if rc1 == 0 else rc1
-    print('  ✗ 反向验证失败：违例未被判红——闸失灵，不许上线')
+    print(f'  ✗ 反向验证失败：造欠账后返回 {rc2}——闸失灵，不许上线')
     return 2
 
 

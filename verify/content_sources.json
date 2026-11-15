@@ -1,15 +1,188 @@
 {
-  "version": "1.0.0",
-  "updated": "2026-11-15",
-  "doc": "内容供给源登记（经验闭环+内容流唯一真源）。原则：空夹不是病，供给事件已发生而内容没落才是病。每夹登记三元组：source_event(何时产生)→producer(谁生成)→action(生成什么)。",
-  "flows": [
-    {"folder": "🧬 520进化论/00-SOP", "source_event": "可复跑操作被复跑≥2次，或遗留登记待办关闭", "producer": "会话收敛时按触发写 SOP 条目", "action": "可复跑流程文档（复跑命令+判据）"},
-    {"folder": "🧬 520进化论/01-方法论", "source_event": "commit Lesson 非空，或通病台账新增病历", "producer": "从 Lesson/病历提炼方法论条目（痊愈病号归档也落此）", "action": "方法论条目（形态+修法+实例坐标）"},
-    {"folder": "🧬 520进化论/02-生态总览", "source_event": "巡检 run、GATE 审计、规则生效清单更新", "producer": "巡检司 run 后快照落库", "action": "巡检快照/审计报告/规则全景"},
-    {"folder": "🧬 520进化论/03-子项目演进", "source_event": "技能版本 bump", "producer": "各技能 CHANGELOG 人读版追加", "action": "演进时间线/逐版交付"},
-    {"folder": "🧬 520进化论/04-侦察资产", "source_event": "探源司 S 编号资产入库", "producer": "probe-hub artifacts.json 分片自动归档", "action": "S 编号文档/词表/解密链（带 expires_hint）"},
-    {"folder": "🧬 520进化论/05-复盘与判例", "source_event": "悬案关闭/误判复盘/审查/方案拍板", "producer": "会话收敛时归档", "action": "判例文档（含事件指针 event_ref）"},
-    {"folder": "🧬 520进化论/06-新人培训", "source_event": "新判例/新资产沉淀后改写课程；学员任务卡跑挂触发课程改版", "producer": "课程从真实判例改写", "action": "课程+任务卡（带复跑命令+判据）"},
-    {"folder": "🧬 520进化论/07-落地监测", "source_event": "巡检 run", "producer": "巡检司快照", "action": "监测快照（七问七答）"}
-  ]
+ "_doc": "内容供给源登记（内容流唯一真源）。原则：空夹不是病，供给事件已发生而内容没落才是病。v2.0.0 起每条 flow 的 source_event 必须配机器可测 signal——否则探测器对不可测条件空转（v1.0.0 的纸面漏洞，B-15 模式：登记即监测范围，未登记的流永远是盲区）。",
+ "_schema": {
+  "id": "F01..F10 稳定编号，台账/欠账按 id 引用",
+  "kind": "folder=云端夹（参与 chk_contentflow 断路判据）/ ledger=云端库（不参与夹断路，靠自身 flow 对账）",
+  "signal.type": "lesson(nonempty|keyword) / message(all_of|any_of) / diff_paths(glob) / version_bump / online / derived",
+  "probe": "debt=该产未产写欠账 / advisory=只提示不记账（需语义判断）/ online=离线不可判记 unknown / derived=派生流不独立探测",
+  "close_by": "核销：ledger 中 result=ok 且 target 以 folder 开头、ts>=commit 日期"
+ },
+ "version": "2.0.1",
+ "updated": "2026-11-15",
+ "probe": {
+  "window_commits": 40,
+  "dedupe_key": "flow+commit",
+  "debt_file": "verify/delivery_debt.json"
+ },
+ "flows": [
+  {
+   "id": "F01",
+   "kind": "folder",
+   "folder": "🧬 520进化论/00-SOP",
+   "source_event": "commit Lesson 含可复跑操作标记（复跑/SOP/遗留登记/待办关闭）",
+   "signal": {
+    "type": "lesson",
+    "match": "keyword",
+    "keywords": [
+     "复跑",
+     "SOP",
+     "遗留登记",
+     "待办关闭"
+    ]
+   },
+   "producer": "会话收敛时把该操作写成可复跑流程（命令+判据）",
+   "action": "可复跑流程文档（复跑命令+判据）",
+   "probe": "debt"
+  },
+  {
+   "id": "F02",
+   "kind": "folder",
+   "folder": "🧬 520进化论/01-方法论",
+   "source_event": "commit Lesson 非空且非「无」，或通病台账新增病历行",
+   "signal": {
+    "type": "lesson",
+    "match": "nonempty"
+   },
+   "producer": "从 Lesson/病历提炼方法论条目（痊愈病号归档也落此）",
+   "action": "方法论条目（形态+修法+实例坐标）",
+   "probe": "debt"
+  },
+  {
+   "id": "F03",
+   "kind": "folder",
+   "folder": "🧬 520进化论/02-生态总览",
+   "source_event": "巡检 run / GATE 审计（commit 同时含巡检类与快照类词）",
+   "signal": {
+    "type": "message",
+    "all_of": [
+     [
+      "巡检",
+      "inspect",
+      "体检"
+     ],
+     [
+      "快照",
+      "报告",
+      "面板",
+      "总览"
+     ]
+    ]
+   },
+   "producer": "巡检司 run 后快照落库",
+   "action": "巡检快照/审计报告/规则全景",
+   "probe": "debt"
+  },
+  {
+   "id": "F04",
+   "kind": "folder",
+   "folder": "🧬 520进化论/03-子项目演进",
+   "source_event": "技能 CHANGELOG 变更（diff 命中 CHANGELOG.md）；核销靠回执含该 commit 的版本号",
+   "signal": {
+    "type": "diff_paths",
+    "glob": "CHANGELOG.md"
+   },
+   "producer": "各技能 CHANGELOG 人读版追加（版本号作核销锚）",
+   "action": "演进时间线/逐版交付说明",
+   "probe": "debt",
+   "close_match": "msg_version"
+  },
+  {
+   "id": "F05",
+   "kind": "folder",
+   "folder": "🧬 520进化论/04-侦察资产",
+   "source_event": "probe-hub 资产分片变更（diff 命中 probe-hub 下 artifacts/assets json）",
+   "signal": {
+    "type": "diff_paths",
+    "glob": "probe-hub/**/*.json",
+    "path_filter": [
+     "artifacts",
+     "assets"
+    ]
+   },
+   "producer": "探源司 S 编号资产入库",
+   "action": "S 编号文档/词表/解密链（带 expires_hint）",
+   "probe": "debt"
+  },
+  {
+   "id": "F06",
+   "kind": "folder",
+   "folder": "🧬 520进化论/05-复盘与判例",
+   "source_event": "docs/通病台账.md 变更（新增病历行）",
+   "signal": {
+    "type": "diff_paths",
+    "glob": "docs/通病台账.md"
+   },
+   "producer": "会话收敛时归档判例（含事件指针 event_ref）",
+   "action": "判例文档（含事件指针 event_ref）",
+   "probe": "debt"
+  },
+  {
+   "id": "F07",
+   "kind": "folder",
+   "folder": "🧬 520进化论/06-新人培训",
+   "source_event": "F06 判例新增后课程需改写（派生流，不独立探测）",
+   "signal": {
+    "type": "derived",
+    "from": "F06",
+    "grace_days": 30
+   },
+   "producer": "课程从真实判例改写",
+   "action": "课程+任务卡（带复跑命令+判据）",
+   "probe": "advisory"
+  },
+  {
+   "id": "F08",
+   "kind": "folder",
+   "folder": "🧬 520进化论/07-落地监测",
+   "source_event": "监测面变更（commit 同时含监测类与落库类词）",
+   "signal": {
+    "type": "message",
+    "all_of": [
+     [
+      "监测",
+      "巡检",
+      "M9",
+      "M10",
+      "M11",
+      "M12"
+     ],
+     [
+      "快照",
+      "面板",
+      "落库",
+      "出图"
+     ]
+    ]
+   },
+   "producer": "巡检司监测快照",
+   "action": "监测快照（七问七答）",
+   "probe": "debt"
+  },
+  {
+   "id": "F09",
+   "kind": "ledger",
+   "folder": "🧬 520进化论/版本演化台账",
+   "source_event": "VERSION 值变更（版本 bump）",
+   "signal": {
+    "type": "version_bump"
+   },
+   "producer": "space-hub evolve-log 正门（挂 install.sh；沙箱内 git bump 需手动补跑）",
+   "action": "版本台账记录一条（版本/日期/类型/摘要/证据）",
+   "probe": "debt"
+  },
+  {
+   "id": "F10",
+   "kind": "ledger",
+   "folder": "📦 产物归档/产物索引",
+   "source_event": "archive_out 回执（ledger ok 行）须在产物索引库有对应记录",
+   "signal": {
+    "type": "online",
+    "check": "ledger_ok_vs_index_count",
+    "tolerance": 5
+   },
+   "producer": "space-hub archive_out 自动写索引（当前缺失，靠 db_insert 兜底）",
+   "action": "索引库记录（node_id/标题/落点/时间）",
+   "probe": "online"
+  }
+ ]
 }

@@ -209,6 +209,26 @@ def main():
                 msg += '｜📚 本轮同型坑 %s·%s：%s' % (_top['id'], _top['name'], _top['fix'][:60])
         except Exception:
             pass  # 经验注入失败不影响主提醒
+        # v0.8.67 批3：落库欠账注入——「该产未产」每轮红着给模型看，销账才消红。
+        # 与上方落库提醒分层：提醒是"今天还没落库"，欠账是"某个 commit 的产出欠着"。
+        try:
+            import os as _osd
+            _dp = _osd.path.join(root, 'verify', 'delivery_debt.json')
+            if _osd.path.isfile(_dp):
+                _dd = json.load(open(_dp, encoding='utf-8'))
+                _op = [x for x in (_dd.get('debts') or []) if x.get('status') == 'open']
+                if _op:
+                    _thr = (_dd.get('thresholds') or {}).get('red_age_commits', 3)
+                    _mx = max((x.get('age_commits') or 0) for x in _op)
+                    _lvl = '⛔' if _mx > _thr else '⚠️'
+                    _head = '，'.join('%s(%s←%s)' % (x.get('id', ''),
+                                                    (x.get('folder', '').split('/')[-1]),
+                                                    x.get('commit', '')) for x in _op[:3])
+                    msg += ('｜%s 落库欠账 %d 条（最老 %d commit）%s%s——应产：%s；落库后自动销账'
+                            % (_lvl, len(_op), _mx, '：' if _head else '', _head,
+                               (_op[0].get('expect') or '')[:30]))
+        except Exception:
+            pass  # 欠账注入失败不影响主提醒
         # v0.8.64 方案v3 梯度③：交付落库提醒（520进化论·每轮必落库）——只提示不拦截，
         # 硬对账在 verify/gate_archive_ledger.py（梯度④），提醒与闸分层。
         import os as _os

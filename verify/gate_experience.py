@@ -25,11 +25,51 @@ def check():
     from chk_landing import chk_contentflow          # noqa: E402（延迟导入，失败显式报）
     from inspect_hub import worst                    # noqa: E402
     ctx = {'thresholds': {}, 'worst': worst}
+    worst_st = 'green'
+
+    # ① 先探测：HEAD 变了才真扫（未变则零写盘零扰动），保证新 commit 必被探到
+    try:
+        sys.path.insert(0, os.path.join(REPO, 'verify'))
+        from delivery_probe import scan as probe_scan, summary as debt_summary   # noqa: E402
+        if os.environ.get('WB_PROBE_NO_SCAN') != '1':        # selftest 隔离：不污染真账本
+            probe_scan(quiet=True)
+        ds = debt_summary()
+        red_age = 3
+        try:
+            import json as _j
+            red_age = _j.load(open(os.path.join(REPO, 'verify', 'delivery_debt.json'),
+                                   encoding='utf-8')).get('thresholds', {}).get('red_age_commits', 3)
+        except Exception:
+            pass
+        if ds['open'] == 0:
+            print(f"  ✓ [落库欠账] 0 条（已还 {ds['closed']} / 豁免 {ds['waived']}）")
+        else:
+            lvl = 'red' if ds['max_age'] > red_age else 'yellow'
+            mark = '✗' if lvl == 'red' else '⚠'
+            print(f"  {mark} [落库欠账] {ds['open']} 条未还（最老 {ds['max_age']} commit，阈值 {red_age}）")
+            for it in ds['items'][:6]:
+                print(f"       {it['id']}  龄 {it['age']}  {it['folder'].split('/')[-1]}"
+                      f"  ← {it['commit']}  应为「{it['expect'][:28]}」")
+            if len(ds['items']) > 6:
+                print(f"       …另 {len(ds['items']) - 6} 条（--list 看全）")
+            if lvl == 'red':
+                worst_st = 'red'
+    except Exception as ex:
+        print(f"  · [落库欠账] 无法判定：探测器不可用（{str(ex)[:60]}）")
+        worst_st = 'unknown'
+
+    # ② 内容流四判据
     r = chk_contentflow(REPO, {'repo': REPO}, ctx)
     for it in r.get('items', []):
         mark = {'green': '✓', 'yellow': '⚠', 'red': '✗'}.get(it.get('s'), '·')
         print(f"  {mark} [{it.get('t')}] {it.get('e', '')[:90]}")
-    return r.get('status')
+
+    sts = [worst_st, r.get('status')]
+    if 'red' in sts:
+        return 'red'
+    if 'unknown' in sts:
+        return 'unknown'
+    return 'yellow' if 'yellow' in sts else 'green'
 
 
 def selftest():

@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.66 经验闭环接电批1：2026-11-15 四轮漏检排查（账实对账→触发源→库内质量→规则接线）确认 4 断点并全部修复——**①M12 经验门接电**：chk_contentflow 四判据（断流/账实脱节/复发超限/效果指标）此前只在巡检 run（模型自愿发起）跑，闸建了没通电；新建薄壳 `verify/gate_experience.py` 接进 verify.sh 必经链路（--selftest 正反向实测：真数据 yellow/造缺 ref 新账即红）。**②Lesson 机器记账补全**：复发记账声明含 commit-msg 侧但代码不存在（机器计数只有 guard 拦截一半）；commit-msg ③ 段接 `guard_cmd.py --bump`（实测 count 6→7→恢复）。**③痊愈机判**：active→观察→retired 声明了"巡检 chk 自动降级"但代码不存在（病11 retired 是手工标）；chk_landing 新增 `chk_cure`（10 自然日无复发机器写回降级，双向实测）。**④监测者受监测**：rule_map B-15 登记 S5+proven_by 实测记录，impl-reconcile 纳入四闸实物标记；硬化矩阵 B-15 回写 S5（原判"硬化不了"已过时）。**⑤B-07 SessionStart 注入实测通过**（悬挂多轮的遗留项）：next_anchor 加 SessionStart 分支注入 handoff 首段，settings.json 已注册，模拟 payload 正反向实测（正向 via=session-start+handoff；反向无 handoff 明说"未对齐"不装懂）。**排查同期发现的欠账**：版本演化台账断流 11 版（0.8.55→0.8.65 未记，evolve-log 挂 install.sh 而沙箱内 git bump 不触发）+ 22 条 failed/pending 死账无补投闭环 + 01-方法论 2 笔欠账 + VERSION 文件停 0.8.62 与 commit 脱节（本轮已修 VERSION）。**遗留（批2/批3 已批准）**：历史债（台账补记/死账 retry/md 后缀改名）+ 探测器链（content_sources 改可测信号→欠账负账本→探测器→注入）。
+v0.8.67 批3 探测器链落地（内容流自动化闭环）：四轮漏检排查后按优先级施工，**批1 接电**（M12 经验门进 verify 必经链路 / commit-msg 接复发记账 / 痊愈机判 chk_cure / 硬化矩阵回写 / B-07 SessionStart 实测）、**批2 还债**（版本台账补记、22 条死账处置、71 件 .md 改名）之后，本轮完成**批3 自动化链**：①`verify/content_sources.json` v2.0.0 把 8 条流全部改成**机器可测 signal**（lesson/message/diff_paths/version_bump），并补登第 9、10 条流（版本演化台账、产物索引）——此前未登记的流永远是盲区；②新建**欠账负账本** `verify/delivery_debt.json`（open/closed/waived 三态 + age_commits 增龄 + 豁免到期自动转 open）；③新建探测器 `verify/delivery_probe.py`（纯函数 `probe_commit` + 8 例正反向 selftest + 机器核销）；④`gate_archive_ledger` 主判据由「近 3 天窗口」改为**账本制**（窗口会把长期欠债洗白）；⑤next_anchor 加**欠账注入**（每轮红着提醒，销账才消）。**落地实证**：探测器扫出并清偿 43 条真实欠账——版本台账 git 里 55 版 vs 台账 20 条（**缺 36 版**，批2 只按范围补了 12 版）、18 个 commit 的 Lesson 从未转资产、22 条 failed。三项资产已落库：01-方法论《方法论总编·历史 Lesson 提炼》（18 条归 6 类）、00-SOP《Stop 钩子完成态判据》、02-生态总览与 07-落地监测快照。**过程中修掉的真缺陷**：evolve-log 只写云端不写仓级账（新增 `write_ledger` 自动回执，space-hub v2.7.9）；核销判据用「同夹+同日」把他人回执当自己的（改为必须能指回 commit，病15 第 8 例）。**遗留**：探源司代码级移植 4 项、91探花悬案、187 仓云端写回待用 db_edit 补。
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.66 经验闭环接电批1：2026-11-15 四轮漏检排查（账实对账→
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.66
+- 版本：0.8.67
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）

@@ -262,7 +262,9 @@ def chk_contentflow(target, cfg, ctx):
         # 判3 内容流断路：供给信号已现而夹空（ledger target 代理）
         cs_path = os.path.join(repo, 'verify', 'content_sources.json')
         try:
-            flows = _json.load(open(cs_path, encoding='utf-8')).get('flows', [])
+            # v2.0.0：只判 kind=folder 的流（ledger 类流是云端库，无 doc 回执，判了必假红）
+            flows = [f for f in _json.load(open(cs_path, encoding='utf-8')).get('flows', [])
+                     if f.get('kind', 'folder') == 'folder']
             covered = set()
             for e in entries:
                 if e.get('result') == 'ok' and e.get('target'):
@@ -271,11 +273,11 @@ def chk_contentflow(target, cfg, ctx):
                             covered.add(f['folder'])
             empty = [f['folder'].split('/')[-1] for f in flows if f['folder'] not in covered]
             if empty:
-                items.append({'s': 'yellow', 't': f'内容流断路: {len(empty)} 夹无入库',
+                items.append({'s': 'yellow', 't': f'内容流断路: {len(empty)}/{len(flows)} 夹无入库',
                               'e': '，'.join(empty) + '（供给源登记于 content_sources.json）'})
                 sts.append('yellow')
             else:
-                items.append({'s': 'green', 't': '内容流: 8 夹全有入库', 'e': ''})
+                items.append({'s': 'green', 't': f'内容流: {len(flows)} 夹全有入库', 'e': ''})
                 sts.append('green')
         except Exception as ex:
             items.append({'s': 'unknown', 't': 'content_sources 不可读', 'e': str(ex)[:80]})

@@ -2946,6 +2946,54 @@ def _root_id(title):
     return _find_folder_by_title('', title)
 
 
+def _ledger_root():
+    """找含 archive_ledger.json 的仓根：先看 cwd（脚本常以 ~/.codebuddy 副本运行，
+    副本路径上找不到仓），再看脚本自身路径。"""
+    for base in (os.getcwd(), os.path.dirname(os.path.abspath(__file__))):
+        p = base
+        for _ in range(6):
+            if os.path.isfile(os.path.join(p, 'archive_ledger.json')):
+                return p
+            p = os.path.dirname(p)
+    return None
+
+
+def write_ledger(row):
+    """落库回执写仓级 archive_ledger.json（v2.7.9 起 evolve-log 自动回执）。
+    纯云端装机（无仓）→ 返回 False 不阻断；已存在同 round+artifact 的 ok 行 → 幂等跳过。
+    背景：archive_out / evolve-log 一直只写云端不写仓级账，导致「落库对账闸」与
+    「内容流探测器」都对不上账（批2 手工补行才过闸）——回执必须跟着落库动作一起产出。"""
+    root = _ledger_root()
+    if not root:
+        return False
+    fp = os.path.join(root, 'archive_ledger.json')
+    try:
+        d = json.load(open(fp, encoding='utf-8'))
+        rows = d.setdefault('entries', [])
+        for e in rows:
+            if (e.get('round') == row.get('round') and e.get('artifact') == row.get('artifact')
+                    and e.get('result') == 'ok'):
+                return True                      # 幂等：同回执不重复记
+        rows.append(row)
+        tmp = fp + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(d, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, fp)
+        return True
+    except Exception as ex:
+        print(f'  ⚠️ 回执未写入 ledger（{str(ex)[:60]}）——不影响云端落库，但落库对账会对不上')
+        return False
+
+
+def _evolve_ledger_row(ver, dbid, target, evidence='', note=''):
+    """版本台账落库回执行（round 含版本号，探测器 F09 按 target 前缀+版本号核销）。"""
+    return {'ts': time.strftime('%Y-%m-%dT%H:%M:%S'), 'round': f'evolve-log {ver}',
+            'artifact': f'版本演化台账记录 {ver}', 'target': target,
+            'node_id': dbid, 'idx_row': '', 'result': 'ok',
+            'event_ref': f'VERSION={ver}' + (f' · {evidence[:60]}' if evidence else ''),
+            'note': note or 'evolve-log 正门写入（v2.7.9 起自动回执）'}
+
+
 def _cloud_versions(db_id):
     """云端台账已有版本集合。None = 读不到（无法判定，不折叠为空集）。"""
     j, _ = _db_query(db_id, 'csv')
@@ -2988,6 +3036,13 @@ def cmd_evolve_log(a):
     if not ver:
         print('❌ 版本号无法判定（无 --version、无部署标记、无 VERSION 文件）——拒绝写空版本记录')
         return 2
+    # 回执 target 用**实际根名**（rename 后不能沿用常量，否则探测器按 folder 前缀对不上账）
+    try:
+        _ri = _space('space.workspace.node-info', nodeId=rid)
+        _rt = ((_ri.get('data') or {}).get('node') or {}).get('title') or ''
+    except Exception:
+        _rt = ''
+    ledger_target = f'{_rt or EVOLVE_ROOT}/{EVOLVE_DB}'
     # ★ 去重以**云端台账**为准，不能只看本地 state：换机/重装后 state 是空的，
     #   只看本地会把同一版本重复记成"首次落地"（实测踩到：两份 state 各记一条 0.8.10）。
     cloud_vers = _cloud_versions(dbid)
@@ -2995,6 +3050,9 @@ def cmd_evolve_log(a):
         print('  ⚠️ 云端台账读取失败（无法判定是否已记）——本次按新记录写入')
     elif ver in cloud_vers:
         print(f'ℹ️ {ver} 已在云端台账（{dbid}），不重复记')
+        if write_ledger(_evolve_ledger_row(ver, dbid, ledger_target, a.evidence or '',
+                                           note='云端已有记录，本行=补登仓级回执（v2.7.9）')):
+            print(f'   ⟳ 仓级回执已补登：{ver}')
         return 0
     snap = _skills_snapshot()
     h = _snap_hash(snap)
@@ -3045,7 +3103,9 @@ def cmd_evolve_log(a):
                          'at': time.strftime('%Y-%m-%d %H:%M')}
     save_state(st)
     print(f'✅ 演化已记账：{ver}｜{kind}｜{delta}')
-    print(f'   → {EVOLVE_ROOT}/{EVOLVE_DB}（{dbid}）')
+    print(f'   → {ledger_target}（{dbid}）')
+    if write_ledger(_evolve_ledger_row(ver, dbid, ledger_target, evidence)):
+        print('   ⟳ 仓级回执已写 archive_ledger.json（落库对账闸/探测器可核销）')
     return 0
 
 
