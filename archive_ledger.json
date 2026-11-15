@@ -2499,6 +2499,17 @@
    "result": "ok",
    "event_ref": "commit b1b1430",
    "note": "foundry W4 判例：病15第15例 gate bump 核销假绿，event_ref 指回 commit"
+  },
+  {
+   "ts": "2026-11-16T00:30:41",
+   "round": "archive 方法论_中性摆出不自定边界.md @0071c05",
+   "artifact": "方法论_中性摆出不自定边界.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "i5QeT2mq9bPnEosAcAKogu",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 0071c05",
+   "note": "F02 方法论：中性摆出不替用户定边界（形态+修法+实例坐标）；commit 0071c05"
   }
  ]
 }

@@ -1723,6 +1723,23 @@
    "waived_ts": "2026-11-15T23:50:48"
   },
   {
+   "id": "D-0071c05-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "0071c05",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(foundry): W6 补码做实 — 一手真源63域落仓 + 中性摆出 + port_ok正向判据 + cap检索",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 第三次自定边界是模式（用户明确纠偏）——「中性摆出/边界用户拍板」在 SKILL.md 与 handoff 早有明文，AI 仍自加敏感分级、只翻一个、自定搬运深",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "archive 方法论_中性摆出不自定边界.md @0071c05 @ 2026-11-16",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
    "id": "D-b1b1430-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",
