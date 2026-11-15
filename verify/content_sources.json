@@ -65,12 +65,12 @@
    "id": "F04",
    "kind": "folder",
    "folder": "🧬 520进化论/03-子项目演进",
-   "source_event": "技能 CHANGELOG 变更（diff 命中 CHANGELOG.md）；核销靠回执含该 commit 的版本号",
+   "source_event": "技能 CHANGELOG 变更（diff 命中 CHANGELOG.md）；核销靠回执含本 commit 短 sha 或本次 VERSION bump 目标版本（病15 第13例收紧：禁用 message 全量版本号，凭据须能指回本 commit）",
    "signal": {
     "type": "diff_paths",
     "glob": "CHANGELOG.md"
    },
-   "producer": "各技能 CHANGELOG 人读版追加（版本号作核销锚）",
+   "producer": "各技能 CHANGELOG 人读版追加（回执 event_ref 指回本 commit 作核销锚）",
    "action": "演进时间线/逐版交付说明",
    "probe": "debt",
    "close_match": "msg_version"

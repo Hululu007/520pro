@@ -99,16 +99,23 @@ def _closed(folder, flow, commit, ledger_rows):
     """核销判定：ledger 有 result=ok、target 前缀命中、ts>=commit 日期 的行，
     **且回执能指回这条 commit**——否则同夹里别人的回执会把账误销掉（实测踩到：
     d8b5b6a 的方法论欠账被 01 夹「自愈演示」旧回执误判为已还）。
-      · F09 / close_match=version：回执须含目标版本号
-      · close_match=msg_version：回执须含 message 中的任一 x.y.z 版本号（技能 bump）
+      · F09 / close_match=version：回执须含 VERSION bump 目标版本（本身就是本 commit 引入的）
+      · close_match=msg_version（F04）：回执须含**本 commit 短 sha 或本次 bump 目标版本**。
+        ★ 病15 第 13 例横向复发（2026-11-15 W2）：旧实现用「message 里任一 x.y.z 版本号」
+          当核销凭据，而提交信息会写承接版本（承接 v0.8.75）、范式版本（v0.8.4）、
+          技能版本（1.1.0）——实测命中 artifact-store v1.1.0 的**他人回执**，把 foundry
+          的 F04 静默销掉。核销凭据必须能指回本 commit，不能用 message 全量版本号。
       · 其余：回执须含 commit 短 sha（无源内容判据的口径：event_ref 必须指向 commit）
     """
     day = (commit.get('date') or '')[:10]
     fid = flow.get('id', '')
     cm = flow.get('close_match', '')
     sha = (commit.get('short') or '')[:7]
-    want_ver = (commit.get('version') or (None, None))[1] if (fid == 'F09' or cm == 'version') else None
-    msg_vers = re.findall(r'\d+\.\d+\.\d+', commit.get('msg', '')) if cm == 'msg_version' else []
+    ver = commit.get('version') or (None, None)
+    want_ver = ver[1] if (fid == 'F09' or cm == 'version') else None
+    bumped = ver[1] if (ver[0] != ver[1] and ver[1]) else None
+    # msg_version 的锚 = 本 commit 短 sha 或本次 bump 目标版本（二选一即指回本 commit）
+    msg_anchors = [a for a in (sha, bumped) if a] if cm == 'msg_version' else []
     for e in ledger_rows:
         if e.get('result') != 'ok':
             continue
@@ -121,8 +128,8 @@ def _closed(folder, flow, commit, ledger_rows):
         if want_ver:
             if want_ver not in blob:
                 continue
-        elif msg_vers:
-            if not any(v in blob for v in msg_vers):
+        elif msg_anchors:
+            if not any(a in blob for a in msg_anchors):
                 continue
         elif sha:
             if sha not in blob:
@@ -551,6 +558,38 @@ def selftest():
                        'paths': ['VERSION'], 'version': ('0.8.66', '0.8.67')},
          [{'result': 'ok', 'target': '🧬 520进化论/版本演化台账', 'ts': '2026-11-15T10:00:00',
            'note': '记了 0.8.66'}], 1)
+
+    # ── 病15 第13例：msg_version 的核销凭据必须能指回本 commit（9 例正反向）
+    #    直接测 _closed 纯函数，避开 probe_commit 里 F02/F09 串扰（识别范围=对象范围）。
+    print('── 病15 第13例：msg_version 核销凭据须指回本 commit（9 例正反向）')
+    f04f = '🧬 520进化论/03-子项目演进'
+    f04 = {'id': 'F04', 'folder': f04f, 'close_match': 'msg_version'}
+    w2 = {'short': 'j13aaa1xxx', 'date': '2026-11-15',
+          'msg': ('v0.8.76 熔铸司 W2 引擎上提\n承接 W1（v0.8.75）；沿用 v0.8.4 范式；'
+                  '版本四处对齐 1.1.0；VERSION 0.8.76'),
+          'version': ('0.8.75', '0.8.76'),
+          'paths': ['通用层/skills/foundry/CHANGELOG.md']}
+
+    def L13(note, **kw):
+        return dict({'result': 'ok', 'target': f04f, 'ts': '2026-11-15T20:10:00',
+                     'event_ref': '他人 commit', 'note': note}, **kw)
+
+    def ccase(name, ledger, want):
+        nonlocal ok
+        got = _closed(f04f, f04, w2, ledger) is not None
+        good = got == want
+        ok = ok and good
+        print(f'  {"✓" if good else "✗"} {name}：核销 {got}（期望 {want}）')
+
+    ccase('他人回执含技能版本 1.1.0（原始踩坑）', [L13('artifact-store v1.1.0 变更说明落库')], False)
+    ccase('他人回执含承接版本 v0.8.75', [L13('承接 v0.8.75 说明')], False)
+    ccase('他人回执含范式版本 v0.8.4', [L13('沿用 v0.8.4 范式')], False)
+    ccase('他人回执只含无关版本 2.3.4', [L13('无关技能 2.3.4 落库')], False)
+    ccase('本 commit 短 sha 可核销', [L13('演进说明落库 @ commit j13aaa1')], True)
+    ccase('本次 bump 目标版本 0.8.76 可核销', [L13('foundry 演进说明 v0.8.76 落库')], True)
+    ccase('result!=ok 不销', [L13('commit j13aaa1 落库', result='fail')], False)
+    ccase('旧账不销新账', [L13('commit j13aaa1 落库', ts='2026-11-10T10:00:00')], False)
+    ccase('回执 target 不命中', [L13('commit j13aaa1 落库', target='🧬 520进化论/别的夹')], False)
 
     print('── 正向④：豁免校验三条件齐备 → 放行')
     today = datetime.date.today()
