@@ -1108,6 +1108,23 @@
    "note": "2026-11-15 误报：F08 判据原「提到落库即命中」，普通提交也命中；已收窄为需 M9-M12/监测面等具体词"
   },
   {
+   "id": "D-1c42310-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "1c42310",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.70-账本收口：d193bcd 两条欠账真补落库（方法论 + 判例）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 该产未产的核销凭据必须是「回执能指回本 commit」——本次两条回执均由 archive 正门自动写入 commit 短 sha，不是同夹同日的他人回执",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "archive 方法论_配置里的能力清单不等于实际接口.md @1c42310 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
    "id": "D-5acf706-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",

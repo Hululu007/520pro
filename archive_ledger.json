@@ -2246,6 +2246,28 @@
    "result": "ok",
    "event_ref": "commit d193bcd",
    "note": "判例：扫不到不等于没有（S232 包鉴定误判）；覆盖 commit d193bcd 的 F06 欠账"
+  },
+  {
+   "ts": "2026-11-15T12:37:57",
+   "round": "evolve-log 0.8.71",
+   "artifact": "版本演化台账记录 0.8.71",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.71 · VERSION=0.8.71 · 技能快照 7911cbf06d92 · 技能 19 个",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
+  },
+  {
+   "ts": "2026-11-15T12:38:36",
+   "round": "archive 方法论_配置里的能力清单不等于实际接口.md @1c42310",
+   "artifact": "方法论_配置里的能力清单不等于实际接口.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "JLWYug0shLMj17DjCgbBqf",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 1c42310",
+   "note": "jadx MCP 踩坑方法论：preset 的 24 个工具名与 jar 原生 26 个零交集；覆盖 commit 1c42310 的 F02 欠账"
   }
  ]
 }

@@ -109,13 +109,21 @@ repair/recon/forge 可直接 import。
 
 | 壳 | 鉴定 | 出厂自带（APK 内证据路径） | 对探源司的意义 |
 |---|---|---|---|
-| **LeeCat**（294MB） | Flutter 全本地引擎壳，**唯一不需远程 jar** | `libnode.so` 49MB（Node.js）；`assets/chaquopy/` Python 3.10 全运行时 + `build.json` `"extract_packages":["lxml"]`；`flutter_assets/assets/js-runtime/drpy3-engine.js` 205KB；播放五引擎 mpv/VLC(45MB)/mdk/ffmpeg/fvp；`libxl_thunder_sdk.so`（迅雷）；`libonnxruntime.so`+`libsherpa-onnx`（本地 AI） | py 源优先适配此壳；py 源里 **lxml 可用**；js/drpy3 亦本地支持 |
-| **云取** 2.7.12 | 网盘下载特化壳 | `libquickjs.so`×4 架构；`libaria2c.so` 17MB；`dev/turbodl/plugin/js/abi.js` | 仅支持 js/drpy 类源；下载走 aria2 |
-| **MilkCode** 1.0.4（302MB） | **手机越狱 AI Agent**，非 TVBox 协议壳 | `assets/builtin_skills/manifest.json`：69 技能/62 breakerKit（渗透/逆向/破解，含 phishing-kit、identity-docs 高危项）；`assets/mcp/jadx-headless-mcp-0.7.1-all.jar` 42MB；proot + DexKit | 架构与探源司同构（self-improving-agent / env-audit / skill-installer）；**⚠️ 内置红队技能库，不建议安装**，仅作技术观察 |
-| Muse_from_Meta | **Meta 官方 App，非壳** | dex 包名统计（见上） | 从壳兼容矩阵除名 |
+| **LeeCat**（294MB） | Flutter 全本地引擎壳，**唯一不需远程 jar**；实测**四种源语言**（py/js/php/lua） | `libnode.so` 49MB（Node.js）；`assets/chaquopy/` Python 3.10 全运行时 + **22 包**（`lxml 5.3.0`/`pyquery`/`bs4`/**`pycryptodome 3.21.0**`/`ujson`/`jsonpath`）；`flutter_assets/assets/js-runtime/` drpy3-host 1190KB + cat.js 475KB + cheerio；**`php-runtime/php_8_4.wasm` 26MB + dispatcher.php/spider.php**（第三种源语言）；`libfjs.so` 8.2MB；播放五引擎 mpv/VLC(45MB)/mdk/ffmpeg/fvp；`libxl_thunder_sdk.so`（迅雷）；`libonnxruntime.so`；`assets/lua/` 33 个 Kodi 插件 | py 源优先适配此壳；**py 协议 = 标准 CatVod + drpy 双方言，`forge` 生成的源可直接跑**；自带 pycryptodome → AES 不必走兜底（写源应按壳分档）；见 S233 §1 |
+| **云取** 2.7.12 | **⚠️ 订正：不是壳，是 QuickJS 插件化下载器**（包名 `com.yunget.app`，22432 类；`catvod`/`tvbox`/`spider`/`drpy` **全 0 命中**） | `libaria2c.so` 17MB；`libquickjs.so`×4 架构；`dev/turbodl/**`（`AdaptiveConcurrencyController`/`BackendResolver`/`plugin/js/JsCapability`/`JsHostCrypto`/`plugin/hls/HlsBackend`） | **原判「仅支持 js/drpy 类源」不成立**——它的 js 是下载器插件脚本，与 drpy 源无关；从壳矩阵移到「下载器参考」，仅吸收自适应并发与能力声明两机制；见 S233 §2 |
+| **MilkCode** 1.0.4（302MB） | **手机越狱 AI Agent**，非 TVBox 协议壳 | `assets/builtin_skills/manifest.json`：69 技能/62 breakerKit（渗透/逆向/破解，含 phishing-kit、identity-docs 高危项）；`assets/mcp/jadx-headless-mcp-0.7.1-all.jar` 42MB；`assets/frida/frida-server-17.23.3` 56MB；`assets/linux-tools/` proot 169MB；proot + DexKit | 架构与探源司同构（self-improving-agent / env-audit / skill-installer）；**⚠️ 内置红队技能库，不建议安装**，仅作技术观察；jadx 已抽并实测，见下 |
+| Muse_from_Meta | **Meta 官方 App，非壳** | dex 字节计数 `com/facebook/`×**43588**、`com/meta/`×**765**、`com/instagram/`×**19**；`catvod`/`tvbox`/`spider` 全 0（S231 原记 7648/82/17 为 `grep -c` 行数口径，结论不变、数字以 S233 §4 为准） | 从壳兼容矩阵除名 |
 
-**jadx-headless-mcp** 现成工具提示：MilkCode 内的 42MB jadx MCP jar 可抽出部署，探源司验
-jar/dex 的备选逆向工具（本次未抽，行号证据：`assets/mcp/jadx-headless-mcp-0.7.1-all.jar`）。
+**jadx-headless-mcp**（MilkCode 内 42MB jar）：**2026-11-15 已抽出并实测可用**——
+`java -jar … --transport stdio` → MCP 握手成功，暴露 **26 个工具**（`load_apk`/`get_class_source`/
+`get_smali_of_class`/`get_xrefs_to_*`/`search_classes_by_keyword`…），对云取 APK
+`load_apk` **22432 类 / 14.8 秒**、`get_app_info` 正常返回。
+**做法与边界**：不入 git（40MB fat jar 违反产物纪律且拖慢分发），需要时从 APK 现抽或 MCP 指向本机路径。
+**坑**：`assets/mcp/rea-preset.json` 里的 24 个工具名（`inspect_android_package` 等）是 MilkCode
+上层封装，**照抄会 `Tool not found`**——详见 S233 §3.3。
+
+> **深入档**：[`S233_四壳深入_LeeCat云取MilkCodeMuse.md`](S233_四壳深入_LeeCat云取MilkCodeMuse.md)
+> （四栏结论：出厂自带证据 / 对探源司意义 / 可吸收项 / 明确不吸收项，含两处纠正）
 
 ---
 
@@ -166,4 +174,4 @@ NETDISK（magnet/网盘域名） → L1 player JSON（url/link/url_next/link_nex
 | 探源司 | `_probe_site` 语义测活并入死因分型前置探针 | 同上 | ✅ 已完成（`_list_count`/`probe_site`/`death_cause` 两型） |
 | 探源司 | shellcrack 第 7 条金律实测评估 | ≥3 壳样本 | ✅ 已完成（46 源实测 → 扩到 7 层，见 §四） |
 | 探源司 | 通道层三件代码化 | 三件各有 selftest 正反向 | ✅ 已完成（`atomicio.py` 17 项 / `pushconfig.py` 20 项 / `imgproxy.py` 18 项） |
-| 我 | 抽出 MilkCode 内 42MB `jadx-headless-mcp-0.7.1-all.jar` 并评估能否替代现逆向工具 | 给出「可用／不可用／需改」结论 | ⏳ 转入第二立项（4 个 APK 深入） |
+| 我 | 抽出 MilkCode 内 42MB `jadx-headless-mcp-0.7.1-all.jar` 并评估 | 给出「可用／不可用／需改」结论 | ✅ 已完成（第二立项）：**可用**，26 工具实测通过，不入 git，见 S233 §3 |

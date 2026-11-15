@@ -1,3 +1,12 @@
+## v1.28.8 — 第二立项：四壳逐个深入（两个纠正 + 一个可用工具）（2026-11-15）
+- **需求**：用户第二立项「4 个 APK 深入，按顺序单独深入」——LeeCat → 云取 → MilkCode → Muse，每个出四栏（出厂自带证据 / 对探源司意义 / 可吸收项 / 明确不吸收项）。产物 `references/S233_四壳深入_LeeCat云取MilkCodeMuse.md`。
+- **LeeCat（294MB）**：实测**四种源语言**。新发现两样 S231 没记的：**PHP 8.4 WASM 运行时 26MB**（`php-runtime/` + `dispatcher.php` 常驻循环 + `spider.php`，协议与 py 完全同构，连 `pdfh/pdfa/pd` 都同名）与 `libfjs.so` 8.2MB。更有用的两条：①`spider_compat.py` 的 `Spider` 基类 + `source_loader.py` 的 `dialect='catvod'|'drpy'` → **`forge` 生成的源可直接跑，不需适配层**；②自带 `pycryptodome 3.21.0` → AES 兜底在此壳上不必要，**写源应按目标壳分档**而非一律最保守写法。
+- **云取（32MB）纠正**：S231 写「仅支持 js/drpy 类源」——**不成立**。实测 22432 类、`catvod`/`tvbox`/`spider`/`drpy` **全 0 命中**，`turbodl` 190 处、aria2 39 处。它是 QuickJS 插件化**下载器**（`dev/turbodl/core/AdaptiveConcurrencyController`、`plugin/js/JsCapability`、`plugin/hls/HlsBackend`），js 指下载插件脚本不是 drpy 源。处置：从壳矩阵移到「下载器参考」，只吸收自适应并发与能力声明两个机制。
+- **MilkCode（302MB）**：**抽出了 42MB jadx jar 并实测可用**（S231 挂着的待办）。`java 20` 在机，MCP 握手成功，暴露 **26 个 jadx 级工具**，`load_apk` 云取 **22432 类 / 14.8s** 正常返回。**部署结论：可用但不入 git**（40MB fat jar 违反产物纪律、拖慢分发），需要时现抽或指向本机路径。**踩到一个坑**：`assets/mcp/rea-preset.json` 里那 24 个工具名（`inspect_android_package` 等）是上层封装，照抄直接 `Tool not found`——配置文件的能力清单 ≠ 实际接口。
+- **Muse（42MB）**：除名确认。dex 字节计数 `com/facebook/`×43588 / `com/meta/`×765 / `com/instagram/`×19，`catvod`/`tvbox`/`spider` 全 0。顺带订正 S231 记的 7648/82/17（那是 `grep -c` 行数口径，对二进制无意义）——结论不变，数字以 S233 为准。
+- **S231 壳矩阵表同步订正四处**：LeeCat 补 php/fjs/pycryptodome/双方言、云取改判定、MilkCode 的 jadx 状态由「本次未抽」改为已抽实测、Muse 数字口径。
+- **判据**：四个 APK 均有实测证据（结构体积、源码原文、dex 字节计数、MCP 真调用），无一条靠文件大小推测。
+
 ## v1.28.7 — S231 收口：通道三件代码化 + 第 7 条金律实测升判据（2026-11-15）
 - **需求**：用户拍板「第一立项 1/2/3 都做」——①S231 通道层三件（原先只有文档承载，零实现）②第 7 条金律（挂了两轮，卡在「凑不齐 ≥3 壳样本」）③订正 S231 自己那些「待移植」的过期标注。
 - **通道三件（各带 selftest + 正反向）**：
