@@ -715,7 +715,7 @@ else
 fi
 # v0.8.73：闸化登记判据自证接电（判据不在执行路径=挂空）。五形态/六反例/端到端 green-yellow 正反向。
 if exp_st_out=$( python3 "$TARGET/verify/gate_experience.py" --selftest 2>&1 ); then
-  ok "  └ M12 闸化登记 --selftest 正反向全过（五形态+反例+端到端 green/yellow）"
+  ok "  └ M12 闸化登记 --selftest 正反向全过（五形态+反例+端到端+多病号混合 green/yellow）"
 else
   no "  └ M12 闸化登记 --selftest 未过：$(printf '%s' "$exp_st_out" | grep -E '✗|FAIL' | head -3 | tr '\n' ' ')"
 fi

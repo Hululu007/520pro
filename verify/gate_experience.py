@@ -139,6 +139,35 @@ def _gate_selftest():
         print(f"  selftest[闸化]: 形态{len(forms)}/反例{len(negs)} "
               f"端到端 green={it['s'] if it else 'None'} "
               f"不存在文件={it2['s'] if it2 else 'None'} 无登记={it3['s'] if it3 else 'None'}")
+        # ── D. 多病号混合（v0.8.74 B-15 同类排查）：部分有 gate/部分无 → 只对无 gate 的 hot 报 yellow ──
+        #   含 retired 非 hot 病号，断言不被误伤；正反向：补一个 gate / 撤一个 gate，计数恰变。
+        mixed = {
+            '病15': {'count': 7, 'status': 'active'},     # 有 gate（应 gated）
+            '病10': {'count': 5, 'status': 'active'},     # 无 gate（应 ungated）
+            '病1':  {'count': 4, 'status': 'active'},     # 无 gate（应 ungated）
+            '病11': {'count': 3, 'status': 'retired'},    # 非 hot（不应出现在明细）
+        }
+        json.dump({'counters': mixed, 'direction_cases': []},
+                  open(os.path.join(tmp, 'experience_recurrence.json'), 'w'))
+        g_ok = {'script': '_gate_probe.py', 'anchor': ANCH}   # 合成环境复用同一落点，仅验判4 分流逻辑
+        itA = item4({'病15': g_ok})
+        if not itA or itA['s'] != 'yellow' or '2 病号' not in itA['t'] \
+                or '病10×' not in itA['e'] or '病1×' not in itA['e'] \
+                or '病15' in itA['e'] or '病11' in itA['e']:
+            fails.append(f'闸化·混合A 应仅对病10/病1 报 yellow：{itA}')
+        itB = item4({'病15': g_ok, '病10': g_ok})            # 补一个 gate → 只剩病1
+        if not itB or itB['s'] != 'yellow' or '1 病号' not in itB['t'] \
+                or '病10×' in itB['e'] or '病1×' not in itB['e']:
+            fails.append(f'闸化·混合B 补 gate 后应只剩病1：{itB}')
+        itC = item4({'病15': {'script': '__不存在__.py', 'anchor': ANCH}, '病10': g_ok})
+        if not itC or itC['s'] != 'yellow' or '2 病号' not in itC['t'] or '病15×' not in itC['e']:
+            fails.append(f'闸化·混合C 登记未落地应回到 ungated：{itC}')
+        itD = item4({'病15': g_ok, '病10': g_ok, '病1': g_ok})   # 全有 → green
+        if not itD or itD['s'] != 'green':
+            fails.append(f'闸化·混合D 全登记应 green：{itD}')
+        print(f"  selftest[闸化·混合]: A={itA['s'] if itA else 'None'} "
+              f"B={itB['s'] if itB else 'None'} C={itC['s'] if itC else 'None'} "
+              f"D={itD['s'] if itD else 'None'}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     return fails

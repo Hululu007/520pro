@@ -1,7 +1,7 @@
 {
  "version": "1.0.0",
  "updated": "2026-11-15",
- "doc": "病号映射表（经验闭环·闸1数据件）。真源=docs/通病台账.md；本表是机器可读投影：病号→一句修法(≤40字)→归宿(闸化/注入/归档)→任务标签(next_anchor 匹配用)。维护纪律：台账新增病历须同步本表；每条必须答归宿三选一，答不出不收。 闸化落点：destination=闸化 的病号须带结构化 gate（script/selftest/anchor/evidence/registered），由 chk_contentflow 判4 实证落点脚本+selftest 后方免报「须升【阻】或闸化」；登记不落地仍报黄。",
+ "doc": "病号映射表（经验闭环·闸1数据件）。真源=docs/通病台账.md；本表是机器可读投影：病号→一句修法(≤40字)→归宿(闸化/注入/归档)→任务标签(next_anchor 匹配用)。维护纪律：台账新增病历须同步本表；每条必须答归宿三选一，答不出不收。 闸化落点：destination=闸化 的病号须带结构化 gate（script/selftest/anchor/evidence/registered），由 chk_contentflow 判4 实证落点脚本+selftest 后方免报「须升【阻】或闸化」；登记不落地仍报黄。v0.8.74 同类排查：destination=闸化 共 5 病号，仅病15 有 gate，其余 4 个（病1/病10/病11/病12）经 docs/通病台账.md 文首「闸化登记推广」小节逐个实证后暂不登记——无 _gate_landed 可实证的「落点脚本+selftest」，gate 字段保持缺失即保留 yellow，不许造空 gate 或指同型脚本冒充。",
  "task_tags": {
   "bump": "版本升级/CHANGELOG/契约登记",
   "判据": "写闸/改 verify/自检/判据设计",
