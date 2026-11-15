@@ -1,5 +1,5 @@
 {
- "_doc": "落库欠账负账本（v0.8.67 批3）：正向账 archive_ledger 只记「落了的」，本文件记「该落未落的」。由 verify/delivery_probe.py 机器写入（模型不手工记账）；核销靠 ledger 出现对应回执行，机器自动销账。三态：open 未还 / closed 已还 / waived 显式豁免（必须带期限，到期转 open 并计入超期）。",
+ "_doc": "落库欠账负账本（v0.8.67 批3）：正向账 archive_ledger 只记「落了的」，本文件记「该落未落的」。由 verify/delivery_probe.py 机器写入（模型不手工记账）；核销靠 ledger 出现对应回执行，机器自动销账。三态：open 未还 / closed 已还 / waived 显式豁免（必须带期限，到期转 open 并计入超期）。【误报处置】判据修正导致的误报账不静默删除：标 closed 且 closed_by 写「判据修正销账」并留原因（可反查）。",
  "_schema": {
   "id": "D-<commit7>-<flow>，同 flow+commit 唯一（幂等键）",
   "age_commits": "首次入账后又被扫过的 commit 数；>3 由 gate_experience 判红（欠债不能躺着）",
@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "10d0f35ffe66113b4b7ebb53145727d69980ffb2",
-  "last_scan_ts": "2026-11-15T10:24:32"
+  "last_sha": "0cbf1b54288d9f068c5819814ca4a9d714b37b10",
+  "last_scan_ts": "2026-11-15T10:43:51"
  },
  "debts": [
   {
@@ -679,6 +679,40 @@
    "closed_by": "批3-欠账清偿 f5973ae @ 2026-11-15",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-0cbf1b5-F03",
+   "flow": "F03",
+   "folder": "🧬 520进化论/02-生态总览",
+   "commit": "0cbf1b5",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.67-批3 回执与判据收窄：落方法论销 D-10d0f35-F02 + F08 监测流判据收窄（提到落库即命中→须含M9-M12具体词）",
+   "expect": "巡检快照/审计报告/规则全景",
+   "evidence": "message 命中 ['巡检', '快照']",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "判据修正销账（非落库）",
+   "waived_until": "",
+   "note": "2026-11-15 误报：F03/F08 原用 message 关键词，正文讨论监测即命中；已改 diff 实现文件判据（病15 第9例）"
+  },
+  {
+   "id": "D-0cbf1b5-F08",
+   "flow": "F08",
+   "folder": "🧬 520进化论/07-落地监测",
+   "commit": "0cbf1b5",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.67-批3 回执与判据收窄：落方法论销 D-10d0f35-F02 + F08 监测流判据收窄（提到落库即命中→须含M9-M12具体词）",
+   "expect": "监测快照（七问七答）",
+   "evidence": "message 命中 ['M9', '快照']",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "判据修正销账（非落库）",
+   "waived_until": "",
+   "note": "2026-11-15 误报：F03/F08 原用 message 关键词，正文讨论监测即命中；已改 diff 实现文件判据（病15 第9例）"
   },
   {
    "id": "D-10d0f35-F02",

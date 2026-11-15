@@ -1,5 +1,5 @@
 {
- "_doc": "内容供给源登记（内容流唯一真源）。原则：空夹不是病，供给事件已发生而内容没落才是病。v2.0.0 起每条 flow 的 source_event 必须配机器可测 signal——否则探测器对不可测条件空转（v1.0.0 的纸面漏洞，B-15 模式：登记即监测范围，未登记的流永远是盲区）。",
+ "_doc": "内容供给源登记（内容流唯一真源）。原则：空夹不是病，供给事件已发生而内容没落才是病。v2.0.0 起每条 flow 的 source_event 必须配机器可测 signal——否则探测器对不可测条件空转（v1.0.0 的纸面漏洞，B-15 模式：登记即监测范围，未登记的流永远是盲区）。【不回溯原则】判据修正只对**上线后**的 commit 生效，不回溯重算历史——历史欠账由「全量对账」一次性处置（v0.8.67 已清偿 43 条）。若允许回溯，改一次判据就会冒几十条已无法追溯的旧账，反而淹没真信号。",
  "_schema": {
   "id": "F01..F10 稳定编号，台账/欠账按 id 引用",
   "kind": "folder=云端夹（参与 chk_contentflow 断路判据）/ ledger=云端库（不参与夹断路，靠自身 flow 对账）",
@@ -7,7 +7,7 @@
   "probe": "debt=该产未产写欠账 / advisory=只提示不记账（需语义判断）/ online=离线不可判记 unknown / derived=派生流不独立探测",
   "close_by": "核销：ledger 中 result=ok 且 target 以 folder 开头、ts>=commit 日期"
  },
- "version": "2.0.2",
+ "version": "2.0.3",
  "updated": "2026-11-15",
  "probe": {
   "window_commits": 40,
@@ -51,26 +51,15 @@
    "id": "F03",
    "kind": "folder",
    "folder": "🧬 520进化论/02-生态总览",
-   "source_event": "巡检 run / GATE 审计（commit 同时含巡检类与快照类词）",
+   "source_event": "巡检/审计实现变更（diff 命中 inspect_registry.json）",
    "signal": {
-    "type": "message",
-    "all_of": [
-     [
-      "巡检",
-      "inspect",
-      "体检"
-     ],
-     [
-      "快照",
-      "报告",
-      "面板",
-      "总览"
-     ]
-    ]
+    "type": "diff_paths",
+    "glob": "inspect_registry.json"
    },
    "producer": "巡检司 run 后快照落库",
    "action": "巡检快照/审计报告/规则全景",
-   "probe": "debt"
+   "probe": "debt",
+   "note": "v2.0.3：原 message 关键词判据会把「正文讨论巡检」当「做了巡检」（病15 第9例）"
   },
   {
    "id": "F04",
@@ -134,32 +123,15 @@
    "id": "F08",
    "kind": "folder",
    "folder": "🧬 520进化论/07-落地监测",
-   "source_event": "监测面（M9-M12/巡检快照/面板）变更",
+   "source_event": "监测实现变更（diff 命中 chk_landing.py 监测判据）",
    "signal": {
-    "type": "message",
-    "all_of": [
-     [
-      "M9",
-      "M10",
-      "M11",
-      "M12",
-      "监测面",
-      "监测快照",
-      "巡检快照",
-      "七问七答"
-     ],
-     [
-      "快照",
-      "面板",
-      "落库",
-      "出图"
-     ]
-    ]
+    "type": "diff_paths",
+    "glob": "chk_landing.py"
    },
    "producer": "巡检司监测快照",
    "action": "监测快照（七问七答）",
    "probe": "debt",
-   "note": "v2.0.2 收窄：原判据「提到落库」即命中，普通提交也误报（实测 10d0f35）"
+   "note": "v2.0.3：同上，改为 diff 实现文件，不再扫 message 关键词"
   },
   {
    "id": "F09",

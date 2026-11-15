@@ -178,7 +178,7 @@ main() {
       exit 0
     fi
   fi
-  log "✗ ${MAX_RETRIES} 次 HTTPS + SSH 兜底均失败，远端未确认。最后错误样本："
+  log "✗ ${MAX_RETRIES} 次尝试均未能确认远端（注意：这可能只是 fetch 无法判定，推送本身可能已成功——先用 gh api 核对远端 sha，别再盲重推）。最后错误样本："
   echo "$err" | head -3 | sed 's/^/    /'
   log "（提交已在本地，不丢失；建议稍后手动重跑本脚本）"
   exit 1
