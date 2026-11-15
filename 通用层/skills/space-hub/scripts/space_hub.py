@@ -1279,7 +1279,69 @@ def cmd_move(a):
                        f'——疑似索引延迟或移动未落地，请复核（不当作成功）'))
         return 3
     print(f'✅ 已移动：{title}（{nid}）\n   从 {src or "（未知，全树未反查到）"} → {target}')
+    _sync_ledger_target(nid, target)
     return 0
+
+
+def _sync_ledger_target(nid, new_parent_id):
+    """移动后同步仓级回执的 target（v2.8.0）。
+
+    为什么必须做：内容流探测器按回执的 `target` 前缀核销欠账。节点从
+    「📦 产物归档/未归类」移进「🧬 520进化论/01-方法论」后，回执若仍写未归类，
+    **核销永远匹配不上**——账会一直红，人会开始手工补行（批2 就是这么烂掉的）。
+    三态：找不到回执/找不到父夹 → 静默跳过（不是所有移动都来自落库，属正常）；
+    找到了就按新父夹标题重写 target，并留 `moved_from` 痕迹（不抹历史）。
+    """
+    try:
+        root = _ledger_root()
+        if not root:
+            return
+        # 按父链**上溯**构造真实路径（v2.8.0 修）：原来拿旧 target 的首段当根名，
+        #   跨根移动时（📦 产物归档/未归类 → 🧬 520进化论/01-方法论）根名会取错，
+        #   回执写成「📦 产物归档/01-方法论」，探测器按 "🧬 520进化论/01-方法论" 前缀
+        #   匹配仍然核销不了——搬对了位置、写错了名字，等于没修。
+        chain, seen_ids, cur, guard = [], set(), new_parent_id, 0
+        while cur and guard < 8:
+            guard += 1
+            cid = cur if isinstance(cur, str) else (cur or {}).get('id')
+            if not cid or cid in seen_ids:
+                break
+            seen_ids.add(cid)
+            info = _space('space.workspace.node-info', node_id=cid)
+            node = ((info or {}).get('data') or {}).get('node') or {}
+            t = (node.get('title') or '').strip()
+            if not t:
+                # 走到底了（空间根节点无标题）→ 停，但**已收集的链仍然有效**。
+                # 这里曾写成 `return`：链已集齐却整个函数放弃，回执一字不写，
+                # 表现为「修了但没生效」（本轮实测踩到）。
+                break
+            chain.append(t)
+            cur = node.get('parentId') or ''
+        if not chain:
+            return
+        new_target = '/'.join(reversed(chain))
+        fp = os.path.join(root, 'archive_ledger.json')
+        d = json.load(open(fp, encoding='utf-8'))
+        hits = [e for e in (d.get('entries') or []) if e.get('node_id') == nid]
+        if not hits:
+            return
+        changed = False
+        for e in hits:
+            old = e.get('target') or ''
+            if old == new_target:
+                continue
+            e['target'] = new_target
+            e['moved_from'] = old
+            changed = True
+        if not changed:
+            return
+        tmp = fp + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(d, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, fp)
+        print(f'  ⟳ 回执 target 已同步为「{hits[-1].get("target")}」（原「{hits[-1].get("moved_from")}」）')
+    except Exception as ex:
+        print(f'  · 回执 target 未同步（{type(ex).__name__}）——云端已移动，仅仓级账未跟上')
 
 
 def cmd_rename(a):
@@ -1809,11 +1871,15 @@ def cmd_archive(a):
     p = os.path.abspath(os.path.expanduser(a.file))
     if not os.path.isfile(p):
         print(f'❌ 文件不存在：{p}'); return 1
-    ok, info = _archive_file(p, a.category, a.source, a.note, a.keep)
+    # ★v2.8.0：--target 直落（此前只能落「未归类」再人工 move，而 move 不同步回执
+    #   target → 内容流探测器按 target 前缀核销，永远匹配不上，账一直红。
+    #   落点一次写对，比"先落错再搬"少两个可错步骤。）
+    ok, info = _archive_file(p, a.category, a.source, a.note, a.keep,
+                             target=(a.target or None))
     if not ok:
         print(f'❌ 归档失败：{info}（本地文件保留）'); return 2
     rule = _match_rule(p) or {}
-    landing = (rule.get('target') or f'{ARCHIVE_TITLE}/未归类')
+    landing = (a.target or rule.get('target') or f'{ARCHIVE_TITLE}/未归类')
     print(f'{{已存至 {SPACE_TITLE_OR_FALLBACK()}/{landing}/{os.path.basename(p)}}}')
     return 0
 
@@ -3219,6 +3285,9 @@ def main(argv=None):
     ar.add_argument('--source', default='', help='来源说明（哪个技能/任务产出）')
     ar.add_argument('--note', default='', help='说明（批次/条数/结论等，进索引"说明"列）')
     ar.add_argument('--keep', action='store_true', help='保留本地文件（默认落库成功后删除本地）')
+    ar.add_argument('--target', default='',
+                    help='显式落点（如「🧬 520进化论/01-方法论」）；缺省按 artifacts.json 声明，'
+                         '再缺省落「📦 产物归档/未归类」')
     pr = sub.add_parser('products', help='★产物盘点+搜索框（B-09 配套）')
     pr.add_argument('--scan', action='store_true', help='盘点已落库+本地产物区现存（只打印不落盘）')
     pr.add_argument('--search-box', action='store_true', dest='search_box',

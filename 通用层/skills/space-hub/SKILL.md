@@ -48,7 +48,7 @@ python3 space_hub.py move --node ID --to 父ID     # 节点移动正门（双校
 python3 space_hub.py rename --node ID --title "新名"  # 改名正门（改后回读）
 python3 space_hub.py census [--json]              # 分层普查（归属/缝统计）
 python3 space_hub.py local-rm --path <前缀>|--all # ★销账：本地欠账已人工处置，从清单移除
-python3 space_hub.py archive --file <f> [--category 类] [--source 来源] [--note 说明] [--keep]  # ★落库正门：按声明归类+写索引+本地清理
+python3 space_hub.py archive --file <f> [--target "🧬 520进化论/01-方法论"] [--category 类] [--source 来源] [--note 说明] [--keep]  # ★落库正门：直落指定夹+按声明归类+写索引+写仓级回执+本地清理
 python3 space_hub.py products --scan|--search-box|--retry  # ★盘点/搜索框/待归档补投
 python3 space_hub.py adopt [--dry-run] [--force]    # ★账号接管：判 fresh/hybrid/foreign → 建齐 或 接管存量（登记不搬）
 python3 space_hub.py ensure [--dry-run]            # ★库房自举：按蓝图收敛（认领已有+补建缺失），幂等

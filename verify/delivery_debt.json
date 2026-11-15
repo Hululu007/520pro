@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "5acf706f08be92c496d3cff87323b93e2a7a5975",
-  "last_scan_ts": "2026-11-15T11:40:46"
+  "last_sha": "dd6758d342ac0db2590085688f7e9aa4aafd3ab1",
+  "last_scan_ts": "2026-11-15T11:45:00"
  },
  "debts": [
   {
@@ -847,6 +847,23 @@
    "age_commits": 0,
    "first_seen": "2026-11-15",
    "closed_by": "批3-欠账清偿 d8b5b6a @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-dd6758d-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "dd6758d",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.68-批4b 修 archive 正门缺回执（探测器照出的基建缺陷）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 补一个出口时要把「同类出口还有几个」一起数完——v2.7.9 补了 evolve-log 却漏了 archive 这条主出口，导致落库主路径整体不记账；单点修复",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "archive 方法论_补出口要先数同类.md @dd6758d @ 2026-11-15",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
   },

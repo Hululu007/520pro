@@ -2135,6 +2135,18 @@
    "result": "ok",
    "event_ref": "commit 5acf706",
    "note": "销欠账 D-5acf706-F02：判据合法形态枚举遗漏（病15 第10例）；本条为 v2.8.0 修 archive 回执前的存量补登"
+  },
+  {
+   "ts": "2026-11-15T11:43:26",
+   "round": "archive 方法论_补出口要先数同类.md @dd6758d",
+   "artifact": "方法论_补出口要先数同类.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "U3lnHvvTDPuPzEhBFCryCZ",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit dd6758d",
+   "note": "v0.8.68 · 补出口先数同类出口 + 修在底层 3 条修法",
+   "moved_from": "📦 产物归档/01-方法论"
   }
  ]
 }
