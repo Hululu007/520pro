@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "bce02ae59aea4209b5da9131824f6d1d7fff34f8",
-  "last_scan_ts": "2026-11-15T11:46:32"
+  "last_sha": "40ba16a9a612805c3ab91fe95b2fe040c37d0857",
+  "last_scan_ts": "2026-11-15T11:47:21"
  },
  "debts": [
   {

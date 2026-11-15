@@ -185,7 +185,20 @@ def save_json_atomic(path, data):
 
 
 def read_commits(limit=None, after_sha=None):
-    """读 commit 列表（含 diff 路径与 VERSION 前后值）。after_sha 之后的所有 commit。"""
+    """读 commit 列表（含 diff 路径与 VERSION 前后值）。after_sha 之后的所有 commit。
+
+    ★2026-11-15 修（病15 第 11 例，本轮最大发现）：`git show --name-only` 默认
+    `core.quotepath=true`，**中文路径会被转义成 `"\\350\\203\\275..."` 并加引号**。
+    于是 glob 判据（`CHANGELOG.md` / `docs/通病台账.md` / `probe-hub/**/*.json`）
+    对这些路径**永远不命中**——判据看着在工作（其它流照常），实则 5 条流整体失效：
+    F03 生态总览 / F04 子项目演进 / F05 侦察资产 / F06 复盘与判例 / F08 落地监测。
+    实测：bce02ae 改了 `能力层/.../CHANGELOG.md`，F04 命中结果为 False。
+    本仓绝大多数路径含中文（`能力层/`、`通用层/`、`docs/通病台账.md`），
+    等于探测器只对 `VERSION`/`MANIFEST.json` 这类纯 ASCII 路径有效。
+
+    修法：显式 `-c core.quotepath=false`，让 git 输出原始 UTF-8 路径。
+    这不是"改判据迁就数据"，是**让判据看到真实对象**（B-15 机制级修复）。
+    """
     fmt = '--format=%h%x1f%H%x1f%ad%x1f%B%x1e'
     rng = f'{after_sha}..HEAD' if after_sha else f'-{limit or 40}'
     raw = _git('log', '--date=short', fmt, rng)
@@ -198,13 +211,151 @@ def read_commits(limit=None, after_sha=None):
         if len(parts) < 4:
             continue
         short, full, date, msg = parts[0], parts[1], parts[2], parts[3]
-        paths = [p for p in _git('show', '--name-only', '--format=', short).splitlines() if p.strip()]
+        # ★ quotepath=false：中文路径原样输出（否则 glob 判据对中文路径永不命中）
+        paths = [p for p in _git('-c', 'core.quotepath=false', 'show', '--name-only',
+                                 '--format=', short).splitlines() if p.strip()]
         v_new = _git('show', f'{short}:VERSION').strip()
         v_old = _git('show', f'{short}^:VERSION').strip() or v_new
         out.append({'short': short, 'full': full, 'date': date, 'msg': msg,
                     'paths': paths, 'version': (v_old, v_new) if v_new else None})
     out.reverse()   # 时间正序
     return out
+
+
+def _probe_window(limit=40, flows=None, rows=None):
+    """按 probe_commit 复算窗口内欠账（不写盘）。返回 (commits, debts)。"""
+    cs = load_json(CS)
+    led = load_json(LEDGER)
+    if not cs or not led:
+        return [], []
+    fl = flows if flows is not None else [f for f in cs.get('flows', []) if f.get('probe') == 'debt']
+    lr = rows if rows is not None else (led.get('entries', []) if isinstance(led, dict) else led)
+    commits = read_commits(limit=limit, after_sha=None)
+    out = []
+    for c in commits:
+        ds, _ = probe_commit(c, fl, lr)
+        out.extend(ds)
+    return commits, out
+
+
+def audit(limit=40):
+    """只读全量对账：列出窗口内「该产未产」的账，**不写账本**（--audit）。
+
+    为什么要有这个模式（病15 第 11 例的出口）：判据修好那一轮，历史窗口会一次性
+    浮现几十条旧账。没有只读对账口，处置只能靠临时脚本——口径与 probe_commit
+    各写一份，改一处必漏一处（本仓已因「复制判据」栽过）。本模式复用同一套
+    probe_commit，只打印不落盘；处置结论由 --backfill 入账 + --waive/真补决定。
+    """
+    commits, ds = _probe_window(limit)
+    if not commits:
+        print('  · [delivery-probe] 无法判定：content_sources / archive_ledger 不可读，或窗口无 commit')
+        return 0
+    debt = load_json(DEBT) or {}
+    known = {d['id'] for d in debt.get('debts', [])}
+    print(f'🔍 只读对账窗口：{len(commits)} 个 commit（{commits[0]["short"]}..{commits[-1]["short"]}）')
+    new = 0
+    for d in ds:
+        flag = '' if d['id'] in known else '  ← 未入账'
+        new += 0 if d['id'] in known else 1
+        print(f'    {d["id"]:18s} {d["folder"].split("/")[-1]:12s} {d["commit"]} {d["title"][:40]}{flag}')
+    print(f'--- 窗口内欠账合计: {len(ds)}（其中未入账 {new} 条）')
+    print('    处置：入账后逐条决定「真补落库」或「--waive 显式豁免」——两条都不许不做就翻篇')
+    return 0
+
+
+def backfill(limit=40):
+    """把窗口内「未入账」的旧账补进账本（--backfill）——只入账，不改状态。
+
+    判据修正后必须做的事：修好判据的那次提交之前，历史窗口里的欠账是**判据盲区**
+    造成的静默漏账，它们既不在账本里也没人处置。补记入账才会让它们出现在
+    `--list` 上，进而被迫处置（真补 or 豁免），而不是随判据修正一起消失。
+    """
+    debt = load_json(DEBT)
+    if not debt:
+        print('  · [delivery-probe] 无法判定：delivery_debt.json 不可读')
+        return 2
+    commits, ds = _probe_window(limit)
+    if not commits:
+        print('  · [delivery-probe] 无法判定：content_sources / archive_ledger 不可读')
+        return 0
+    existing = {d['id']: d for d in debt.get('debts', [])}
+    added = [d for d in ds if d['id'] not in existing]
+    for d in added:
+        d['note'] = '判据盲区补记（quotepath 修复后浮现的历史旧账，非本轮新增）'
+        existing[d['id']] = d
+    if added:
+        debt['debts'] = sorted(existing.values(), key=lambda x: (x.get('commit_date', ''), x['id']))
+        debt['updated'] = datetime.date.today().isoformat()
+        save_json_atomic(DEBT, debt)
+    print(f'📥 补记入账 {len(added)} 条（窗口 {len(commits)} 个 commit，欠账共 {len(ds)} 条）')
+    for d in added:
+        print(f'    + {d["id"]:18s} {d["folder"].split("/")[-1]:12s} {d["commit"]} {d["title"][:40]}')
+    return 0
+
+
+def _waive_check(status, until, why, today=None, max_days=90):
+    """豁免校验（纯函数，供 selftest 正反向）。返回 (ok, 原因)。
+
+    三道硬条件，缺一即拒——它们分别堵三种洗绿手法：
+      · why 写"后续优化/待跟进"这类无主无期的话 → 豁免变成静默删除（B-14）
+      · 不写期限 → 豁免变成永久绿（账本 schema 要求带期限，到期转 open）
+      · 期限超上限 → 等于变相永久豁免
+    """
+    today = today or datetime.date.today()
+    if status != 'open':
+        return False, f'只有 open 账可豁免（当前 {status}）；已还的账不许改成豁免，那是改历史'
+    why = (why or '').strip()
+    if len(why) < 20:
+        return False, f'理由需 ≥20 字且写实（当前 {len(why)} 字）：豁免不是"后续优化"这类无主无期条目'
+    if not until:
+        return False, '必须给 waived_until（YYYY-MM-DD）：无期限豁免=永久绿'
+    try:
+        d = datetime.date.fromisoformat(until)
+    except Exception:
+        return False, f'waived_until 不是合法日期：{until}'
+    if d <= today:
+        return False, f'waived_until {until} 不晚于今天——那不是豁免，是过期'
+    if (d - today).days > max_days:
+        return False, f'waived_until 超上限 {max_days} 天（{(d - today).days} 天）：变相永久豁免'
+    return True, ''
+
+
+def waive(ids, until, why, by='agent'):
+    """显式豁免正门（三态里的 waived）：不静默删、不假称已还、到期自动转 open。
+
+    为什么要有这个入口：账本 schema 声明三态，但此前只有 open/closed 两个产生
+    通道——waived 只能手改 JSON，等于"模型手工记账"（违反本文件 _doc 的口径），
+    实操里必然被绕过，或者被随手写成 closed 洗绿。
+    """
+    debt = load_json(DEBT)
+    if not debt:
+        print('  · [delivery-probe] 无法判定：delivery_debt.json 不可读')
+        return 2
+    rows = {d['id']: d for d in debt.get('debts', [])}
+    maxd = (debt.get('thresholds') or {}).get('waive_max_days', 90)
+    bad, done = [], []
+    for i in ids:
+        d = rows.get(i)
+        if not d:
+            bad.append((i, '账本无此 id（先 --audit 看真实 id，别猜）'))
+            continue
+        ok, msg = _waive_check(d.get('status', ''), until, why, max_days=maxd)
+        if not ok:
+            bad.append((i, msg))
+            continue
+        d['status'] = 'waived'
+        d['waived_until'] = until
+        d['waived_by'] = by
+        d['waived_ts'] = datetime.datetime.now().isoformat(timespec='seconds')
+        d['note'] = (d.get('note', '') + f'｜豁免至 {until}：{why.strip()}').strip('｜')
+        done.append(i)
+    if done:
+        debt['updated'] = datetime.date.today().isoformat()
+        save_json_atomic(DEBT, debt)
+        print(f'🏷  已豁免 {len(done)} 条（至 {until}，到期 auto 转 open）：' + '，'.join(done))
+    for i, m in bad:
+        print(f'  ✗ {i}：{m}')
+    return 2 if bad else 0
 
 
 def scan(limit=None, quiet=False):
@@ -279,7 +430,9 @@ def scan(limit=None, quiet=False):
             print(f'  扫描 {len(commits)} 个新 commit（{commits[0]["short"]}..{commits[-1]["short"]}）')
         elif not just_closed:
             print(f'  ✓ [delivery-probe] 无新 commit（上次扫到 {after[:7] if after else "—"}），无可判对象（绿）')
-        print(f'  新增欠账 {len(added)} 条；当前 open {len(open_ds)} 条')
+        print(f'  新增欠账 {len(added)} 条；当前 open {len(open_ds)} 条；'
+              f'已豁免 {len([d for d in debt["debts"] if d.get("status") == "waived"])} 条'
+              f'（到期自动转 open，不是永久绿）')
         for d in added:
             print(f'    + {d["id"]}  {d["folder"].split("/")[-1]}  ← {d["commit"]} {d["title"][:40]}')
         for a in advices:
@@ -369,15 +522,74 @@ def selftest():
          [{'result': 'ok', 'target': '🧬 520进化论/版本演化台账', 'ts': '2026-11-15T10:00:00',
            'note': '记了 0.8.66'}], 1)
 
+    print('── 正向④：豁免校验三条件齐备 → 放行')
+    today = datetime.date.today()
+
+    def wcase(name, status, until, why, want):
+        nonlocal ok
+        got, msg = _waive_check(status, until, why, today=today)
+        good = got == want
+        ok = ok and good
+        print(f'  {"✓" if good else "✗"} {name}：{"放行" if got else "拒绝"}（期望 {"放行" if want else "拒绝"}）'
+              + ('' if got else f' — {msg[:40]}'))
+
+    wcase('理由充分+限期30天', 'open', (today + datetime.timedelta(days=30)).isoformat(),
+          '判据盲区期的历史旧账，按不回溯原则不追补，留痕待复检', True)
+    print('── 反向⑤：理由写「后续优化」→ 拒（无主无期，B-14）')
+    wcase('理由空话', 'open', (today + datetime.timedelta(days=30)).isoformat(), '后续优化', False)
+    print('── 反向⑥：不写期限 → 拒（否则=永久绿）')
+    wcase('无期限', 'open', '', '判据盲区期的历史旧账，按不回溯原则不追补', False)
+    print('── 反向⑦：期限已过/就是今天 → 拒')
+    wcase('过期期限', 'open', today.isoformat(), '判据盲区期的历史旧账，按不回溯原则不追补', False)
+    print('── 反向⑧：期限超上限 90 天 → 拒（变相永久）')
+    wcase('超上限', 'open', (today + datetime.timedelta(days=200)).isoformat(),
+          '判据盲区期的历史旧账，按不回溯原则不追补', False)
+    print('── 反向⑨：已 closed 的账改成豁免 → 拒（那是改历史）')
+    wcase('改历史', 'closed', (today + datetime.timedelta(days=30)).isoformat(),
+          '判据盲区期的历史旧账，按不回溯原则不追补', False)
+
     print('✓ selftest 全通过（探测器活着，正反向皆如预期）' if ok
           else '✗ selftest 有失败——闸失灵，不许上线')
     return 0 if ok else 2
 
 
+def selftest_quotepath():
+    """病15 第 11 例的**回归用例**：直接拿真 git 输出验「中文路径能看见」。
+
+    为什么必须走真 git：出问题的是 `read_commits` 取路径那一步（quotepath 转义），
+    而 signal_hit 的用例喂的是**合成路径列表**——合成数据永远不含转义，
+    所以原来那 8 个用例 100% 绿也照样漏掉 5 条流整体失效。判据的用例
+    如果绕开了真实取值链路，等于没测（B-13 看落点不看断言）。
+    """
+    commits = read_commits(limit=20)
+    paths = [p for c in commits for p in (c.get('paths') or [])]
+    zh = [p for p in paths if any('\u4e00' <= ch <= '\u9fff' for ch in p)]
+    # ★ 先判转义、再判样本：转义后的路径**不含汉字**（`"\350\203\275..."`），
+    #   若先按「有汉字吗」判样本，回归会退化成"无法判定：未触及中文路径"——看着像没数据，
+    #   实则正是 bug 本身。这是本条用例第一版的原样漏洞，反向实测（摘掉 quotepath=false）
+    #   打出来的就是"无法判定"而不是红。判定顺序错 = 闸不判红（病15 第 11 例的套娃）。
+    esc = [p for p in paths if p.startswith('"') or '\\3' in p]
+    if esc:
+        print(f'  ✗ quotepath 回归：{len(esc)} 条路径被转义，如 {esc[0][:40]}——中文路径判据会整体失明')
+        return False
+    if not paths:
+        print('  · 无法判定：最近 20 个 commit 取不到路径（空仓或 git 不可用）')
+        return None
+    if not zh:
+        print('  · 无法判定：最近 20 个 commit 未触及中文路径，本用例样本不足（不当绿）')
+        return None
+    print(f'  ✓ quotepath 回归：{len(zh)}/{len(paths)} 条中文路径原样可见（如 {zh[0][:50]}）')
+    return True
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
     if '--selftest' in a:
-        sys.exit(selftest())
+        rc = selftest()
+        qp = selftest_quotepath()
+        if qp is False:
+            rc = 2
+        sys.exit(rc)
     if '--json' in a:
         print(json.dumps(summary(), ensure_ascii=False))
         sys.exit(0)
@@ -387,6 +599,25 @@ if __name__ == '__main__':
         for d in s['items']:
             print(f"  {d['id']}  龄{d['age']}  {d['folder']}  ← {d['commit']}  {d['title']}")
         sys.exit(0)
+
+    def _num(flag, default):
+        return int(a[a.index(flag) + 1]) if flag in a else default
+
+    if '--audit' in a:
+        sys.exit(audit(_num('--audit', 40)))
+    if '--backfill' in a:
+        sys.exit(backfill(_num('--backfill', 40)))
+    if '--waive' in a:
+        ids, i = [], a.index('--waive') + 1
+        while i < len(a) and not a[i].startswith('--'):
+            ids.append(a[i])
+            i += 1
+        until = a[a.index('--until') + 1] if '--until' in a else ''
+        why = a[a.index('--why') + 1] if '--why' in a else ''
+        if not ids:
+            print('  ✗ --waive 需要至少一个欠账 id（先 --list 看清单）')
+            sys.exit(2)
+        sys.exit(waive(ids, until, why))
     lim = None
     if '--commits' in a:
         lim = int(a[a.index('--commits') + 1])
