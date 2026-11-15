@@ -150,7 +150,7 @@
       ],
       "entry": "scripts/foundry.py",
       "trigger_samples": "references/trigger-samples.md",
-      "_note": "W1 骨架；W2 引擎上提与 26 工具全量接线完成（tools_schema verified 26/26，正反向 selftest 覆盖病15 五种后接形态）；W3 全量迁入 63 目录，W4 产出接入"
+      "_note": "W1 骨架；W2 引擎上提与 26 工具全量接线完成（tools_schema verified 26/26，正反向 selftest 覆盖病15 五种后接形态）；W3 63 目录能力面全量登记完成（capability_surface.json 63/63，surface 子命令机检可回读）；W4 产出接入"
     },
     "foundry-core": {
       "kind": "lib",
@@ -163,11 +163,12 @@
         "scripts/core.py",
         "scripts/jadx_engine.py",
         "scripts/tools_schema.json",
+        "scripts/capability_surface.json",
         "docs/TROUBLESHOOTING.md"
       ],
       "entry": "scripts/core.py",
       "trigger_samples": "",
-      "_note": "故意无 SKILL.md：纯共享内核，平台不注册、不路由、不进上下文；版本真源在 manifest.json。W2 新增 scripts/jadx_engine.py（26 工具泛化引擎，独立命名避开与 tvbox-core/core.py 撞名）"
+      "_note": "故意无 SKILL.md：纯共享内核，平台不注册、不路由、不进上下文；版本真源在 manifest.json。W2 新增 scripts/jadx_engine.py（26 工具泛化引擎，独立命名避开与 tvbox-core/core.py 撞名）；W3 新增 scripts/capability_surface.json（63 目录能力面清单，登记与补码转正分离，surface_ok 63/63 机检可回读）"
     }
   },
   "runtime_dirs": [

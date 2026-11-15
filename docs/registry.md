@@ -46,6 +46,7 @@
 | jadx MCP 26 工具名册与参数链 | `通用层/skills/foundry-core/scripts/tools_schema.json` + `通用层/skills/foundry-core/scripts/core.py` | 一手 `tools/list` 实测 26 个（非文档枚举 25）；W2 已补 26 个 inputSchema + 26 条真调配方，verified 26/26（登记与转正分离口径已收敛） |
 | jadx MCP 26 工具泛化传输引擎 | `通用层/skills/foundry-core/scripts/jadx_engine.py` | W2 从能力层 `shellcrack.py` 上提：`call(name,args)` 泛化 + `FakeTransport` 离线注入 + 独立命名避开与 `tvbox-core/core.py` 撞名；能力层 `probe-hub` 反向 import（收件方自持，调用行零改动） |
 | 熔铸司产出归属声明 | `通用层/skills/foundry/artifacts.json` | 声明能力面对照/解码资产/工具清单/板块演进/真调判例五类落点；库务司扫描 `*/artifacts.json` 自动纳入 |
+| 熔铸司 63 目录能力面清单 | `通用层/skills/foundry-core/scripts/capability_surface.json` + `通用层/skills/foundry-core/scripts/core.py`（`CAPABILITY_63` 名册 / `surface_ok` 判据 / `SURFACE_ANCHORS` 硬锚） | W3 从 `/tmp/milk63_deep.json` 一手深读迁入：63 目录 / 349 文件 / 196 refs / 38 脚本，中性结构化登记（只摆目录名+计数+脚本名，不搬运正文、全量不裁剪）；登记与补码转正分离（`registered/ported`）；`surface_ok` 逐目录验+六维对账+名册比对+独立硬锚防洗绿（病15 识别范围=对象范围） |
 
 ## 四、运行时登记册（随使用增长，不入 git 或按需提交）
 

@@ -535,6 +535,30 @@ fi
   && ok "learn-hub 在位（通用层业务主件，B-16 同保项）" \
   || no "learn-hub 缺失/改名——学习工坊不可用（B-16 同保项）"
 
+# ★ W3（v0.8.76 增量）：熔铸司判据接电 —— 只写 selftest 不接电 = 判据挂空
+#   （病「判据不在执行路径」，同上方 S231 六层资产的教训）。W2 的三个 selftest 一直是
+#   install.sh / 手工跑，从未进 verify.sh 执行路径；这里补进仓库级段，验 $TARGET 仓内真源，
+#   --repo-only 干净检出也在电。正向全过 ✓；反向脚本缺失或 selftest 未过即 ✗，不折叠成 opt。
+echo
+echo "[熔铸司 foundry 判据接电（W3 起·通用层横向能力板块）]"
+for _sp in "foundry-core/scripts/core.py|core.py --selftest（26 工具转正 + 63 目录能力面登记 + 多形态造错）" \
+           "foundry-core/scripts/jadx_engine.py|jadx_engine.py --selftest（FakeTransport / PROC_DEAD 三态）" \
+           "foundry/scripts/foundry.py|foundry.py selftest（正门层正反向）"; do
+  _rel="${_sp%%|*}"; _label="${_sp##*|}"
+  _full="$TARGET/通用层/skills/$_rel"
+  if [ -f "$_full" ]; then
+    _dir="$(dirname "$_full")"; _base="$(basename "$_full")"
+    _arg="--selftest"; [ "$_base" = "foundry.py" ] && _arg="selftest"
+    if _o=$( cd "$_dir" && timeout 90 python3 "$_base" "$_arg" 2>&1 ); then
+      ok "  └ ${_label} 正反向全绿"
+    else
+      no "  └ ${_label} 未过：$(printf '%s' "$_o" | grep -E '✗|项失败|Error' | head -3 | tr '\n' ' ')"
+    fi
+  else
+    no "  └ ${_rel} 缺失（判据挂空）"
+  fi
+done
+
 # ★ v0.8.15（工程C）：技能契约机检——结构/头部/描述五组/版本三处/镜像 sha/样本集
 echo
 echo "[技能契约（v0.8.15 起·工程C：技能该长什么样是机器判据）]"

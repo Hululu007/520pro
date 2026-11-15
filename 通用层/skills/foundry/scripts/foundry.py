@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """foundry · 熔铸司正门（平台可路由 skill 的执行入口）。
 
-三个子命令：status / tools / selftest。
+四个子命令：status / tools / surface / selftest。
 selftest 是施工纪律③「正反向验证通过才落地」的执行面：
-  正向 = 真实骨架应绿（W2 起含 schema_ok 26/26 转正判定）；
+  正向 = 真实骨架应绿（W2 起含 schema_ok 26/26 转正判定；W3 起含
+  surface_ok 63/63 能力面登记判定）；
   反向 = 造多类违例（缺 SKILL.md / 缺 manifest.json / 名册非 26 /
-  描述五组缺项 / 参数链五种后接形态坏填法）必须各自翻红。
+  描述五组缺项 / 参数链五种后接形态坏填法 / W3 能力面多形态造错）必须各自翻红。
   造错用临时目录 + 内存深拷贝，不动真文件。
 """
 import json
@@ -101,10 +102,23 @@ def cmd_status():
     except Exception as e:
         sok = False
         print(f'  转正判定   : 无法判定（{type(e).__name__}: {e}）')
+    # W3：63 目录能力面清单（登记与补码转正分离）
+    try:
+        surf = core.load_surface()
+        uok, umsg = core.surface_ok(surf)
+        t = surf['source']['totals']
+        print(f'  能力面清单 : {t["directories"]}/63 目录 / {t["files"]} 文件 / '
+              f'{t["refs"]} refs / {t["exe_scripts"]} 脚本（W3 全量登记）')
+        print(f'  能力面判定 : {"63/63 登记齐全且机检可回读" if uok else "红 → " + umsg}')
+        nport = sum(1 for x in surf['directories'] if x.get('ported'))
+        print(f'  补码转正   : {nport}/63（登记≠转正，逐目录补码由用户拍板）')
+    except Exception as e:
+        uok = False
+        print(f'  能力面判定 : 无法判定（{type(e).__name__}: {e}）')
     print('  引擎真源   : 通用层 foundry-core/scripts/jadx_engine.py（能力层 shellcrack 反向复用）')
-    print('  当前阶段   : W2 引擎上提与 26 工具全量接线完成（W0→W1→W2 → W3 全量迁入 → W4 产出接入 → W5 收口）')
+    print('  当前阶段   : W3 63 目录能力面全量迁入完成（W0→W1→W2→W3 → W4 产出接入 → W5 收口）')
     print('  产出落点   : 🧬 520进化论/03·04·05 + 📦 产物归档/清单（见 artifacts.json）')
-    return 0 if (ok and dok and nok and sok) else 2
+    return 0 if (ok and dok and nok and sok and uok) else 2
 
 
 def cmd_tools():
@@ -123,8 +137,32 @@ def cmd_tools():
     return 0 if ok else 2
 
 
+def cmd_surface():
+    """W3 机检可回读：列出 63 目录能力面清单（中性结构化登记，不搬运正文）。"""
+    core = _load_core()
+    d = core.load_surface()
+    ok, msg = core.surface_ok(d)
+    print('【foundry · 63 目录能力面清单】')
+    print(f'  机检判定   : {"63/63 登记齐全" if ok else "红 → " + msg}')
+    print(f'  {msg}')
+    print(f'  一手来源   : {d["source"]["evidence"]}')
+    print(f'  分离口径   : {d["separation"]["note"]}')
+    print()
+    print(f'  {"#":>2}  {"目录":42s} files refs exe  sec mech tool  fm')
+    for i, x in enumerate(d['directories'], 1):
+        print(f'  {i:2d}. {x["id"]:42s} {x["n_files"]:5d} {x["n_refs"]:4d} '
+              f'{x["n_exe"]:3d} {x["n_sections"]:4d} {x["n_mech"]:4d} '
+              f'{x["n_tool_tokens"]:4d}  {"Y" if x["has_fm"] else "-"}')
+    t = d['source']['totals']
+    print(f'\n  合计: {t["directories"]} 目录 / {t["files"]} 文件 / {t["refs"]} refs / '
+          f'{t["exe_scripts"]} 脚本 / {t["sections"]} 章节 / {t["mech"]} 机制点 / '
+          f'{t["tool_tokens"]} 工具令牌')
+    print(f'  补码转正: {sum(1 for x in d["directories"] if x.get("ported"))}/63')
+    return 0 if ok else 2
+
+
 def cmd_selftest():
-    """正反向验证。造错用临时目录，不碰真文件。"""
+    """正反向验证。造错用临时目录 + 内存深拷贝，不碰真文件。"""
     core = _load_core()
     fails = []
 
@@ -139,7 +177,7 @@ def cmd_selftest():
     dok, dbad = _desc_ok(os.path.join(SKILL_DIR, 'SKILL.md'))
     ck('描述五组 + C9 + C11 齐备', dok, dbad)
     lok, lmiss = core.skeleton_ok()
-    ck('lib 内核骨架（含 jadx_engine.py）齐全', lok, lmiss)
+    ck('lib 内核骨架（含 jadx_engine.py + capability_surface.json）齐全', lok, lmiss)
     nok, nmsg = core.names_ok(core.TOOLS_26)
     ck('名册 26 个与 tools/list 实测一致', nok, nmsg)
     # W2：真实配方含 class_name 键（病15 修正后必须判绿，W1 会误判）
@@ -154,6 +192,15 @@ def cmd_selftest():
         ck('W2 转正：26 工具 schema+配方+参数链齐备', sok, smsg)
     except Exception as e:
         ck('tools_schema.json 可读 / 转正', False, f'{type(e).__name__}: {e}')
+    # W3：63 目录能力面清单转正判定（登记齐全 + 机检可回读）
+    try:
+        surf = core.load_surface()
+        uok, umsg = core.surface_ok(surf)
+        ck('W3 能力面清单 63/63 登记齐全且机检可回读', uok, umsg)
+        ck('W3 名册 63 个与一手深读一致', len(core.CAPABILITY_63) == 63
+           and set(core.CAPABILITY_63) == set(x['id'] for x in surf['directories']))
+    except Exception as e:
+        ck('capability_surface.json 可读 / 转正', False, f'{type(e).__name__}: {e}')
 
     print('── 反向（多类造错必须各自翻红）──')
     tmp = tempfile.mkdtemp(prefix='foundry-selftest-')
@@ -214,6 +261,26 @@ def cmd_selftest():
             ck('W1 残留：inputSchema=null → 转正判红', not core.schema_ok(_d2)[0])
         except Exception as e:
             ck('schema 造错用例可读', False, f'{type(e).__name__}: {e}')
+
+        # ⑦ W3 能力面多形态造错：只认单个 count 布尔会全漏，逐层判据各自翻红
+        try:
+            import copy
+            smk = lambda: copy.deepcopy(core.load_surface())  # noqa: E731
+            u1 = smk(); u1['directories'] = u1['directories'][:-1]
+            ck('能力面判红·少一个目录', not core.surface_ok(u1)[0])
+            u2 = smk(); u2['directories'][7]['ported'] = True
+            ck('能力面判红·冒充补码转正', not core.surface_ok(u2)[0])
+            u3 = smk()
+            u3['directories'][0]['n_files'] -= 1
+            u3['source']['totals']['files'] -= 1
+            ck('能力面判红·清单+totals 同步洗绿（独立硬锚）', not core.surface_ok(u3)[0])
+            u4 = smk(); u4['directories'][0]['id'] = 'ghost-dir'
+            ck('能力面判红·目录名不在名册', not core.surface_ok(u4)[0])
+            u5 = smk(); u5['directories'][3]['n_files'] = '349'
+            ck('能力面判红·计数类型错', not core.surface_ok(u5)[0])
+            ck('能力面判红·整表非 dict', not core.surface_ok([1, 2, 3])[0])
+        except Exception as e:
+            ck('能力面造错用例可读', False, f'{type(e).__name__}: {e}')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -223,11 +290,11 @@ def cmd_selftest():
 
 def main(argv):
     cmd = (argv[1] if len(argv) > 1 else 'status').lstrip('-')
-    fn = {'status': cmd_status, 'tools': cmd_tools,
+    fn = {'status': cmd_status, 'tools': cmd_tools, 'surface': cmd_surface,
           'selftest': cmd_selftest, 'self-test': cmd_selftest}.get(cmd)
     if fn is None:
         print(__doc__)
-        print('用法：foundry.py status | tools | selftest')
+        print('用法：foundry.py status | tools | surface | selftest')
         return 1
     return fn()
 

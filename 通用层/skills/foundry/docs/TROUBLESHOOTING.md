@@ -65,3 +65,23 @@
 当成了违例——而 `class_name` 是 26 工具合法必填参数名（病15：识别范围 ≠ 对象范围）。
 W2 改为查参数**值**（`_bad_value`）：JSON key 字面量 / 占位符 / zip 原始路径前缀才判红，
 键名任意合法。若又见此症状说明跑的是旧安装副本，先按 §8 重装。
+
+## 10. status/surface 报「能力面判定：无法判定」或 63/63 未登记齐
+
+症状：`status` 显示「能力面判定：无法判定（AttributeError: module 'core' has no
+attribute 'surface_ok'）」，`surface` 报 `capability_surface.json` 读不到，或 `selftest`
+正向「W3 能力面清单 63/63」红。
+处置：两类根因，别混：① **镜像滞后**——`_load_core()` 用户级优先，命中 W2 旧
+`~/.codebuddy/skills/foundry-core/`，走 `bash install.sh --user-skill` 重装同步即自愈
+（同 §8）；② **清单漂移**——`capability_surface.json` 被改动导致 `surface_ok` 判红，
+先看红项文案（少目录 / 求和与 totals 失配 / 名册不符 / 硬锚失配 / 冒充转正），
+按病15「识别范围 = 对象范围」回真源修，不要改判据迁就、不要只改 `len==63`
+——判据是逐目录验 + 六维对账 + 独立硬锚，改一个数字洗不绿。
+
+## 11. 分不清「已登记」和「已迁入」
+
+症状：有人拿 `capability_surface.json` 的 63/63 宣称「63 目录能力已迁入 520」。
+处置：清单是**中性结构化登记**（只有目录名 + 计数 + 脚本名，不搬运技能正文），
+`registered=true / ported=false` 是如实状态。**登记 ≠ 补码转正**：逐目录补码接线属
+后续阶段、边界由用户拍板。把「登记了」说成「迁移完了」是洗绿（B-02 / M2），
+`surface_ok` 会拦下任何 `ported=true` 的冒充。

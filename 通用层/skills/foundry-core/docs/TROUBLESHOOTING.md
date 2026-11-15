@@ -63,3 +63,25 @@ sys.path 或用 `import core` 加载引擎，`from core import ...` 会被劫持
 这是 jadx 服务端稳定性、不是传输层缺陷：起独立 java 进程分批跑、或换稳定类名
 （`get_main_activity_class` 的返回，别用 Kotlin 合成类 `...$MainActivityKt`）即可。
 不要为了「凑绿」把 `PROC_DEAD` 判成 success（病15 / B-02）。
+
+## 10. `surface_ok` 报能力面清单判红（W3）
+
+症状：`core.py --selftest` 正向「W3 能力面清单 63/63」红，文案为以下之一：
+「目录数 ≠63 / id 缺失或重复 / 目录名与 CAPABILITY_63 不一致 / 某目录缺字段 /
+某计数非非负 int / scripts 非 list[str] / n_exe≠len(scripts) / registered=false /
+ported=true / 求和与 source.totals 不符 / 硬锚失配 / 缺 separation」。
+处置：判据是病15「识别范围 = 对象范围」——逐目录验字段 + 六维求和对账 + 名册比对 +
+独立硬锚（`SURFACE_ANCHORS` 63/349/196/38 固化在 core.py，与清单 totals 分离）。
+**改一个 `len==63` 或把清单和 `source.totals` 一起改小都洗不绿**：后者会撞硬锚。
+回 `/tmp/milk63_deep.json` 一手素材核对真实值再修清单，不要改判据迁就（病15 / B-02）。
+`capability_surface.json` 是中性结构化登记（只有目录名 + 计数 + 脚本名），
+`registered=true / ported=false` 是如实状态，登记 ≠ 补码转正。
+
+## 11. 清单里出现技能正文 / 被裁剪
+
+症状：`capability_surface.json` 里混进了 `description` / `positioning` / `mech` /
+`sections` 正文，或 63 目录少了几个「看起来敏感」的目录。
+处置：W3 口径是**中性结构化登记、全量不裁剪、边界由用户拍板**——只登记目录 id +
+聚合计数 + 脚本名，不搬运内容、不做价值判断。正文混入属越界，少了目录属替用户
+定边界（二者都违 M2 / 用户拍板原则）。`CAPABILITY_63` 名册固化 63 个 id，
+`surface_ok` 会拦下名册不符。

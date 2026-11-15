@@ -83,7 +83,7 @@
         },
         "skills/foundry/SKILL.md": {
           "install_to": "~/.codebuddy/skills/foundry/SKILL.md",
-          "role": "熔铸司 v1.1.0：520 横向工具能力板块（jadx 26 工具全量接线 / 63 目录能力面 / 产出经 archive_out 落 520进化论）",
+          "role": "熔铸司 v1.1.0：520 横向工具能力板块（jadx 26 工具全量接线 / 63 目录能力面 W3 已 63/63 全量登记 / 产出经 archive_out 落 520进化论）",
           "entry": "scripts/foundry.py",
           "self_check": "python3 scripts/foundry.py selftest → 正向绿 / 反向全红",
           "version": "1.1.0"
