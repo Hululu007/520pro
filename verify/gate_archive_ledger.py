@@ -15,17 +15,40 @@ import json, os, re, sys, time, datetime
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(REPO, 'archive_ledger.json')
 SKILLS = ['probe-hub', 'space-hub', 'inspect-hub', 'tvbox-pipeline', 'learn-hub',
-          'artifact-store', 'machine-bootstrap']
+          'artifact-store', 'machine-bootstrap', 'foundry']
 SKILL_DIRS = {
     'probe-hub': os.path.join(REPO, '能力层/tvbox/skills/probe-hub'),
     'space-hub': os.path.join(REPO, '通用层/skills/space-hub'),
     'inspect-hub': os.path.join(REPO, '通用层/skills/inspect-hub'),
     'tvbox-pipeline': os.path.join(REPO, '能力层/tvbox/skills/tvbox-pipeline'),
 }
-for name in ['learn-hub', 'artifact-store', 'machine-bootstrap']:
+for name in ['learn-hub', 'artifact-store', 'machine-bootstrap', 'foundry']:
     SKILL_DIRS[name] = os.path.join(REPO, f'通用层/skills/{name}')
 
 WINDOW_DAYS = 3
+
+
+def _ver_token_in(blob, ver):
+    """版本完整 token 命中：防 1.1.0 子串误命中 1.1.01（病15 识别范围=对象范围）。"""
+    v = ver.replace('v', '')
+    return re.search(r'(?<!\d)' + re.escape(v) + r'(?!\d)', blob) is not None
+
+
+def _owned_hit(e, name, ver):
+    """归属判据（病15 第15例，2026-11-15 W4）：一条 ok 回执能否核销「本技能的本次 bump」。
+    原实现只判 `ver in json.dumps(e)`：foundry v1.1.0 会命中 artifact-store v1.1.0 的
+    他人回执，把没落库的 bump 假绿销掉（同病15 第13例的 message 全量版本号）。
+    正解=排他：版本 token 命中 **且 未署名其他技能**。两头都不伤——
+      · 强制「本技能署名」会误伤 space-hub v2.7.9 那种只在 note 写版本、无署名的补登回执；
+      · 只认版本会假绿。排他法以「有没有署名别人」划线，对象范围=「回执归属本 bump」。
+    """
+    if e.get('result') != 'ok':
+        return False
+    blob = json.dumps(e, ensure_ascii=False)
+    if not _ver_token_in(blob, ver):
+        return False
+    others = [s for s in SKILLS if s != name]
+    return not any(o in blob for o in others)
 
 
 def _recent_bumps(now=None):
@@ -115,7 +138,7 @@ def check(now=None):
     missing = []
     for name, ver, day in bumps:
         hit = [e for e in ok_rows
-               if (e.get('ts') or '')[:10] >= day and ver.replace('v', '') in json.dumps(e, ensure_ascii=False)]
+               if (e.get('ts') or '')[:10] >= day and _owned_hit(e, name, ver)]
         if not hit:
             missing.append((name, ver, day))
     if missing:
@@ -135,6 +158,36 @@ def selftest():
     已全量清偿，旧 bump 现在都有回执。反向必须对准**新主判据**（账本制）。）
     """
     import shutil, tempfile
+    # 归属判据正反（病15 第15例）：纯函数喂样本，不碰真文件。
+    print('── 归属判据 _owned_hit 正反（版本 token + 排他，防假绿/防误伤）──')
+    import copy
+    base = {'result': 'ok', 'ts': '2026-11-15T06:00:00',
+            'artifact': 'foundry_v1.1.0_产出.md', 'round': 'v1.1.0',
+            'event_ref': 'foundry v1.1.0 W4 落库', 'note': 'foundry 自己落库'}
+    cases = [
+        # (说明, 回执, 技能, 版本, 期望)
+        ('本技能署名+版本命中→核销', base, 'foundry', 'v1.1.0', True),
+        ('他人署名 artifact-store v1.1.0 不得核销 foundry（假绿反向）',
+         {'result': 'ok', 'ts': '2026-11-15T05:46:08', 'artifact': '瘦身司v1.1.0经验热冷分层.md',
+          'event_ref': 'artifact-store v1.1.0 bump（本提交）'}, 'foundry', 'v1.1.0', False),
+        ('无署名补登回执只写版本→仍核销（防误伤 space-hub v2.7.9 型）',
+         {'result': 'ok', 'ts': '2026-11-15T10:05:00', 'artifact': '版本演化台账记录 0.8.66',
+          'event_ref': 'VERSION=0.8.66 · batch3', 'note': '补回执（v2.7.9）'}, 'space-hub', 'v2.7.9', True),
+        ('版本 token 边界：1.1.0 不命中 1.1.01',
+         {'result': 'ok', 'ts': '2026-11-15T06:00:00', 'artifact': 'foundry_1.1.01.md',
+          'event_ref': 'foundry v1.1.01'}, 'foundry', 'v1.1.0', False),
+        ('result 非 ok 不核销', {**base, 'result': 'pending'}, 'foundry', 'v1.1.0', False),
+    ]
+    oh_pass = True
+    for label, e, nm, ver, want in cases:
+        got = _owned_hit(e, nm, ver)
+        if got != want:
+            oh_pass = False
+            print(f'  ✗ {label}: want={want} got={got}')
+    if not oh_pass:
+        print('  ✗ 归属判据正反失败，不许上线')
+        return 2
+    print(f'  ✓ 归属判据 {len(cases)} 例正反全过（含假绿反向 + 防误伤 + token 边界）')
     print('── 正向（真实状态）──')
     rc1 = check()
     print('── 反向（造违例：账本里塞一条 open 欠账 → 必红）──')

@@ -7,7 +7,7 @@
   "waived_until": "豁免期限 YYYY-MM-DD，到期自动转 open"
  },
  "version": "1.0.0",
- "updated": "2026-11-15",
+ "updated": "2026-11-16",
  "thresholds": {
   "red_age_commits": 3,
   "waive_max_days": 90
@@ -1354,6 +1354,23 @@
    "age_commits": 0,
    "first_seen": "2026-11-15",
    "closed_by": "批3-欠账清偿 adfc4c9 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-b5109eb-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "b5109eb",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "feat(hook): 在途后台任务跟踪机制（发即登记/完成自动销账/每轮可见）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 用户「不提醒就不知道完成没完成」——根因不是没通知而是没有跨回合自主跟踪：收口全押通知+靠 Next 锚点记忆，改法是在 state 建在途台账+完成通知自动销",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "archive 方法论_在途任务跨回合跟踪.md @b5109eb @ 2026-11-16",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
   },
