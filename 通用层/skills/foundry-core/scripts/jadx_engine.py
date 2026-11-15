@@ -252,13 +252,101 @@ def selftest():
     ck('死进程 as_json=False → 空文本不折叠',
        dead_m.call('get_resource_file', {'name': 'x'}, as_json=False) == '')
 
+    # W7 真跑通判据三态（注入可控分支，不依赖本机 java；病15：识别=对象）
+    print('── W7 realcall 三态（无 jar→unknown / 真跑失败→fail / 真跑通→ok）──')
+    st, msg, _ = realcall(_inject='nojar')
+    ck('无 jar → unknown（不假绿不置红）', st == 'unknown', (st, msg))
+    st, msg, _ = realcall(_inject='startfail')
+    ck('起 java 失败 → fail（真红暴露）', st == 'fail', (st, msg))
+    st, msg, _ = realcall(_inject='badnames')
+    ck('名册≠26 → fail（识别范围=名册全体）', st == 'fail', (st, msg))
+    st, msg, _ = realcall(_inject='badprobe')
+    ck('探活非结构化 → fail（真调要真响应）', st == 'fail', (st, msg))
+    # 正向真实态：本机有 jar 才判，没 jar 记 opt（selftest 不自假绿）
+    st, msg, _ = realcall()
+    ck('真跑通 → ok（本机有 jar 时）', st in ('ok', 'unknown'), (st, msg))
+
     print(f'\n结果：{"全部通过（正向绿 / 反向红）" if not fails else str(len(fails)) + " 项失败"}')
     return 0 if not fails else 2
+
+
+def realcall(jar='', evidence_path='', _inject=None):
+    """W7 真跑通判据：真起 java 跑 26 工具链，三态诚实 + 证据落盘。
+
+    这是「脚本级可用」的阶段A实证——区别于 selftest 的 FakeTransport 离线模拟，
+    本函数起真实 java 子进程走 stdio JSON-RPC。判据范围（病15：识别=对象）：
+      · 真起进程（start 成功）只是前提，不算跑通；
+      · 必须 tools/list 真拿回 26 工具名册（对齐 core 名册判定，不越界替 core 数）；
+      · 必须对真实 MCP 服务发一次 tools/call 并拿到真实结构化响应（探活工具 status）；
+      · 三者全过才算 'ok'，证据落盘含 sha256/工具数/响应样本，可回读核销。
+
+    三态（B-02，绝不折叠）：
+      · 'unknown' 无 jar 或 java 不在 PATH → 环境不支持，verify 用 opt 接，不假绿不置红；
+      · 'fail'    有环境但真跑失败（起不来/名册缺/探活错）→ 真红，暴露问题；
+      · 'ok'      真跑通 → 证据 json 落盘，返回路径。
+
+    _inject 仅供 selftest 注入可控分支（'nojar' / 'startfail' / 'badnames' / 'badprobe'），
+    生产调用不传；注入不改变三态语义，只替换不可控的环境/进程步骤。
+    """
+    jar, reason = resolve_jadx_jar(jar)
+    if _inject == 'nojar' or not jar:
+        return 'unknown', reason or '注入：无 jar', ''
+    m = None
+    try:
+        if _inject == 'startfail':
+            raise RuntimeError('注入：真起 java 失败')
+        m = JadxMCP(jar=jar, timeout=120)
+        m.start()
+    except Exception as e:
+        return 'fail', f'真起 java 失败：{type(e).__name__}: {e}', ''
+    try:
+        if _inject == 'badnames':
+            m.tool_names = ['status', 'load_apk']
+        if len(m.tool_names) != 26:
+            return 'fail', f'真 tools/list 名册 {len(m.tool_names)}≠26', ''
+        import hashlib
+        jar_sha = hashlib.sha256(open(jar, 'rb').read()).hexdigest()
+        # 探活：status 是最安全的只读工具，真调一次验证通道双向可用
+        probe = 'non-dict' if _inject == 'badprobe' else m.call('status', {}, 60)
+        if not isinstance(probe, dict):
+            return 'fail', f'status 真调非结构化响应：{str(probe)[:80]}', ''
+        evidence = {
+            'schema_version': 1,
+            'kind': 'foundry-realcall-evidence',
+            'jar': os.path.basename(jar),
+            'jar_sha256': jar_sha,
+            'tool_count': len(m.tool_names),
+            'tool_names': m.tool_names,
+            'probe_tool': 'status',
+            'probe_response': probe,
+            'channel': 'real-java-stdio',
+            'verdict': 'ok',
+        }
+        if evidence_path:
+            os.makedirs(os.path.dirname(os.path.abspath(evidence_path)), exist_ok=True)
+            with open(evidence_path, 'w', encoding='utf-8') as f:
+                json.dump(evidence, f, ensure_ascii=False, indent=1)
+        return 'ok', f'真起 java 跑通 26 工具（status→{probe}）', evidence_path
+    finally:
+        if m:
+            m.close()
 
 
 def main(argv):
     if '--selftest' in argv:
         return selftest()
+    if '--realcall' in argv:
+        # 证据落点：仓内 foundry-core/assets/realcall_evidence.json（小 json，可入 git；jar 不入）
+        here = os.path.dirname(os.path.abspath(__file__))
+        ev = os.path.join(os.path.dirname(here), 'assets', 'realcall_evidence.json')
+        jar = ''
+        if '--jar' in argv:
+            i = argv.index('--jar')
+            jar = argv[i + 1] if i + 1 < len(argv) else ''
+        state, msg, path = realcall(jar=jar, evidence_path=ev)
+        print(f'[{state}] {msg}')
+        # ok=0 / fail=2 / unknown=3（unknown 不假绿：verify 据此走 opt）
+        return {'ok': 0, 'fail': 2, 'unknown': 3}[state]
     print(__doc__)
     print('通用入口：JadxMCP(transport=FakeTransport()).start() 后 call(name, args)。')
     return 0

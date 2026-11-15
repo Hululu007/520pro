@@ -1,0 +1,41 @@
+{
+ "schema_version": 1,
+ "kind": "foundry-realcall-evidence",
+ "jar": "jadx-headless-mcp-0.7.1-all.jar",
+ "jar_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+ "tool_count": 26,
+ "tool_names": [
+  "status",
+  "load_apk",
+  "unload_apk",
+  "get_app_info",
+  "get_android_manifest",
+  "get_main_activity_class",
+  "list_classes",
+  "get_main_application_classes_names",
+  "get_class_source",
+  "get_class_summary",
+  "get_smali_of_class",
+  "get_fields_of_class",
+  "get_inner_classes",
+  "resolve_class",
+  "get_methods_of_class",
+  "get_method_by_name",
+  "get_method_body",
+  "get_method_smali",
+  "search_method_by_name",
+  "search_classes_by_keyword",
+  "get_xrefs_to_class",
+  "get_xrefs_to_method",
+  "get_xrefs_to_field",
+  "get_strings",
+  "list_resource_files",
+  "get_resource_file"
+ ],
+ "probe_tool": "status",
+ "probe_response": {
+  "state": "EMPTY"
+ },
+ "channel": "real-java-stdio",
+ "verdict": "ok"
+}

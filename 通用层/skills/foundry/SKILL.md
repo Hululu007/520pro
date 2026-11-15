@@ -35,6 +35,7 @@ allowed-tools: Read, Grep, Glob, Bash
 | `python3 scripts/foundry.py surface` | 列出 63 目录能力面清单（W3 全量登记）：目录名 + 文件/refs/脚本/章节计数 + 机检回读判定；真源 `foundry-core/scripts/capability_surface.json` |
 | `python3 scripts/foundry.py cap [id]` | W6 补码检索：无参列 63 域补码资产清单（落点/签名数/port 状态），带 id 回读某域一手落点（定位+计数+脚本签名）；真源 `foundry-core/assets/capability_63/` |
 | `python3 scripts/foundry.py selftest` | 正反向验证：骨架+转正 26/26+能力面 63/63+补码 port_ok 应绿、缺件/坏填法/洗绿/能力面多形态/补码事实造假（落点缺失/sha 失配/签名缺失）应红 |
+| `python3 foundry-core/scripts/jadx_engine.py --realcall` | **真跑通判据（W7）**：真起 jadx java 子进程走 stdio，核对 tools/list 26 名册 + status 真响应，证据落 `foundry-core/assets/realcall_evidence.json`。三态：0=真跑通 / 2=真跑失败 / 3=无 jar 或 java（verify 走 opt 无法判定）。区别于 selftest 的 FakeTransport 离线模拟 |
 
 ## 工作流
 
@@ -44,6 +45,7 @@ allowed-tools: Read, Grep, Glob, Bash
 3b. **补码（W6，用户拍板「全量转正·中性摆出」）**：一手真源从 `/tmp` 迁入 `foundry-core/assets/capability_63/`（63 域全量、脱离临时区），`cap [id]` 可回读。`ported=true` 由 `port_ok` 正向判据背书（资产落点 + 签名数 = n_exe + 真源 sha + 六维自洽），**不做任何价值分级/敏感判断/裁剪**——63 域一视同仁。注意：只迁结构化元数据（desc/positioning 摘要/脚本签名），不搬脚本正文与 mech/refs 全文；「补码落仓」指一手事实资产在册可检索，不等于 63 域脚本已在本地跑通。
 4. **产出**：解码结果、能力对照、判例文档经 `space_hub.archive_out(path, source=..., note=..., target=...)` 落库，回执写 `archive_ledger.json`；失败记 `local_pending(待归档)`，由 `products --retry` 补投，绝不把"没落库"说成"已归档"。
 5. **验证**：`selftest` 正反向通过才允许宣布该阶段完成；`bash verify.sh` 0✗/0⚠ 是阶段收口的硬判据。
+6. **真跑通（W7）**：`jadx_engine.py --realcall` 真起 java 实证 26 工具链（非 FakeTransport），有 jar 必须真跑通、证据落盘可回读；无 jar/java 走三态 `unknown`（verify opt，不假绿不置红）。这是「脚本级可用」的阶段A实证，与离线 selftest 分离，不互相替代。
 
 ## 三态与边界
 

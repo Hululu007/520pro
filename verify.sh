@@ -559,6 +559,25 @@ for _sp in "foundry-core/scripts/core.py|core.py --selftest（26 工具转正 + 
   fi
 done
 
+# ★ W7（v0.8.76 增量）：熔铸司 26 工具链「真跑通」判据——区别于上方 FakeTransport 离线 selftest。
+#   真起 jadx java 子进程走 stdio，核对 26 名册 + status 真响应，证据落盘可回读。
+#   三态按 rc 分：0=真跑通 ok / 3=无 jar 或 java（opt 无法判定，不假绿不置红）/ 2=真跑失败 no。
+#   换机/CI 无 jar 时走 opt，不阻断 verify；本机有 jar 必须真跑通，失败即红（病15 识别=对象）。
+echo
+echo "[熔铸司 26 工具链真跑通（W7 起·real-java-stdio 实证）]"
+_jx="$TARGET/通用层/skills/foundry-core/scripts/jadx_engine.py"
+if [ -f "$_jx" ]; then
+  _jd="$(dirname "$_jx")"
+  _ro=$( cd "$_jd" && timeout 120 python3 jadx_engine.py --realcall 2>&1 ); _rr=$?
+  case "$_rr" in
+    0) ok "  └ 真起 java 跑通 26 工具 + 证据落盘（$(printf '%s' "$_ro" | tail -1)）" ;;
+    3) opt "  └ 无法判定：$(printf '%s' "$_ro" | tail -1)" ;;
+    *) no "  └ 真跑失败：$(printf '%s' "$_ro" | tail -1)" ;;
+  esac
+else
+  no "  └ jadx_engine.py 缺失（真跑判据挂空）"
+fi
+
 # ★ v0.8.15（工程C）：技能契约机检——结构/头部/描述五组/版本三处/镜像 sha/样本集
 echo
 echo "[技能契约（v0.8.15 起·工程C：技能该长什么样是机器判据）]"
