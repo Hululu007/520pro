@@ -7,7 +7,7 @@
   "probe": "debt=该产未产写欠账 / advisory=只提示不记账（需语义判断）/ online=离线不可判记 unknown / derived=派生流不独立探测",
   "close_by": "核销：ledger 中 result=ok 且 target 以 folder 开头、ts>=commit 日期"
  },
- "version": "2.0.1",
+ "version": "2.0.2",
  "updated": "2026-11-15",
  "probe": {
   "window_commits": 40,
@@ -134,17 +134,19 @@
    "id": "F08",
    "kind": "folder",
    "folder": "🧬 520进化论/07-落地监测",
-   "source_event": "监测面变更（commit 同时含监测类与落库类词）",
+   "source_event": "监测面（M9-M12/巡检快照/面板）变更",
    "signal": {
     "type": "message",
     "all_of": [
      [
-      "监测",
-      "巡检",
       "M9",
       "M10",
       "M11",
-      "M12"
+      "M12",
+      "监测面",
+      "监测快照",
+      "巡检快照",
+      "七问七答"
      ],
      [
       "快照",
@@ -156,7 +158,8 @@
    },
    "producer": "巡检司监测快照",
    "action": "监测快照（七问七答）",
-   "probe": "debt"
+   "probe": "debt",
+   "note": "v2.0.2 收窄：原判据「提到落库」即命中，普通提交也误报（实测 10d0f35）"
   },
   {
    "id": "F09",

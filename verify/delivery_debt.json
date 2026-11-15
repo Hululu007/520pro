@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "c1489fe8f9e87b49626417ae3d36ff7dc3c51efd",
-  "last_scan_ts": "2026-11-15T10:20:03"
+  "last_sha": "10d0f35ffe66113b4b7ebb53145727d69980ffb2",
+  "last_scan_ts": "2026-11-15T10:24:32"
  },
  "debts": [
   {
@@ -679,6 +679,40 @@
    "closed_by": "批3-欠账清偿 f5973ae @ 2026-11-15",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-10d0f35-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "10d0f35",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.67 批3 探测器链：内容流从靠自觉变靠机器（可测信号+欠账负账本+探测器+每轮注入+账本制闸），清偿43条真实欠账",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 病15（第8例）落库核销判据用「同夹+同日」当凭据，把 01 夹自愈演示的旧回执算成 d8b5b6a 方法论欠账的还款——他人回执被当成自己的，账静默销掉；修法",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "批3-欠账清偿 10d0f35 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-10d0f35-F08",
+   "flow": "F08",
+   "folder": "🧬 520进化论/07-落地监测",
+   "commit": "10d0f35",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.67 批3 探测器链：内容流从靠自觉变靠机器（可测信号+欠账负账本+探测器+每轮注入+账本制闸），清偿43条真实欠账",
+   "expect": "监测快照（七问七答）",
+   "evidence": "message 命中 ['监测', '快照']",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "判据修正销账（非落库）",
+   "waived_until": "",
+   "note": "2026-11-15 误报：F08 判据原「提到落库即命中」，普通提交也命中；已收窄为需 M9-M12/监测面等具体词"
   },
   {
    "id": "D-adfc4c9-F03",

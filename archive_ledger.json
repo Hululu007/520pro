@@ -2091,6 +2091,17 @@
    "result": "ok",
    "event_ref": "VERSION=0.8.67 · commit 待定 · bash verify.sh rc=0",
    "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
+  },
+  {
+   "ts": "2026-11-15T10:24:32",
+   "round": "批3-欠账清偿 10d0f35",
+   "artifact": "方法论_核销判据必须能指回来源.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "0HRJXc7noxh9UJy7v1euyr",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 10d0f35",
+   "note": "销欠账 D-10d0f35-F02：核销判据必须指回来源"
   }
  ]
 }
