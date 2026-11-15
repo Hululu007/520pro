@@ -184,6 +184,35 @@ def save_json_atomic(path, data):
     os.replace(tmp, path)
 
 
+# ★ 扫描游标放本地，不放受管账本（v0.8.69 修）：
+#   游标是"这台机器扫到哪了"，不是账本事实。放 delivery_debt.json 里会形成一个必然的
+#   差一格闭环——每次提交后扫描把游标推到该提交，于是账本文件**永远**比 HEAD 落后一格，
+#   工作区永远脏一个文件，每轮都得多打一个"位点前移"的提交来收尾。
+#   挪到 .git/ 下（本就不入版本库）后：账本只记事实，游标只在本地，提交后工作区干净。
+#   迁移兼容：本地无游标时回退读账本里的旧 scan_state（老机器不会重复判历史）。
+STATE_LOCAL = os.path.join(REPO, '.git', 'delivery_probe_state.json')
+
+
+def _load_state(debt):
+    """读游标。只认 last_sha / last_scan_ts 两个键——账本里那份 scan_state 已改成说明文字，
+    整个 dict 拿来用会把说明文字当游标一起写回本地（首版就这么干了，本地文件里多出两行 doc）。"""
+    keys = ('last_sha', 'last_scan_ts')
+    try:
+        s = json.load(open(STATE_LOCAL, encoding='utf-8'))
+        if isinstance(s, dict) and s.get('last_sha'):
+            return {k: v for k, v in s.items() if k in keys}
+    except Exception:
+        pass
+    return {k: v for k, v in dict((debt or {}).get('scan_state') or {}).items() if k in keys}
+
+
+def _save_state(state):
+    try:
+        save_json_atomic(STATE_LOCAL, state)
+    except Exception as e:
+        print(f'  · [delivery-probe] 无法判定：游标写盘失败（{type(e).__name__}）——本轮不推进位点，下次会重判同一批 commit')
+
+
 def read_commits(limit=None, after_sha=None):
     """读 commit 列表（含 diff 路径与 VERSION 前后值）。after_sha 之后的所有 commit。
 
@@ -367,7 +396,7 @@ def scan(limit=None, quiet=False):
         return 0
     flows = cs.get('flows', [])
     ledger_rows = led.get('entries', []) if isinstance(led, dict) else led
-    state = debt.setdefault('scan_state', {})
+    state = _load_state(debt)
     after = state.get('last_sha') or None
     commits = read_commits(limit=limit or cs.get('probe', {}).get('window_commits', 40), after_sha=after)
 
@@ -419,8 +448,9 @@ def scan(limit=None, quiet=False):
     debt['debts'] = sorted(existing.values(), key=lambda x: (x.get('commit_date', ''), x['id']))
     if commits or just_closed or expired:   # 有变化才写盘（HEAD 未变时零扰动，不弄脏工作区）
         if commits:
-            debt['scan_state']['last_sha'] = commits[-1]['full']
-        debt['scan_state']['last_scan_ts'] = datetime.datetime.now().isoformat(timespec='seconds')
+            state['last_sha'] = commits[-1]['full']
+        state['last_scan_ts'] = datetime.datetime.now().isoformat(timespec='seconds')
+        _save_state(state)
         debt['updated'] = today
         save_json_atomic(DEBT, debt)
 

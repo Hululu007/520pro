@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "46f902f1418f7ba3ff8123500040e7e12cb42b1f",
-  "last_scan_ts": "2026-11-15T11:59:27"
+  "_moved": "v0.8.69 起扫描游标移出账本，存 .git/delivery_probe_state.json（本地、不入版本库）；本字段仅留作迁移回退，不再随扫描变动",
+  "_schema_was": "last_sha / last_scan_ts"
  },
  "debts": [
   {
