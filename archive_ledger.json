@@ -2102,6 +2102,17 @@
    "result": "ok",
    "event_ref": "commit 10d0f35",
    "note": "销欠账 D-10d0f35-F02：核销判据必须指回来源"
+  },
+  {
+   "ts": "2026-11-15T10:48:32",
+   "round": "批3-欠账清偿 6735a4b",
+   "artifact": "方法论_文本提及不等于发生.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "vbya0jzlhutRW5z2khAHNd",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 6735a4b",
+   "note": "销欠账 D-6735a4b-F02：文本提及≠发生"
   }
  ]
 }
