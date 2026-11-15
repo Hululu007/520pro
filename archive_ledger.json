@@ -2477,6 +2477,28 @@
    "result": "ok",
    "event_ref": "commit b5109eb",
    "note": "F02 方法论：在途任务跨回合跟踪（形态+修法+实例坐标）；commit b5109eb"
+  },
+  {
+   "ts": "2026-11-16T00:10:17",
+   "round": "archive 方法论_排他归属判据.md @b1b1430",
+   "artifact": "方法论_排他归属判据.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "R4ODDFJHt372DAGB0Rokxb",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit b1b1430",
+   "note": "foundry W4 方法论：排他归属判据消解版本号串味假绿（形态+修法+实例坐标）"
+  },
+  {
+   "ts": "2026-11-16T00:10:20",
+   "round": "archive 判例_病15第15例_gate假绿.md @b1b1430",
+   "artifact": "判例_病15第15例_gate假绿.md",
+   "target": "🧬 520进化论/05-复盘与判例",
+   "node_id": "WJvoWtW3jYblFOK3rIqmDD",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit b1b1430",
+   "note": "foundry W4 判例：病15第15例 gate bump 核销假绿，event_ref 指回 commit"
   }
  ]
 }

@@ -1721,6 +1721,40 @@
    "note": "豁免至 2026-12-31：经验闭环视图已落 520进化论/01-方法论（nodeId XzrKBhzFQAvt8xDHpmIev2），但 archive 回执落在 space_hub_state.json 未在 archive_ledger.json 对账，属回执账本未接通；本轮按 B-12 收敛手机指令同步，显式豁免留痕不洗绿，到期 2026-12-31 转 open 后走正门补回执",
    "waived_by": "agent",
    "waived_ts": "2026-11-15T23:50:48"
+  },
+  {
+   "id": "D-b1b1430-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "b1b1430",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(foundry): W4 产出接入 — gate SKILLS 盲区 + 病15第15例排他归属判据 + 五类产出正门落库",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 病15（第15次）：gate 核销判据用 ver in json.dumps(e) 全量版本号匹配，foundry v1.1.0 命中 artifact-sto",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "archive 方法论_排他归属判据.md @b1b1430 @ 2026-11-16",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-b1b1430-F06",
+   "flow": "F06",
+   "folder": "🧬 520进化论/05-复盘与判例",
+   "commit": "b1b1430",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(foundry): W4 产出接入 — gate SKILLS 盲区 + 病15第15例排他归属判据 + 五类产出正门落库",
+   "expect": "判例文档（含事件指针 event_ref）",
+   "evidence": "改动文件: docs/通病台账.md",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "archive 判例_病15第15例_gate假绿.md @b1b1430 @ 2026-11-16",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
   }
  ]
 }
