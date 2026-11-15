@@ -125,7 +125,77 @@ RULES = [
         'fix': '凭据放仓外（/tmp 或 ~/.config 下 0600）并进 .gitignore；'
                '仓内只留 .env.example / credentials.example',
     },
+    # B-11 硬化：前台长 sleep 是「等」本身，把回合挂死让用户插不进话（R-BG03 实测 41 次）。
+    # 判据用执行事实三要素（basename=sleep + 参数=秒数），不搜命令文本里的形容词。
+    {
+        'id': 'G7',
+        'why': '前台 sleep≥30s——「等」本身就是长任务，占死回合，用户插不进话（B-11 / R-BG03）',
+        'pat': None,  # 用 _long_sleep() 做数值判定，见下
+        'check': 'long_sleep',
+        'fix': '长任务走后台通道 + 完成通知；取后台输出一律非阻塞（结果到了再去），禁前台 sleep 等完成',
+    },
 ]
+# impl: B-11 S1  ← G7（前台长 sleep）/ G8（工具洪水，见 check_flood）
+
+
+# ── B-11/G7：前台长 sleep 的执行事实判定 ──
+# 只认「sleep 命令 + 秒数参数」这个执行事实，不认命令文本里有没有「等/长任务」这类形容词
+# （M-R120：判据必须是 basename+子命令+收窄参数；旧正则搜词一次没命中）。
+# 病15 防护：sleep 必须处于「命令起始位」（行首或 ; && | 之后），不认 echo/字符串/参数里的 sleep 串。
+# 首版只写 `(?<![\w.])sleep` 把 `echo sleep 240` / `grep "sleep 60"` 全误拦了——识别范围
+# （整条文本）≠对象范围（命令位置），判据必须锚定命令边界。
+SLEEP_SEC_RE = re.compile(r'(?:^|[;&|]\s*)\s*sleep\s+(\d+(?:\.\d+)?)([sm]?)\b')
+SLEEP_THRESHOLD_SEC = 30  # 与 B-11「超过 30 秒必须后台」同口径
+
+
+def _long_sleep(command):
+    """命中返回秒数（float），否则 None。只认命令起始位的 sleep；sleep 2/0.5 不拦，30/1m 拦。"""
+    for m in SLEEP_SEC_RE.finditer(str(command or '')):
+        sec = float(m.group(1))
+        if m.group(2) == 'm':
+            sec *= 60
+        if sec >= SLEEP_THRESHOLD_SEC:
+            return sec
+    return None
+
+
+# ── B-11/G8：工具洪水（单回合连续命令占满对话） ──
+# 有状态判定，不放进纯函数 check()（那条保持只读无副作用，测试全程调它）。
+FLOOD_STATE = os.path.join(os.path.expanduser('~'), '.codebuddy', 'hooks', '.efficiency_guard_state')
+FLOOD_WINDOW_SEC = 60      # 滑动窗口
+FLOOD_THRESHOLD = 50       # 60 秒内 >50 条 Bash 调用视为洪水（并行一批 8 条属正常，不误伤）
+
+
+def _read_flood():
+    try:
+        d = json.load(open(FLOOD_STATE, encoding='utf-8'))
+        return [t for t in d.get('ts', []) if isinstance(t, (int, float))]
+    except Exception:
+        return []
+
+
+def _write_flood(ts):
+    try:
+        os.makedirs(os.path.dirname(FLOOD_STATE), exist_ok=True)
+        tmp = FLOOD_STATE + '.tmp'
+        json.dump({'ts': ts[-FLOOD_THRESHOLD * 2:]}, open(tmp, 'w', encoding='utf-8'))
+        os.replace(tmp, FLOOD_STATE)
+    except Exception:
+        pass  # fail-open：state 坏不阻断干活
+
+
+def check_flood(now=None):
+    """记一次 Bash 调用并判是否洪水。命中返回规则 dict（G8），否则 None。纯纪律闸，不改命令。"""
+    t = float(now if now is not None else __import__('time').time())
+    recent = [x for x in _read_flood() if t - x <= FLOOD_WINDOW_SEC]
+    recent.append(t)
+    _write_flood(recent)
+    if len(recent) > FLOOD_THRESHOLD:
+        return {'id': 'G8', 'why': '短时间 Bash 调用过多（%d 条/%ds），回合被工具洪水占满，用户插不进话' %
+                (len(recent), FLOOD_WINDOW_SEC),
+                'fix': '单回合探查收敛到少数几条、落文字锚点即停；读仓库交给子代理；能并行的同一条消息并发',
+                'count': len(recent)}
+    return None
 
 
 # 写文件类规则的「规则体」，判据在 check_write()（要看路径，不是命令串）
@@ -179,6 +249,12 @@ def check(command):
     cmd = str(command)
     for r in RULES:
         if r.get('exempt') and re.search(r['exempt'], cmd):
+            continue
+        # 执行事实型判据（G7）：自定义函数返回命中细节，挂到规则上带出去
+        if r.get('check') == 'long_sleep':
+            sec = _long_sleep(cmd)
+            if sec is not None:
+                return dict(r, sec=sec)
             continue
         if r.get('pats'):
             if all(re.search(p, cmd) for p in r['pats']):

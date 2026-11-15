@@ -229,6 +229,12 @@ def main():
                                (_op[0].get('expect') or '')[:30]))
         except Exception:
             pass  # 欠账注入失败不影响主提醒
+        # 思考闸门（防阻塞+效率 S6 纪律层，2026-11-15）：把「简单化」做成每轮必注入的
+        # 三问，不靠模型临场自觉（M-R121：写进册子≠改掉行为）。挂在 UserPromptSubmit
+        # 这个必经点——任何一轮都过，模型侧 additionalContext 实测能进上下文。
+        msg += ('｜🧠 思考闸：①定性——要方案就零探查零施工直接出，要施工才动手；'
+                '②探查——要查仓库丢子代理，主会话不连发命令；'
+                '③收尾——后台非阻塞取（禁 block 等/禁轮询/禁前台 sleep），一目标收敛即停')
         # v0.8.64 方案v3 梯度③：交付落库提醒（520进化论·每轮必落库）——只提示不拦截，
         # 硬对账在 verify/gate_archive_ledger.py（梯度④），提醒与闸分层。
         import os as _os
@@ -314,6 +320,11 @@ def main():
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import guard_cmd
         _hit = guard_cmd.check(command)
+        # B-11/G8 工具洪水计数（只 stats 留痕；超阈值才 deny，正常一批<50 条不误伤）
+        if not _hit:
+            _flood = guard_cmd.check_flood()
+            if _flood:
+                _hit = _flood
         if _hit:
             probe['via'] += '+guard:' + _hit['id']
             _save(d, probe, hit=True)                   # 同上：拦下来就是命中了

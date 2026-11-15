@@ -13,6 +13,7 @@
 """
 import hashlib
 import importlib.util
+import json
 import os
 import re
 import sys
@@ -103,6 +104,12 @@ open(mp, 'w', encoding='utf-8').write(mut)
 Gm = load(mp)
 check('规则清空后强推溜过', Gm.check('git push origin main --force') is None)
 check('规则清空后 --no-verify 溜过', Gm.check(f'git commit {NV}') is None)
+# G7 元变异：数值判定函数失效后，前台长 sleep 必须溜过（自证判据真在守）
+mut2 = re.sub(r'def _long_sleep\(command\):.*?(?=\n\n\n#)', 'def _long_sleep(command):\n    return None', src, flags=re.S)
+mp2 = os.path.join(td, 'guard_nosleep.py')
+open(mp2, 'w', encoding='utf-8').write(mut2)
+Gm2 = load(mp2)
+check('数值判定失效后 sleep 240 溜过（G7 非假绿）', Gm2.check('sleep 240') is None)
 
 # ── ⑥ G4 双核保护（B-16：删/移 probe-hub、tvbox-core 必须拦）──
 # 名字同样运行时拼接，避免本文件被自己扫成违例样本
@@ -161,6 +168,48 @@ g5_pass = [
 for cmd, why in g5_pass:
     h = G.check(cmd)
     check(f'G5 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
+
+# ── ⑧ B-11/G7 前台长 sleep：执行事实判定（basename+秒数），正反样本抄真实教训 ──
+g7_hit = [
+    ('sleep 30', '阈值边界（含等号）'),
+    ('sleep 240', 'R-BG03 实测最长 240s 的前台 sleep'),
+    ('sleep 1m', '分钟单位换算成 60s'),
+    ('sleep 120 && echo done', '带后续命令仍命中'),
+]
+for cmd, why in g7_hit:
+    h = G.check(cmd)
+    check(f'G7 拦下：{why}', h is not None and h['id'] == 'G7',
+          f'实际={h["id"] if h else "放行"}')
+
+g7_pass = [
+    ('sleep 1', '短 sleep 属正常（探活/节流）'),
+    ('sleep 0.5', '亚秒级不拦'),
+    ('echo sleep 240', '命令文本里出现 sleep 串但不是 sleep 命令——判据必须看执行事实'),
+    ('grep -rn "sleep 60" hooks/', '搜索文本含 sleep，不拦'),
+    ('git log --oneline -1', '无关命令'),
+]
+for cmd, why in g7_pass:
+    h = G.check(cmd)
+    check(f'G7 放行：{why}', h is None, f'误拦={h["id"] if h else ""}')
+
+# ── ⑨ B-11/G8 工具洪水：滑动窗口计数，抄真实「41 次 sleep / 工具洪水占满回合」 ──
+G.FLOOD_STATE = os.path.join(tempfile.mkdtemp(), 'flood_state.json')  # 测试隔离，不污染真 state
+json.dump({'ts': []}, open(G.FLOOD_STATE, 'w'))  # 真清空，不靠 check_flood 记一条来"清"
+base = 1000.0
+for i in range(G.FLOOD_THRESHOLD):
+    h = G.check_flood(now=base + i + 1)
+check('G8 阈值内放行（正常一批请求）', h is None, f'误拦={h}')
+h = G.check_flood(now=base + G.FLOOD_THRESHOLD + 1)
+check('G8 超阈值命中（工具洪水）', h is not None and h['id'] == 'G8', f'实际={h}')
+h2 = G.check_flood(now=base + G.FLOOD_WINDOW_SEC + G.FLOOD_THRESHOLD + 5)
+check('G8 窗口外计数滑出后放行', h2 is None, f'误拦={h2}')
+
+# ── 思考闸门：UserPromptSubmit 必须注入三问（写进册子≠改行为，靠必经点注入） ──
+na_src = open(os.path.join(SCRIPTS, 'next_anchor.py'), encoding='utf-8').read()
+check('思考闸门注入：定性一问', '定性' in na_src and '零探查' in na_src)
+check('思考闸门注入：探查走子代理一问', '子代理' in na_src and '主会话不连发' in na_src)
+check('思考闸门注入：收尾非阻塞一问', '禁 block' in na_src and '禁轮询' in na_src)
+check('G8 洪水闸接进 next_anchor 执行路径', 'check_flood' in na_src)
 
 g6_hit = [os.path.join(ROOT, '.env'),
           os.path.join(ROOT, 'deploy', 'server.pem'),

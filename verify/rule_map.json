@@ -166,8 +166,8 @@
   "B-11": {
    "verify_id": "V-MANUAL-11",
    "kind": "manual",
-   "how": "回看长任务：是否走了后台通道并有落盘日志；宣布其结果前是否拿到退出码+日志尾部。给不出就是「还在跑」，不是「完成」。",
-   "strength": {},
+   "how": "回看长任务：是否走了后台通道并有落盘日志；取输出是否非阻塞（禁 block 等/禁轮询/禁前台 sleep，结果到了再去）；宣布其结果前是否拿到退出码+日志尾部。给不出就是「还在跑」，不是「完成」。执行层闸见 hooks/guard_cmd.py 的 G7/G8（PreToolUse·Bash）与 next_anchor.py 思考闸门（UserPromptSubmit）。",
+   "strength": {"S1": "hooks/guard_cmd.py"},
    "impl": [],
    "proven_by": {
     "cmd": "",
