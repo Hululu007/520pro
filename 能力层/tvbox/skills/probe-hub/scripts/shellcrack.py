@@ -258,6 +258,148 @@ def play_sets_shows(ps):
     return shows, urls
 
 
+# ═══════════════════════════════════════════════════════════════════
+# 第 7 条金律：播放页二次解析（S231 L1215-1244 移植，bdb 46 源实测扩宽）
+#
+# 原文只给三条正则 + 一个 JSON 分支。拿 bdb 包 47 个真实 py 源做样本后发现不够用，
+# 差异不是猜的，逐条有出处：
+#
+#   ① **JSON 字段名两种模板**：原文取 `d.get("url")`，但苹果CMS v10 标准模板
+#      `player_aaaa` 的字段是 `link` / `link_next`（bdb 内 `player_aaaa=` 10 处，
+#      歪比影视另用 `.url`）——只认 url 对标准模板**恒失败**，且失败得毫无声响。
+#   ② **值可以是字符串不是 JSON**：`var player_aaaa='https://…m3u8'`（bdb 3 处），
+#      原文的 `\{[\s\S]*?\}` 直接认不出。
+#   ③ **裸赋值形态**：`const url = "…"` / `url: "…"`（6v.py `_find_media` 四条正则里占两条）。
+#   ④ **iframe 套壳要下钻**：6v.py 的做法是「本页找不到 → 跟 iframe 再找一遍」，
+#      原文只在一层页面里找，而播放页是 iframe 壳的站点极多。
+#   ⑤ **网盘直链不该解析**：magnet:/夸克/百度/迅雷/阿里/123/189/139（6v.py 有现成识别）
+#      是「本来就直接交给壳」的集，属于**前置分流**而不是解析失败。
+#
+# 判据顺序（前一层出结果即停）：NETDISK → L1 JSON → L2 字符串变量 → L3 JSON 字段
+#   → L4 裸赋值 → L5 source:'' → L6 裸地址 → iframe 下钻 → parse:1 交壳嗅探
+# ═══════════════════════════════════════════════════════════════════
+
+_MEDIA = r'\.(?:m3u8|mp4|flv|mkv|ts)'
+_NETDISK_HOSTS = ('pan.quark.cn', 'pan.baidu.com', 'xunlei.com', 'aliyundrive.com',
+                  'alipan.com', 'cloud.189.cn', 'yun.139.com', '123pan.com')
+_ENT = (('&amp;', '&'), ('&quot;', '"'), ('&#39;', "'"), ('&lt;', '<'), ('&gt;', '>'))
+
+
+def _clean_url(u):
+    """统一清洗：HTML 实体 → 反斜杠转义。三种真实世界都会出现，漏一种就整条失效。"""
+    u = (u or '').strip()
+    for a, b in _ENT:
+        u = u.replace(a, b)
+    return u.replace('\\/', '/').replace('\\u002F', '/').replace('\\u002f', '/')
+
+
+def _is_netdisk(u):
+    low = (u or '').lower()
+    return low.startswith('magnet:') or any(h in low for h in _NETDISK_HOSTS)
+
+
+def _resolve_once(html, page):
+    """单页解析，返回 (层名, 绝对URL)；全不命中返回 ('', '')。纯函数、不联网。"""
+    html = html or ''
+
+    # 前置：网盘直链——这类集本来就直接交给壳，不是「解析不出来」
+    m = re.search(r'magnet:\?[^\s"\'<>]+', html, re.I)
+    if m:
+        return 'NETDISK magnet', m.group(0)
+    m = re.search(r'https?://[^\s"\'<>]*(?:%s)[^\s"\'<>]*'
+                  % '|'.join(re.escape(h) for h in _NETDISK_HOSTS), html, re.I)
+    if m:
+        return 'NETDISK 网盘', _clean_url(m.group(0))
+
+    # L1 `player_xxx = {...}` JSON：字段名 url / link / url_next / link_next / src 全认
+    for pat in (r'player_[A-Za-z]*\s*=\s*(\{[\s\S]*?\})\s*;?\s*</script>',
+                r'player_[A-Za-z]*\s*=\s*(\{[\s\S]{16,}?\})'):
+        m = re.search(pat, html, re.I)
+        if not m:
+            continue
+        try:
+            d = json.loads(m.group(1))
+        except Exception:
+            continue                       # 括号截错/转义怪，退下一层，不抛
+        if isinstance(d, dict):
+            for k in ('url', 'link', 'url_next', 'link_next', 'src'):
+                v = d.get(k)
+                if isinstance(v, str) and re.search(_MEDIA, v, re.I):
+                    return 'L1 player JSON(%s)' % k, _clean_url(v)
+
+    # L2 `player_xxx = '…'`（值不是 JSON 而是字符串；原文认不出）
+    m = re.search(r'player_[A-Za-z]*\s*=\s*[\'"]([^\'"]+%s[^\'"]*)[\'"]' % _MEDIA, html, re.I)
+    if m:
+        return 'L2 player 字符串', _clean_url(m.group(1))
+
+    # L3~L6 依次尝试；同一套取值/清洗/补全逻辑走一张表，避免各层写法漂移
+    for name, pat in (
+            ('L3 JSON 字段', r'["\'](?:url|link|src)["\']\s*:\s*["\']([^"\']+%s[^"\']*)["\']' % _MEDIA),
+            ('L4 裸赋值', r'(?:const\s+\w+\s*=\s*|url\s*[:=]\s*)["\']([^"\']+%s[^"\']*)["\']' % _MEDIA),
+            ('L5 source', r'source\s*:\s*[\'"]([^\'"]+%s[^\'"]*)[\'"]' % _MEDIA),
+            ('L6 裸地址', r'(https?:[^\s"\'<>\\]+%s[^\s"\'<>]*)' % _MEDIA),
+    ):
+        m = re.search(pat, html, re.I)
+        if m:
+            return name, _clean_url(m.group(1))
+    return '', ''
+
+
+def iframe_targets(html, page):
+    """页面里的 iframe 地址（绝对化、去重、保持出现顺序）。"""
+    out = []
+    for src in re.findall(r'<iframe[^>]+src\s*=\s*["\']([^"\']+)["\']', html or '', re.I):
+        u = urljoin(page, src)
+        if u not in out:
+            out.append(u)
+    return out
+
+
+def resolve_play_page(html, page, *, fetch=None, depth=1):
+    """播放页 → 真实播放地址。返回 {'layer','url','parse','trace'}。
+
+    parse=0 表示拿到了可直放地址；parse=1 表示交给壳嗅探（原文行为：**不硬凑**）。
+    depth 控制 iframe 下钻层数（实测一层最有用；两层以上收益低且容易绕进广告页）。
+    fetch 可注入，离线自检用假函数，避免「单测绕开真实链路」。
+    """
+    trace = []
+    cur_html, cur_page = html, page
+    for level in range(depth + 1):
+        layer, u = _resolve_once(cur_html, cur_page)
+        if u:
+            if not u.startswith(('http://', 'https://', 'magnet:')):
+                u = urljoin(cur_page, u)      # 相对地址播放器直接哑，必须补全
+            trace.append(f'L{level} {layer}')
+            return {'layer': layer, 'url': u, 'parse': 0, 'trace': trace}
+        trace.append(f'L{level} 未命中')
+        if level >= depth or fetch is None:
+            break
+        frames = iframe_targets(cur_html, cur_page)
+        if not frames:
+            break
+        trace.append(f'L{level} 下钻 iframe（{len(frames)} 个候选）')
+        nxt = None
+        for fr in frames:
+            try:
+                h2 = fetch(fr)
+            except Exception as e:
+                trace.append(f'  取 {fr[:60]} 失败：{type(e).__name__}')
+                continue
+            lay2, u2 = _resolve_once(h2, fr)
+            if u2:
+                nxt = (h2, fr, lay2, u2)
+                break
+        if not nxt:
+            trace.append('  下钻后仍未命中')
+            break
+        layer, u = nxt[2], nxt[3]
+        if not u.startswith(('http://', 'https://', 'magnet:')):
+            u = urljoin(nxt[1], u)
+        trace.append(f'L{level + 1} {layer}（经 iframe）')
+        return {'layer': layer + '（经 iframe）', 'url': u, 'parse': 0, 'trace': trace}
+    return {'layer': '', 'url': page, 'parse': 1, 'trace': trace}
+
+
 def triage(name, api):
     """形态分诊：ac=detail 取中间一片，判 直链站 / 壳 / API死。返回 (形态, 详情dict)。"""
     try:
@@ -585,6 +727,75 @@ def selftest():
     # shows/urls 转换对齐 TVBox 结构
     shows, urls = play_sets_shows(r)
     chk('playsets→shows/urls 结构', shows == ['线路1'] and len(urls) == 1, f'{shows} {urls}')
+
+    # ── 第 7 条金律：播放页二次解析（bdb 46 源实测形态）──
+    # ⚠ 每条用例都断言**层名**，不能只看 url：低层兜底会把 url 补出来，
+    #   于是「测 L1」实际测成了「测 L6」，反向摘掉 L1 也不红（本条自检第一版就栽在这）。
+    # ① 苹果CMS 标准模板字段是 link/link_next，原文只取 url → 对标准模板恒失败
+    h = ('<script>var player_aaaa={"flag":"play","encrypt":0,"trysee":0,"points":0,'
+         '"link":"https:\\/\\/cdn.ex.com\\/a\\/index.m3u8","link_next":"",'
+         '"server":"no","note":""}</script>')
+    r7 = resolve_play_page(h, page)
+    chk('金律①：L1 层认出苹果CMS link 字段（原文只认 url，此处必红）',
+        r7['layer'].startswith('L1') and r7['url'] == 'https://cdn.ex.com/a/index.m3u8', str(r7))
+    chk('金律①：\\/ 转义被还原', '\\' not in r7['url'], r7['url'])
+
+    # ② 另一种模板用 url 字段
+    r7 = resolve_play_page('<script>var player_aaaa={"url":"https://cdn.ex.com/b.m3u8"}'
+                           '</script>', page)
+    chk('金律②：L1 层认 url 字段模板',
+        r7['layer'].startswith('L1') and r7['url'] == 'https://cdn.ex.com/b.m3u8', str(r7))
+
+    # ③ 值不是 JSON 而是字符串（bdb 3 处 var player_aaaa='...'）
+    r7 = resolve_play_page("<script>var player_aaaa='https://cdn.ex.com/c.m3u8'</script>", page)
+    chk('金律③：L2 层认出字符串变量（原文的 \\{…\\} 认不出）',
+        r7['layer'].startswith('L2') and r7['url'] == 'https://cdn.ex.com/c.m3u8', str(r7))
+
+    # ④ 无 player_ 前缀的 JSON 字段 / 裸赋值 / source / 裸地址
+    r7 = resolve_play_page('{"url":"https://cdn.ex.com/d.m3u8"}', page)
+    chk('金律④：L3 层认 JSON 字段',
+        r7['layer'].startswith('L3') and r7['url'] == 'https://cdn.ex.com/d.m3u8', str(r7))
+    r7 = resolve_play_page('const url = "https://cdn.ex.com/e.m3u8"', page)
+    chk('金律⑤：L4 层认 const url 裸赋值',
+        r7['layer'].startswith('L4') and r7['url'] == 'https://cdn.ex.com/e.m3u8', str(r7))
+    r7 = resolve_play_page("var c = {source:'https://cdn.ex.com/f.m3u8'}", page)
+    chk('金律⑥：L5 层认 source:\'…\'',
+        r7['layer'].startswith('L5') and r7['url'] == 'https://cdn.ex.com/f.m3u8', str(r7))
+    r7 = resolve_play_page('点此播放 https://cdn.ex.com/g.m3u8 谢谢', page)
+    chk('金律⑦：L6 层裸地址兜底',
+        r7['layer'].startswith('L6') and r7['url'] == 'https://cdn.ex.com/g.m3u8', str(r7))
+
+    # ⑤ 相对地址补全 + HTML 实体还原
+    chk('金律⑧：相对地址补全为绝对',
+        resolve_play_page('{"link":"/vod/h.m3u8"}', page)['url']
+        == 'https://v.example.com/vod/h.m3u8')
+    chk('金律⑨：&amp; 实体还原',
+        resolve_play_page('{"url":"https://c.ex.com/i.m3u8?a=1&amp;b=2"}', page)['url']
+        == 'https://c.ex.com/i.m3u8?a=1&b=2')
+
+    # ⑥ 网盘直链是前置分流，不是解析失败
+    r7 = resolve_play_page('<a href="magnet:?xt=urn:btih:ABC">下载</a>', page)
+    chk('金律⑩：magnet 前置识别（parse=0 不硬凑）',
+        r7['parse'] == 0 and r7['url'].startswith('magnet:'), str(r7))
+    r7 = resolve_play_page('<a href="https://pan.quark.cn/s/abcd">夸克</a>', page)
+    chk('金律⑪：网盘域名前置识别', 'NETDISK' in r7['layer'], str(r7))
+
+    # ⑦ iframe 下钻（6v.py 的两次尝试；fetch 注入，不联网）
+    r7 = resolve_play_page('<iframe src="/frame/1.html"></iframe>', page,
+                           fetch=lambda u: '<script>var player_aaaa='
+                                           '{"link":"https://cdn.ex.com/j.m3u8"}</script>', depth=1)
+    chk('金律⑫：iframe 下钻命中', r7['parse'] == 0 and 'j.m3u8' in r7['url'], str(r7))
+    chk('金律⑬：下钻过程写进 trace（不静默）',
+        any('下钻' in t for t in r7['trace']), str(r7['trace']))
+    r7 = resolve_play_page('<iframe src="/frame/2.html"></iframe>', page,
+                           fetch=lambda u: '<p>页面里什么都没有</p>', depth=1)
+    chk('金律⑭：下钻失败退 parse:1', r7['parse'] == 1, str(r7))
+
+    # ⑧ 全失败：交壳嗅探，且 url 保持原页（不硬凑一个假地址）
+    r7 = resolve_play_page('<p>本站暂无播放</p>', page)
+    chk('金律⑮：全失败 parse:1 且 url 为原页',
+        r7['parse'] == 1 and r7['url'] == page, str(r7))
+    chk('金律⑯：失败也留 trace', bool(r7['trace']), str(r7['trace']))
 
     print()
     if fails:

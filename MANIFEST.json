@@ -1,6 +1,6 @@
 {
  "ecosystem": "520pro",
- "version": "0.8.69",
+ "version": "0.8.70",
  "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
  "based_on": [
   "WorkBuddy 平台运行时",
@@ -106,8 +106,8 @@
      ],
      "entry": "scripts/probe.py",
      "critical": "单独安装必报 ModuleNotFoundError: No module named 'core'",
-     "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack}.py · repair/ · forgekit/ · verify/ · references/",
-     "version": "1.28.6"
+     "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack,atomicio,pushconfig,imgproxy}.py · repair/ · forgekit/ · verify/ · references/",
+     "version": "1.28.7"
     },
     "tvbox/skills/tvbox-pipeline/": {
      "user_install": "~/.codebuddy/skills/tvbox-pipeline/",
@@ -549,5 +549,6 @@
  "changelog_0_8_59": "gate_scan 增两道闸：hook-registered（install.sh 声明的「脚本→事件」与 settings.json 实况对账，补病13「写了没挂」）、case-count（测试例数必须 N[0] 自增，压病12 复发）；4 个测试文件同步改为自增，暴露真实例数 25/13/38/20",
  "changelog_0_8_60": "B-05 硬化：guard_cmd 增 G5（add 凭据名）/G6（Write/Edit 到仓内凭据路径），next_anchor 加 matcher=Write|Edit 第二条注册；补 .gitignore 与 secret_scan.CRED_NAMES 的 .env 缺口（批量 add 拦不住的那条）；矩阵 B-05 改 S1 已落地",
  "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）",
- "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账"
+ "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账",
+ "changelog_0_8_70": "S231 六层全落地：通道三件代码化（atomicio 原子写+内容不变不重写／pushconfig FongMi 推送三态端口／imgproxy wsrv.nl 图代理默认 dry-run）；第 7 条金律升判据（bdb 46 个真实 py 源实测出 5 处原文缺口，最刺眼是苹果CMS player_aaaa 字段是 link 不是 url，原文对标准模板恒失败且无声）；bdb 包立项 S232（第二种写源范式：JSON 模板 DSL，与 S231 代码生成并行；但仓内铁律 §3.12③ 明写不做配置驱动自动生成源，故吸收方向是「认形态判路线」的侦察而非施工）；订正 S231 过期标注（六层总账原全标待移植而代码早已落地）；修三个真缺陷（金律用例只断言 url 致摘层级也不红→改断言层名／imgproxy 三态折叠把「没这行」与「读不了」混成一个 None／install.sh 引号提前闭合致 search_results.json 被当命令执行、每次覆盖安装丢一次搜索候选）；SKILL.md 40.8→39.96KB 消掉长期 C7 WARN"
 }

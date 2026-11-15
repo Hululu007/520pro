@@ -280,12 +280,17 @@ if [ -d "$SK/probe-hub/repair" ]; then
 else
   no "repair/ 修源模块缺失（探源司自愈能力不可用）"
 fi
-# ★S231 四项移植的离线自检（不联网）——**判据必须在执行路径上**：
+# ★S231 六层资产 + 通道三件的离线自检（不联网）——**判据必须在执行路径上**：
 #   只写 selftest 不接电 = 判据挂空（病「判据不在执行路径」的形态）。
 #   正向：装了且全过；反向：selftest 缺失/失败即 ✗，不折叠成 opt。
+#   通道三件（atomicio/pushconfig/imgproxy）原先只是 S231 文档里的「常备资产」，无实现，
+#   2026-11-15 补成可执行正门后一并在电。
 for spec in "livecheck:scripts/livecheck.py:--selftest（TLS指纹段+语义测活）" \
             "recon:repair/recon.py:--selftest（sniff聚类+五层正则）" \
-            "shellcrack:scripts/shellcrack.py:--selftest（6层播放集兜底）"; do
+            "shellcrack:scripts/shellcrack.py:--selftest（6层播放集兜底+第7条金律）" \
+            "atomicio:scripts/atomicio.py:--selftest（原子写+内容不变不重写）" \
+            "pushconfig:scripts/pushconfig.py:--selftest（FongMi 本地推送·假Proxy）" \
+            "imgproxy:scripts/imgproxy.py:--selftest（wsrv.nl 图代理开关）"; do
   name="${spec%%:*}"; rest="${spec#*:}"; rel="${rest%%:*}"; label="${rest##*:}"
   if [ -f "$SK/probe-hub/$rel" ]; then
     if out=$( cd "$SK/probe-hub/$(dirname "$rel")" && timeout 90 python3 "$(basename "$rel")" --selftest 2>&1 ); then

@@ -1,7 +1,7 @@
 ---
 name: probe-hub
 description: "当用户说「作者仓库还在吗」「找源」「采集线路」「这个源好没好」「修源」「AI项目监测」时使用本技能。探源司·TVBox 上游侦察（可升级·规则54三件套）。能力：①监测上游仓库动态（存活/内容变更/新增文件/活跃度；类目=TVBox上游/AI项目）；②搜更多有效仓库（多平台→rank→verify）；③采线路（sites/lives/parses→测活→去伪→入库）；④GitHub 凭据与配额；⑤多平台适配（GitHub/GitLab/Gitee/工蜂）；⑥类目判据复用整包坊 classify_line；⑦活跃度预测；⑧search 三态取数+合并写；⑨--dry 演示；⑩候选上云；⑪真实测活（点播真拉 vod_play_url / 直播真拉分片，非仅 HTTP 码）；⑫promote 写成品源库 DB_PROD；⑬prune 作者原包 SOP；⑭lightjson 全类型轻量 json；⑮采料去向锚定 D 包；⑯单文件容器 `pak`（S171）；网盘取料 `pan` 已于 2026-11-12 迁至 learn-hub（与 TVBox 无关）；⑰壳源侦察与抠链 `shellcrack`（S196）。★写源 `forge`：`verify <源.py> [--save]` 过验才留档（没验过不许进）、`list` 盘点，见 §3.12；写源四门禁 `gate`（能播放/稳定兜底/内容齐全/精简体积，S223）、模板库内联 `hook`（flags/线路分组/封面/AES兜底打进单文件，S225），见 §3.12.2。★写源自验 `livecheck --spider` 逐接口 5 步真跑，坏源判失败、域名挂判无法判定；`livecheck` 单条/批量输出带死因分型（S221）。★修源 `repair`：死因七型→五路由（换域/接口改道/小补/整站重写/复验），checkup/route/drafts/apply/repair/recon/rewrite 七动作，**没验过不许说修好**，见 §3.17。★广告治理 `hls_clean`：61 域名黑名单 + Allow→Block→启发式三段判定，`quality` 的广告判定已委托它（S225），见 §3.11。★破甲 `decrypt`。★AES 兜底 `scripts/_aes_fallback.py`：羊壳无 pycryptodome 时的纯 Python 解密（`--decrypt`），`--crosscheck` 与 forgekit 对账防漂移，见 §3.12.3。 【边界】手上没源/没仓库要去上游找 → 本技能；已有接口 URL 要加工入库 → tvbox-pipeline；要判断某条源该不该拉黑 → tvbox-core 的拉黑判据。本技能亦承接源库查询：这批线路存哪个库 / 这条源能在哪些包用 / 数据源总库什么状况。 触发词：线路存哪个库 / 这条源能在哪些包用 / 存进源库 / 数据源总库 / 扫一遍底包 / 数据源状况 / 哪个底包能加更多线路 / 哪种线路能进我的包 / 给D包换路线 / 线路失效了点不开 / 某个线路转圈 / 还有哪些站能用 / 这个接口还能用吗 / 这批源帮我验一遍 / 作者仓库还在吗 / 他又更新了什么 / 有没有新的源 / 我的库不够用了 / 这个站能不能做成源 / 帮我写个源 / 这个源好没好 / 复现一下之前的采集 / 上游仓库 / 作者仓库 / 原作者 / 跑路 / 被封 / 删库 / 仓库监测 / 找仓库 / 找源 / 搜索源 / 采集线路 / 采集源 / 扩充库容量 / 探源 /  真实测活 / 成品源库 / 剔除失效 / py线路源 / 换路线 / D包 / 新源 / 上游仓库监测 / 找点播源 / 找直播源 / 扩库容 / 新线路 / 合格线路源 / 监测仓库 / 仓库动态 / 上游侦察 / 剔除失效线路 / 直链轻量版 / 原仓库转json / DmaxPro / 播放页壳 / 壳源 / 抠链 / 抠直链 / 壳库 / 从别的站找壳 / 修源 / 源失效了怎么修 / 这个源为什么挂了 / 死因 / 死因分型 / 广告分片 / 广告太多 / HLS 净化 / 写源四门禁 / 模板内联。正门：scripts/probe.py（55 个子命令：monitor/search/harvest/forge/repair/decrypt/shellcrack/hls_clean/quality）；测活走 scripts/livecheck.py（含 --spider 源自验）。"
-version: "1.28.6"
+version: "1.28.7"
 allowed-tools: Read,Grep,Glob,Bash,Write,Edit,Skill
 ---
 
@@ -31,11 +31,9 @@ allowed-tools: Read,Grep,Glob,Bash,Write,Edit,Skill
 
 **核心命题**：用户原话——"我底包库 json 是根据作者原仓库改过来的，只有我知道作者仓库现状，才能做出相应调整"。本技能把"作者仓库现状"从**人脑记忆**变成**可查、可比、可告警的基线**。
 
-> **★ 采料去向（业务链·S085·三系口径 1025）**：采集到的 http(s) 直链天然归**直链系**——
-> 全 `type=1` 直链、零 jar 零 spider，稳、跨壳通用，代价是直链会失效。
-> 调用链 `harvest scan/pull` → `livecheck` → `harvest promote` → **直链系线路池** → 用户按三系给任何直链型配置换路线。
-> （「D 包/DmaxPro908」自 1025 起为**历史别名**，语义指向直链系。）
-> 完整说明与硬约束见 §3.9 / [`references/S109_采料去向与D包换路线.md`](references/S109_采料去向与D包换路线.md)。
+> **★ 采料去向（业务链·S085·三系口径 1025）**：http(s) 直链天然归**直链系**——全 `type=1`、零 jar 零 spider，
+> 稳、跨壳通用，代价是直链会失效。调用链 `harvest scan/pull` → `livecheck` → `harvest promote` → 直链系线路池。
+> （「D 包/DmaxPro908」自 1025 起为历史别名。）详见 §3.9。
 
 
 ## 2. 触发词
@@ -50,9 +48,8 @@ allowed-tools: Read,Grep,Glob,Bash,Write,Edit,Skill
 
 ### 2.1 ★ 铁律：不许看见脚本就直接跑（S148·M-R104）
 
-**病根（S148 实测）**：一次长会话 12884 次工具调用里 `Skill` 只被调用 **3 次**，探源司 **0 次**。
-后果不是"慢"，是 **SKILL.md 的流程约束根本没被读**——§3.7 分类空壳坑、§3.5.1 黑名单三铁律、
-M-R60 三态，全靠"碰巧记得"才遵守，**不是被技能强制的**。
+**病根（S148 实测）**：12884 次工具调用里本技能 **0 次被加载**——§3.7 分类空壳坑、§3.5.1 三铁律、
+M-R60 三态全靠"碰巧记得"，**不是被技能强制的**。
 
 > 正本（S148 全量实测 + S189 二次复发现场 + 没走流程欠下的三笔账）：
 > [`docs/外置_不许看见脚本就直接跑.md`](docs/外置_不许看见脚本就直接跑.md)
@@ -102,7 +99,7 @@ M-R60 三态，全靠"碰巧记得"才遵守，**不是被技能强制的**。
 | 修源 | `probe repair checkup / route / drafts / apply` | 死因七型→五路由，见 §3.17 |
 | 质量 | `probe quality / quality-batch` | 画质/速度/广告，见 §3.11 |
 | 凭据 | `probe token / limits` | 未鉴权 60 req/h，配 token 升 5000 req/h |
-| 自检 | `probe self-check` | 16 组活体探针 + 假阳性基线 |
+| 自检 | `probe self-check` | 16 组活体探针 + 假阳性基线；另 `scripts/{atomicio,pushconfig,imgproxy}.py --selftest`（通道三件） |
 
 > 📌 **S199 两类新型监测目标**：① 发布源直连包（pub-package）——HTTP 轻量探活对象存储直连包（无 git 历史）；② 生命周期声明——mark.json 自报 × 实测活跃度正交交叉。登记见 [`references/S199_发布源与生命周期声明.md`](references/S199_发布源与生命周期声明.md)。
 
@@ -265,25 +262,15 @@ tvbox probe harvest promote --in <候选.json>
 | `scripts/quality.py` | 单条：拉主清单 → 读 RESOLUTION → 拉首分片测耗时与速率 → 扫广告特征 → 合成质量分 |
 | `scripts/quality_batch.py` | 接两库：读库 → 取播放地址 → 8 并发评测 → 回填 6 字段 |
 | `scripts/hls_clean.py` | ★广告治理引擎（S225）：61 域名黑名单 + Allow→Block→启发式三段判定 + m3u8 净化（删广告分片 / 序列号重排 / 时长保护） |
-| `scripts/_aes_fallback.py` | ★纯 Python AES-128-CBC 兜底（S224）：羊壳无 pycryptodome 时唯一的解密路径。**模块形态**，写源时 `from _aes_fallback import decrypt_bytes`；也可命令行救急 `--decrypt 密文 --key <hex> --iv <hex>`；`--crosscheck` 与 forgekit 内联片段对账 |
+| `scripts/_aes_fallback.py` | ★纯 Python AES-128-CBC 兜底（S224）：羊壳无 pycryptodome 时唯一的解密路径。两种形态与用法见 §3.12.3 |
 
 **回填字段**（两库同名）：`最高画质`/`首片耗时`/`下载速率`/`广告判定`/`质量分`/`质量证据`。
 **评分 v3**：画质是门槛、速度只加减分。三条硬限制与四解析坑见正本——**它们都会让「好源被判死」**。
-**广告判定已换引擎（S225）**：`quality.ad_judgment` 委托 `hls_clean.judge_segment`，本地那份 8 个子串特征（`ad.`/`gg.`/`guanggao`…）已废弃——子串匹配会误命中正常路径，又漏掉真实广告域名（大多是 `mimg.0c1q0l.cn` 这类随机串）。聚合规则：跨域 block → 确认；同主 CDN block → 疑似；`unsafe_skip`（想删但违反 RFC）→ 疑似并如实写原因。
+**广告判定已换引擎（S225）**：`quality.ad_judgment` 委托 `hls_clean.judge_segment`（原 8 子串特征已废弃：误中正常路径又漏随机域名）。聚合：跨域 block→确认；同主 CDN block→疑似；`unsafe_skip`→疑似并写原因。
 
 ### 3.11.1 ★ 怎么读测活报告（工程F-5）
 
-`livecheck --batch` 的汇总行后面固定跟三句人话。**别只看数字就下结论**：
-
-| 指标 | 它到底在说什么 | 常见误读 |
-|---|---|---|
-| 通过率 | ✅ ÷ **有结论的条数**（⚠️ 无法判定**不进分母**） | 把"无法判定"算失败 → 通过率虚低；算通过 → 虚高 |
-| p95 / 中位 | p95 由最慢的 5% 决定（最差体验），中位是典型体验 | 只看平均值：少数慢源把均值拉高，看着"全军覆没" |
-| 死因分布 | 失败与无法判定的原因归类（域名/接口/内容/语法/结构/未定·网络） | 见"接口层"就换源——那是地址结构变了，该**改接口**；"未定·网络"先复测再判死 |
-
-- 样本 <5 条不报 p95（标注"不具代表性"），**不硬凑数**。
-- 全在"无法判定"时显示"判不了"，**不是 0%**（三态不折叠）。
-- 报告实体：控制台（人读）+ 同名 `livecheck_*.json`（机器读，含每条 `elapsed_ms` / `death_cause`）。
+**铁律：无法判定不进分母**（算失败→通过率虚低，算通过→虚高）；样本 <5 条不报 p95；全在「无法判定」时显示「判不了」，**不是 0%**（三态不折叠）。指标口径（p95/中位）、死因分布的三类常见误读、报告实体（控制台 + `livecheck_*.json`）见 [`references/S110_质量评测.md`](references/S110_质量评测.md)。
 
 ## 3.12 ★ 写源模块（S161·P018 · `probe forge`）
 
@@ -305,11 +292,10 @@ tvbox probe forge hook <源.py> [--only pic,aes] [--dry-run] [--gate]  # ★模�
 ③不做「配置驱动自动生成源」（遮天法 v3.1：10 项能力 7 项无调用点——**诚实边界不是缺口**）；
 ④**判源类型只看响应行为不看 url 路径**（按路径猜 5 条错 4 条）。详判据与留档格式见正本。
 
-**⑤ 审计不过先修账（S194）**：`forge audit` 七项闸门——索引可读（坏=致命 exit 2）/
-file 唯一 / 四要素齐全 / 双向对账（孤儿=WARN、幽灵=FAIL）/ 内部计数自洽 /
-在册必须「通过」（铁律①的机器判据）/ verified_at 可解析。**FAIL→exit 1、WARN→exit 0**。
-`forge profile` 判据移植自道长 39 项特征表，`modules_for` 改造成 **next_steps**（推荐探源司自己命令，
-画像才接得上执行链）；画像只答"好不好采"，**能不能采一律以实测为准**（M-R60）。
+**⑤ 审计不过先修账（S194）**：`forge audit` 七项闸门（索引可读＝致命 / file 唯一 / 四要素齐全 /
+双向对账：孤儿 WARN·幽灵 FAIL / 计数自洽 / 在册必「通过」/ `verified_at` 可解析），
+**FAIL→exit 1、WARN→exit 0**。`forge profile` 移植道长 39 项特征表，输出 **next_steps**
+（推荐本技能命令，画像才接得上执行链）；只答"好不好采"，**能不能采一律以实测为准**（M-R60）。
 
 ### 3.12.1 ★ 写源规范正本（S195·从 DsPlayer 壳内提取）
 
@@ -403,7 +389,10 @@ tvbox probe shellcrack crack <页面URL> [--save]         # 抠单壳 ｜ scan �
 ```
 **判据主干（必记）**：①金律正则顺序不可换（`const url` 前置，防 vid 抢匹配）；②壳内/master/分片
 一律 `urljoin`（`base+` 拼接 404）；③「已抠」必须真拉分片 >1KB；④三态含「待抠＝非CMS模板」不硬凑；
-⑤入库播放页壳库后必须 readback；⑥「接口给壳」混合形态（新浪 xlyun）进不了 type=1 json，不硬进。
+⑤入库播放页壳库后必须 readback；⑥「接口给壳」混合形态（新浪 xlyun）进不了 type=1 json，不硬进；
+⑦**第 7 条金律**（S231 L1215-1244·v1.28.7）：**播放页 HTML → 真地址** `resolve_play_page()` 七层
+（网盘前置→player JSON 的 url/link→字符串变量→JSON 字段→裸赋值→source→裸地址→iframe 下钻），
+全失败 `parse:1` 交壳嗅探；**用例须断言层名**——低层兜底会把 url 补出来，只看 url 则摘掉某层也不红。
 
 ## 3.17 ★ 修源：死因分型 → 五路由（S221~S227 · `repair/`）
 
@@ -440,7 +429,7 @@ python3 repair/engine.py rewrite <url>              # 整站重写档（结构�
 `gate_r221_death_taxonomy.py`（分型 5 项）/ `gate_r222_repair_contract.py`（契约 6 项）。
 闸门自身也进 `verify.sh`，未过即红。
 
-> 📌 **S231 六层资产**（WeiXin.zip 深挖）：**v1.28.6 已代码级移植四项**——
+> 📌 **S231 六层资产**（WeiXin.zip 深挖）：**v1.28.6 移植四项 / v1.28.7 补齐通道三件与第 7 条金律（六层全落地）**——
 > TLS 指纹挂 `livecheck` 网络层（`_build_cmd` 单一真源 + 失败自动回退）、`ac=list`
 > 语义测活并入 `death_cause` 分型（正门 `livecheck --probe-site`）、sniff 聚类 + 五层
 > 正则进 `repair/recon.py`（固定正则取空才走）、6 层播放集兜底进 `shellcrack.play_sets`。
