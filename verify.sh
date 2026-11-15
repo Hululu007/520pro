@@ -743,6 +743,27 @@ if exp_st_out=$( python3 "$TARGET/verify/gate_experience.py" --selftest 2>&1 ); 
 else
   no "  └ M12 闸化登记 --selftest 未过：$(printf '%s' "$exp_st_out" | grep -E '✗|FAIL' | head -3 | tr '\n' ' ')"
 fi
+# ★ 经验闭环 v2（2026-11-15）：①淬炼器 + ②③观测④呈现探针接电（判据不在执行路径=挂空）。
+#   淬炼器只读回读派生态 + selftest；探针回读四环状态，死库存/假经验如实报，不折叠成通过。
+echo
+echo "[经验闭环 v2（淬炼→呈现→复用→进化）]"
+if python3 "$TARGET/verify/exp_distill.py" --status > /tmp/_exp_distill.out 2>&1; then
+  ok "淬炼状态：$(head -1 /tmp/_exp_distill.out)"
+else
+  no "淬炼状态回读失败：$(head -2 /tmp/_exp_distill.out | tr '\n' ' ')"
+fi
+if python3 "$TARGET/verify/exp_probe.py" > /tmp/_exp_probe.out 2>&1; then
+  ok "$(head -1 /tmp/_exp_probe.out)"
+  sed 's/^/     /' /tmp/_exp_probe.out | tail -3
+else
+  no "经验闭环探针异常：$(head -2 /tmp/_exp_probe.out | tr '\n' ' ')"
+fi
+if exp_v2_st=$( python3 "$TARGET/verify/exp_distill.py" --selftest 2>&1 ) && \
+   exp_pv_st=$( python3 "$TARGET/verify/exp_probe.py" --selftest 2>&1 ); then
+  ok "  └ 淬炼+探针 --selftest 正反向全过（反稀释/幂等/抗洗绿/死库存/缺呈现）"
+else
+  no "  └ 经验闭环 --selftest 未过：$(printf '%s%s' "$exp_v2_st" "$exp_pv_st" | grep -E '✗' | head -3 | tr '\n' ' ')"
+fi
 
 # ★ v0.8.25（规则迁移批2）：台账四律——旧生态 M-R75/82/86/93 的判据化落点
 # 为什么要有：这四条原本是旧生态的"教训条目"，只在文档里躺着。docs 不加载

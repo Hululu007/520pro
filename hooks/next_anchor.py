@@ -207,6 +207,18 @@ def main():
                 _hits.sort(key=lambda x: -x[0])
                 _top = _hits[0][1]
                 msg += '｜📚 本轮同型坑 %s·%s：%s' % (_top['id'], _top['name'], _top['fix'][:60])
+            # 经验闭环 v2 · ④呈现：注入经验池里的**具体条目**（不再只有坑名），
+            # 按当前 Next 的 tags 命中同病号 → 带出 lesson/reuse 经验原文（可核实 evidence）。
+            # 真源=exp_entries（exp_distill.py 从台账+commit 派生的可重建视图）。
+            _es = _rec.get('exp_entries') or []
+            if _es:
+                _rels = [e for e in _es
+                         if (_top and e.get('source_commit') and e.get('kind') == 'lesson'
+                             and _top['id'] in (e.get('text') or ''))]
+                _rels = _rels[:2]  # 最多 2 条，不刷屏（R-BG03 防洪水）
+                for _e in _rels:
+                    msg += ('｜💡经验 %s：%s（据 %s）'
+                            % (_e['id'], (_e.get('text') or '')[:55], _e.get('evidence', '')[:18]))
         except Exception:
             pass  # 经验注入失败不影响主提醒
         # v0.8.67 批3：落库欠账注入——「该产未产」每轮红着给模型看，销账才消红。
