@@ -111,12 +111,19 @@ def cmd_status():
               f'{t["refs"]} refs / {t["exe_scripts"]} 脚本（W3 全量登记）')
         print(f'  能力面判定 : {"63/63 登记齐全且机检可回读" if uok else "红 → " + umsg}')
         nport = sum(1 for x in surf['directories'] if x.get('ported'))
-        print(f'  补码转正   : {nport}/63（登记≠转正，逐目录补码由用户拍板）')
+        print(f'  补码转正   : {nport}/63（port_ok 正向判据背书：资产落点+分级+签名+sha）')
+        try:
+            assets = core.load_assets()
+            pok, pmsg = core.port_ok(surf, assets)
+            print(f'  补码资产层 : 63 域一手真源落仓（{"绿" if pok else "红 → " + pmsg}）'
+                  f'｜foundry.py cap [id] 可检索')
+        except Exception as e:
+            print(f'  补码资产层 : 无法判定（{type(e).__name__}: {e}）')
     except Exception as e:
         uok = False
         print(f'  能力面判定 : 无法判定（{type(e).__name__}: {e}）')
     print('  引擎真源   : 通用层 foundry-core/scripts/jadx_engine.py（能力层 shellcrack 反向复用）')
-    print('  当前阶段   : W3 63 目录能力面全量迁入完成（W0→W1→W2→W3 → W4 产出接入 → W5 收口）')
+    print('  当前阶段   : W6 补码做实（一手真源落仓 + port_ok 正向判据 + 检索接线；W0→W6）')
     print('  产出落点   : 🧬 520进化论/03·04·05 + 📦 产物归档/清单（见 artifacts.json）')
     return 0 if (ok and dok and nok and sok and uok) else 2
 
@@ -161,6 +168,51 @@ def cmd_surface():
     return 0 if ok else 2
 
 
+def cmd_cap(argv=None):
+    """W6 补码检索：按 id 回读某能力域的一手落点；无参列出可转正清单。"""
+    argv = argv or sys.argv
+    core = _load_core()
+    assets = core.load_assets()
+    surf = core.load_surface()
+    smap = {x['id']: x for x in surf['directories']}
+    by_id = {a['id']: a for a in assets['assets']}
+    pok, pmsg = core.port_ok(surf, assets)
+    want = argv[2] if len(argv) > 2 else None
+    if want:
+        a = by_id.get(want)
+        if not a:
+            print(f'  未找到能力域 {want!r}（可用 foundry.py cap 列全清单）')
+            return 1
+        s = smap.get(want, {})
+        print(f'【能力域 · {want}】')
+        print(f'  补码状态   : {"ported（一手真源落仓 + 事实自洽转正）" if s.get("ported") else "registered（仅登记）"}')
+        print(f'  定位       : {a.get("desc", "")[:180]}')
+        print(f'  计数       : {a["n_files"]} 文件 / {a["n_refs"]} refs / {a["n_exe"]} 脚本 / '
+              f'{a["n_sections"]} 章节 / {a["n_mech"]} 机制点')
+        sigs = a.get('script_signatures') or []
+        if sigs:
+            print('  脚本签名   :（只登记签名，不搬正文）')
+            for sg in sigs:
+                defs = ','.join(sg.get('defs', [])) or '—'
+                print(f'    - {sg.get("file", "?"):46s} {sg.get("bytes", 0):6d}B  defs={defs}')
+        print(f'  一手真源   : {assets["origin"]}')
+        return 0
+    # 无参：清单
+    print(f'【foundry · 补码资产清单（{len(assets["assets"])} 域）】')
+    print(f'  补码判定   : {"绿 · " + pmsg if pok else "红 → " + pmsg}')
+    print('  摆出口径   : 中性摆出，63 域一视同仁，不分级、不裁剪（边界由用户拍板）')
+    nport = sum(1 for x in surf['directories'] if x.get('ported'))
+    print(f'  已转正     : {nport}/63')
+    print(f'  {"#":>2}  {"目录":34s} {"状态":9s} 文件 refs 脚本 签名')
+    for i, a in enumerate(assets['assets'], 1):
+        s = smap.get(a['id'], {})
+        print(f'  {i:2d}. {a["id"]:34s} '
+              f'{"ported" if s.get("ported") else "reg":9s} '
+              f'{a["n_files"]:3d} {a["n_refs"]:4d} {a["n_exe"]:3d} {len(a.get("script_signatures",[])):3d}')
+    print('\n  用法：foundry.py cap <id> 查看单域一手落点')
+    return 0 if pok else 2
+
+
 def cmd_selftest():
     """正反向验证。造错用临时目录 + 内存深拷贝，不碰真文件。"""
     core = _load_core()
@@ -201,6 +253,20 @@ def cmd_selftest():
            and set(core.CAPABILITY_63) == set(x['id'] for x in surf['directories']))
     except Exception as e:
         ck('capability_surface.json 可读 / 转正', False, f'{type(e).__name__}: {e}')
+    # W6：补码资产层 + port_ok 正向判据（中性摆出，无价值分级）
+    try:
+        assets = core.load_assets()
+        surf = core.load_surface()
+        ck('W6 补码资产层 63 域齐备', len(assets['assets']) == 63)
+        ck('W6 一手真源 sha 在册（脱离 /tmp 临时区）',
+           len(assets.get('source_sha256', '')) == 64)
+        ck('W6 中性摆出：无 content_tier/分级字段',
+           all('content_tier' not in a and 'tier' not in a for a in assets['assets']))
+        pok, pmsg = core.port_ok(surf, assets)
+        ck('W6 port_ok 正向：63 域全量转正有资产落点背书', pok, pmsg)
+        ck('W6 骨架含资产层两件', core.skeleton_ok()[0])
+    except Exception as e:
+        ck('补码资产层可读 / 转正', False, f'{type(e).__name__}: {e}')
 
     print('── 反向（多类造错必须各自翻红）──')
     tmp = tempfile.mkdtemp(prefix='foundry-selftest-')
@@ -268,8 +334,10 @@ def cmd_selftest():
             smk = lambda: copy.deepcopy(core.load_surface())  # noqa: E731
             u1 = smk(); u1['directories'] = u1['directories'][:-1]
             ck('能力面判红·少一个目录', not core.surface_ok(u1)[0])
-            u2 = smk(); u2['directories'][7]['ported'] = True
-            ck('能力面判红·冒充补码转正', not core.surface_ok(u2)[0])
+            # W6：63 域已全量真实转正，旧「翻 ported=true 即冒充」前提失效；
+            # 改成名册外 id 翻正，防冒充语义在新态下仍成立。
+            u2 = smk(); u2['directories'][7]['id'] = 'ghost-port'
+            ck('能力面判红·名册外 id 冒充转正', not core.surface_ok(u2)[0])
             u3 = smk()
             u3['directories'][0]['n_files'] -= 1
             u3['source']['totals']['files'] -= 1
@@ -281,6 +349,24 @@ def cmd_selftest():
             ck('能力面判红·整表非 dict', not core.surface_ok([1, 2, 3])[0])
         except Exception as e:
             ck('能力面造错用例可读', False, f'{type(e).__name__}: {e}')
+
+        # ⑧ W6 补码判据反向（中性：只测事实自洽，不涉及分级/敏感判断）
+        try:
+            import copy
+            assets = core.load_assets()
+            surf = core.load_surface()
+            na = copy.deepcopy(assets); na['assets'] = na['assets'][:-1]
+            ck('补码判红·资产落点缺失', not core.port_ok(surf, na)[0])
+            fs = copy.deepcopy(assets); fs['source_sha256'] = 'f' * 64
+            ck('补码判红·真源 sha 失配', not core.port_ok(surf, fs)[0])
+            ns = copy.deepcopy(assets)
+            for a in ns['assets']:
+                if a['n_exe'] > 0:
+                    a['script_signatures'] = []
+                    break
+            ck('补码判红·脚本签名缺失', not core.port_ok(surf, ns)[0])
+        except Exception as e:
+            ck('补码判据造错用例可读', False, f'{type(e).__name__}: {e}')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -291,10 +377,10 @@ def cmd_selftest():
 def main(argv):
     cmd = (argv[1] if len(argv) > 1 else 'status').lstrip('-')
     fn = {'status': cmd_status, 'tools': cmd_tools, 'surface': cmd_surface,
-          'selftest': cmd_selftest, 'self-test': cmd_selftest}.get(cmd)
+          'cap': cmd_cap, 'selftest': cmd_selftest, 'self-test': cmd_selftest}.get(cmd)
     if fn is None:
         print(__doc__)
-        print('用法：foundry.py status | tools | surface | selftest')
+        print('用法：foundry.py status | tools | surface | cap [id] | selftest')
         return 1
     return fn()
 

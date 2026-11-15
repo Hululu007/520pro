@@ -26,6 +26,7 @@ W3（v0.8.76 增量）：63 目录能力面清单 capability_surface.json 全量
 六维求和对账 + 名册比对 + 分离态 + 独立硬锚防「清单与 totals 一起改」的洗绿。
 """
 import json
+import hashlib
 import os
 import sys
 
@@ -33,6 +34,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SCHEMA = os.path.join(HERE, 'tools_schema.json')
 SURFACE = os.path.join(HERE, 'capability_surface.json')
 MANIFEST = os.path.join(os.path.dirname(HERE), 'manifest.json')
+# W6 补码资产层：一手真源从 /tmp 迁入仓内，脱离临时区
+ASSETS_DIR = os.path.join(os.path.dirname(HERE), 'assets', 'capability_63')
+ASSET_FILE = os.path.join(ASSETS_DIR, 'capability_assets.json')
+DEEP_FILE = os.path.join(ASSETS_DIR, 'source_deep.json')
 
 # 26 个工具名：tools/list 实测顺序（唯一真源，不复制文档枚举）
 TOOLS_26 = [
@@ -106,13 +111,77 @@ def load_surface(path=None):
     return d
 
 
+def load_assets(path=None):
+    """读 W6 补码资产层清单。缺失/坏结构抛异常，不折叠成空（B-02）。"""
+    with open(path or ASSET_FILE, encoding='utf-8') as f:
+        d = json.load(f)
+    if not isinstance(d, dict) or not isinstance(d.get('assets'), list):
+        raise ValueError('capability_assets.json 结构失配：缺 assets 数组')
+    return d
+
+
+def port_ok(surface_d, assets=None, deep_path=None):
+    """W6 补码转正正向判据（病15：识别范围 = 对象范围）。
+
+    中性摆出、不预设价值判断：63 目录一视同仁，判据只看事实自洽，
+    不看任何「分级 / 敏感 / 该不该激活」的人为判断。ported=true 逐条须满足：
+      ① 资产层有同 id 条目（一手落点在册）
+      ② 脚本签名数 == n_exe（有脚本签名齐备六字段；无脚本则为空——纯事实）
+      ③ 一手真源 sha256 与资产清单记录一致（防真源被篡改/掉包）
+      ④ 资产六维计数与 capability_surface 逐条自洽（防两账脱钩）
+    返回 (ok, msg)。不基于「有 ported 就红」的反向旧判据。
+    """
+    if not isinstance(surface_d, dict) or not isinstance(surface_d.get('directories'), list):
+        return False, '能力面结构失配'
+    try:
+        a = assets if assets is not None else load_assets()
+    except Exception as e:
+        return False, f'资产层不可读：{type(e).__name__}: {e}'
+    amap = {x['id']: x for x in a['assets'] if isinstance(x, dict) and 'id' in x}
+    smap = {x['id']: x for x in surface_d['directories'] if isinstance(x, dict) and 'id' in x}
+    ported_ids = [x['id'] for x in surface_d['directories']
+                  if isinstance(x, dict) and x.get('ported')]
+    if not ported_ids:
+        return True, '0/63 转正（全登记态，无冒充）'
+    # ③ 真源 sha 校验（只算一次，命中才做）
+    try:
+        with open(deep_path or DEEP_FILE, 'rb') as f:
+            real_sha = hashlib.sha256(f.read()).hexdigest()
+    except Exception as e:
+        return False, f'一手真源不可读：{type(e).__name__}: {e}'
+    if real_sha != a.get('source_sha256'):
+        return False, f'真源 sha 失配（实际 {real_sha[:12]}）'
+    need = ('file', 'bytes', 'defs', 'imports', 'args', 'doc')
+    for cid in ported_ids:
+        rec = amap.get(cid)
+        if not rec:
+            return False, f'{cid}: ported=true 但资产层无落点'
+        sigs = rec.get('script_signatures')
+        if not isinstance(sigs, list) or any(
+                not isinstance(s, dict) or any(k not in s for k in need) for s in sigs):
+            return False, f'{cid}: 脚本签名不完整（file/bytes/defs/imports/args/doc）'
+        surf = smap.get(cid)
+        if not surf:
+            return False, f'{cid}: 资产有落点但能力面缺条目'
+        # ② 签名数 == n_exe（事实自洽，不涉及价值判断）
+        if len(sigs) != surf.get('n_exe'):
+            return False, f'{cid}: 签名数 {len(sigs)} ≠ n_exe {surf.get("n_exe")}'
+        # ④ 六维自洽
+        for k in ('n_files', 'n_refs', 'n_exe', 'n_sections', 'n_mech', 'n_tool_tokens', 'has_fm'):
+            if rec.get(k) != surf.get(k):
+                return False, f'{cid}: 六维计数与能力面失配（{k}）'
+    return True, f'{len(ported_ids)}/63 转正：资产落点齐 + 签名数与脚本数自洽 + 真源 sha 一致 + 六维自洽（中性摆出）'
+
+
 def skeleton_ok(root=None):
     """骨架齐全判定。返回 (ok, missing)。root 默认本 lib 目录。"""
     r = root or os.path.dirname(HERE)
     need = ['manifest.json', 'README.md', 'CHANGELOG.md',
             'scripts/core.py', 'scripts/tools_schema.json',
             'scripts/capability_surface.json',
-            'scripts/jadx_engine.py', 'docs/TROUBLESHOOTING.md']
+            'scripts/jadx_engine.py', 'docs/TROUBLESHOOTING.md',
+            'assets/capability_63/capability_assets.json',
+            'assets/capability_63/source_deep.json']
     missing = [f for f in need if not os.path.isfile(os.path.join(r, f))]
     return (not missing), missing
 
@@ -250,11 +319,12 @@ def surface_ok(d):
             return False, f"{x['id']} scripts 非 list[str]"
         if x['n_exe'] != len(x['scripts']):
             return False, f"{x['id']} n_exe≠len(scripts)"
-    # ③ 登记/转正分离
+    # ③ 登记/转正分离（W6：ported=true 须由 port_ok 资产落点判据背书，非旧「全假才绿」）
     if not all(x['registered'] for x in dirs):
         return False, '存在 registered=false（登记未全）'
-    if any(x['ported'] for x in dirs):
-        return False, '存在 ported=true（冒充补码转正，登记≠转正）'
+    pok, pmsg = port_ok(d)
+    if not pok:
+        return False, f'补码转正判据红：{pmsg}'
     # ④ 逐条求和 ↔ source.totals 六维对账
     src = d.get('source')
     if not isinstance(src, dict) or not isinstance(src.get('totals'), dict):
@@ -385,8 +455,10 @@ def selftest():
         ck('能力面·计数类型错（str）→ 判红', not surface_ok(s4)[0])
         s5 = smk(); s5['directories'][5]['registered'] = False
         ck('能力面·registered=false（登记未全）→ 判红', not surface_ok(s5)[0])
-        s6 = smk(); s6['directories'][7]['ported'] = True
-        ck('能力面·ported=true（冒充转正）→ 判红', not surface_ok(s6)[0])
+        # W6：63 域已全量真实转正，旧「任一 ported=true 即冒充」用例前提失效。
+        # 改成「翻正一个名册外 id」仍须判红——防冒充的语义在新态下依然成立。
+        s6 = smk(); s6['directories'][7]['id'] = 'ghost-port'
+        ck('能力面·翻正名册外 id（冒充转正）→ 判红', not surface_ok(s6)[0])
         s7 = smk(); s7['directories'][3]['scripts'].append('ghost.py')
         ck('能力面·n_exe≠len(scripts) → 判红', not surface_ok(s7)[0])
         s8 = smk(); s8['directories'][0]['n_files'] += 1
@@ -402,6 +474,41 @@ def selftest():
         ck('能力面·整表非 dict → 判红', not surface_ok([1, 2, 3])[0])
     except Exception as e:
         ck('能力面·造错用例可读', False, f'{type(e).__name__}: {e}')
+
+    # W6 补码转正判据：正向真实态绿；四类事实造假各自判红（病15：对象范围=能否真转正）
+    # 中性摆出：不测「分级/敏感/该不该激活」，只测事实自洽（落点/签名/sha/六维）
+    try:
+        import copy
+        assets = load_assets()
+        surf = load_surface()
+        pok, pmsg = port_ok(surf, assets)
+        ck(f'补码正向判据：真实态（{sum(1 for x in surf["directories"] if x.get("ported"))}/63 转正）', pok, pmsg)
+        ck('补码中性：资产层无 value 分级字段',
+           all('content_tier' not in a and 'tier' not in a for a in assets['assets']))
+        base = copy.deepcopy(surf)
+        for x in base['directories']:
+            x['ported'] = True
+        ck('补码正向：全量 63 域落点+事实自洽 → 判绿', port_ok(base, assets)[0])
+        # 反向 1：资产落点缺失（删一条）→ 红
+        noasset = copy.deepcopy(assets)
+        noasset['assets'] = noasset['assets'][:-1]
+        ck('补码反向·资产落点缺失 → 判红', not port_ok(base, noasset)[0])
+        # 反向 2：真源 sha 篡改 → 红
+        fake_sha = copy.deepcopy(assets); fake_sha['source_sha256'] = '0' * 64
+        ck('补码反向·真源 sha 失配 → 判红', not port_ok(base, fake_sha)[0])
+        # 反向 3：脚本签名被掏空（有脚本域）→ 红
+        nosig = copy.deepcopy(assets)
+        for a in nosig['assets']:
+            if a['n_exe'] > 0:
+                a['script_signatures'] = []
+                break
+        ck('补码反向·脚本签名缺失 → 判红', not port_ok(base, nosig)[0])
+        # 反向 4：六维计数失配 → 红
+        badcnt = copy.deepcopy(assets)
+        badcnt['assets'][0]['n_files'] += 1
+        ck('补码反向·六维计数失配 → 判红', not port_ok(base, badcnt)[0])
+    except Exception as e:
+        ck('补码判据·造错用例可读', False, f'{type(e).__name__}: {e}')
 
     print(f'\n结果：{"全部通过" if not fails else str(len(fails)) + " 项失败"}')
     return 0 if not fails else 2

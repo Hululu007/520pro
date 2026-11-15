@@ -33,13 +33,15 @@ allowed-tools: Read, Grep, Glob, Bash
 | `python3 scripts/foundry.py status` | 打印板块状态：登记工具数、verified 26/26 转正判定、63/63 能力面登记判定、引擎真源、当前施工阶段、产出落点 |
 | `python3 scripts/foundry.py tools` | 列出 26 个 jadx MCP 工具的 inputSchema / required / 真调参数配方（真源 `tools_schema.json`） |
 | `python3 scripts/foundry.py surface` | 列出 63 目录能力面清单（W3 全量登记）：目录名 + 文件/refs/脚本/章节计数 + 机检回读判定；真源 `foundry-core/scripts/capability_surface.json` |
-| `python3 scripts/foundry.py selftest` | 正反向验证：骨架+转正 26/26+能力面 63/63 应绿、缺件/坏填法五种后接形态/洗绿造错/能力面多形态造错应红 |
+| `python3 scripts/foundry.py cap [id]` | W6 补码检索：无参列 63 域补码资产清单（落点/签名数/port 状态），带 id 回读某域一手落点（定位+计数+脚本签名）；真源 `foundry-core/assets/capability_63/` |
+| `python3 scripts/foundry.py selftest` | 正反向验证：骨架+转正 26/26+能力面 63/63+补码 port_ok 应绿、缺件/坏填法/洗绿/能力面多形态/补码事实造假（落点缺失/sha 失配/签名缺失）应红 |
 
 ## 工作流
 
 1. **先验**：`status` 确认骨架与 `schema_ok` 转正判定 26/26 绿、`surface_ok` 能力面 63/63 登记判定绿，不许凭印象说"接好了"。
 2. **取工具面**：`tools` 读 26 个 inputSchema + 真调配方；调用走 `foundry-core/scripts/jadx_engine.py` 的 `call(name, args)`（W2 已上提泛化，能力层 shellcrack 反向复用）；参数一律取**上一步真实返回**（`items[0]`、解码资源名、构造器 `<init>/<clinit>`），不手敲类名。
-3. **能力面**：`surface` 读 63 目录能力面清单（W3 已 63/63 全量登记，`capability_surface.json`）；清单是**中性结构化登记**，只摆目录名与计数、不搬运技能正文、不预设裁剪，边界由用户拍板。**登记 ≠ 补码转正**：清单 `registered=true / ported=false` 是如实状态，逐目录补码接线属后续阶段，不许把"登记了"说成"迁移完了"。判据 `surface_ok` 逐目录验字段 + 六维求和对账 + 名册比对 + 独立硬锚，病15「识别范围 = 对象范围」。
+3. **能力面**：`surface` 读 63 目录能力面清单（W3 已 63/63 全量登记，`capability_surface.json`）；清单是**中性结构化登记**，只摆目录名与计数、不搬运技能正文、不预设裁剪，边界由用户拍板。判据 `surface_ok` 逐目录验字段 + 六维求和对账 + 名册比对 + 独立硬锚，病15「识别范围 = 对象范围」。
+3b. **补码（W6，用户拍板「全量转正·中性摆出」）**：一手真源从 `/tmp` 迁入 `foundry-core/assets/capability_63/`（63 域全量、脱离临时区），`cap [id]` 可回读。`ported=true` 由 `port_ok` 正向判据背书（资产落点 + 签名数 = n_exe + 真源 sha + 六维自洽），**不做任何价值分级/敏感判断/裁剪**——63 域一视同仁。注意：只迁结构化元数据（desc/positioning 摘要/脚本签名），不搬脚本正文与 mech/refs 全文；「补码落仓」指一手事实资产在册可检索，不等于 63 域脚本已在本地跑通。
 4. **产出**：解码结果、能力对照、判例文档经 `space_hub.archive_out(path, source=..., note=..., target=...)` 落库，回执写 `archive_ledger.json`；失败记 `local_pending(待归档)`，由 `products --retry` 补投，绝不把"没落库"说成"已归档"。
 5. **验证**：`selftest` 正反向通过才允许宣布该阶段完成；`bash verify.sh` 0✗/0⚠ 是阶段收口的硬判据。
 
