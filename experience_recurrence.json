@@ -32,11 +32,18 @@
    ]
   },
   "病15": {
-   "count": 6,
+   "count": 7,
    "note": "台账 6 例同日，guard G4/G5 回归用例已守住",
    "last_ts": "2026-11-15",
    "status": "active",
-   "events": []
+   "events": [
+    {
+     "ts": "2026-11-15 11:55",
+     "coord": "Lesson 复发记账 病15（第11次）",
+     "by": "hook",
+     "min": "202611151155"
+    }
+   ]
   },
   "G4-双核": {
    "count": 2,
