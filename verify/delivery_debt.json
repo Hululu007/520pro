@@ -1263,6 +1263,23 @@
    "note": "机器核销：ledger 回执已现"
   },
   {
+   "id": "D-b8221ee-F04",
+   "flow": "F04",
+   "folder": "🧬 520进化论/03-子项目演进",
+   "commit": "b8221ee",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.75 熔铸司 W1 骨架登记：通用层落 foundry(skill)+foundry-core(lib) 双件套",
+   "expect": "演进时间线/逐版交付说明",
+   "evidence": "改动文件: 通用层/skills/foundry-core/CHANGELOG.md",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "archive 子项目演进_v0.8.75_熔铸司W1骨架登记.md @b8221ee @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
    "id": "D-bce02ae-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",

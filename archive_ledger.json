@@ -2389,6 +2389,17 @@
    "result": "ok",
    "event_ref": "VERSION=0.8.75 · VERSION=0.8.75 · 技能快照 fe28143a3577 · 技能 21 个",
    "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
+  },
+  {
+   "ts": "2026-11-15T19:40:50",
+   "round": "archive 子项目演进_v0.8.75_熔铸司W1骨架登记.md @b8221ee",
+   "artifact": "子项目演进_v0.8.75_熔铸司W1骨架登记.md",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "2N1ZbRsESSAMlADaC9GYdo",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit b8221ee",
+   "note": "v0.8.75 W1 骨架登记逐版交付说明；核销 D-b8221ee-F04；版本 0.8.75；foundry(skill)+foundry-core(lib) 双件套"
   }
  ]
 }
