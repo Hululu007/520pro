@@ -1666,6 +1666,25 @@
    "closed_by": "evolve-log 0.8.66 @ 2026-11-15",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-fbac7c0-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "fbac7c0",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "feat(exp): 经验闭环四环机制化（①淬炼→④呈现→②复用→③进化）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 病15（同型·本轮防住未复发）：trailers:valueonly 丢键名——识别范围（只有值）窄于对象范围（键+值配对），改完整 %B 正则 + 反例固化；",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "",
+   "waived_until": "2026-12-31",
+   "note": "豁免至 2026-12-31：经验闭环视图已落 520进化论/01-方法论（nodeId XzrKBhzFQAvt8xDHpmIev2），但 archive 回执落在 space_hub_state.json 未在 archive_ledger.json 对账，属回执账本未接通；本轮按 B-12 收敛手机指令同步，显式豁免留痕不洗绿，到期 2026-12-31 转 open 后走正门补回执",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-15T23:50:48"
   }
  ]
 }
