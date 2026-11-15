@@ -280,6 +280,23 @@ if [ -d "$SK/probe-hub/repair" ]; then
 else
   no "repair/ 修源模块缺失（探源司自愈能力不可用）"
 fi
+# ★S231 四项移植的离线自检（不联网）——**判据必须在执行路径上**：
+#   只写 selftest 不接电 = 判据挂空（病「判据不在执行路径」的形态）。
+#   正向：装了且全过；反向：selftest 缺失/失败即 ✗，不折叠成 opt。
+for spec in "livecheck:scripts/livecheck.py:--selftest（TLS指纹段+语义测活）" \
+            "recon:repair/recon.py:--selftest（sniff聚类+五层正则）" \
+            "shellcrack:scripts/shellcrack.py:--selftest（6层播放集兜底）"; do
+  name="${spec%%:*}"; rest="${spec#*:}"; rel="${rest%%:*}"; label="${rest##*:}"
+  if [ -f "$SK/probe-hub/$rel" ]; then
+    if out=$( cd "$SK/probe-hub/$(dirname "$rel")" && timeout 90 python3 "$(basename "$rel")" --selftest 2>&1 ); then
+      ok "  └ $name $label"
+    else
+      no "  └ $name $label 未过：$(printf '%s' "$out" | grep -E '^\[FAIL\]|✗' | head -3 | tr '\n' ' ')"
+    fi
+  else
+    no "  └ $SK/probe-hub/$rel 缺失（$name 自检无从跑起）"
+  fi
+done
 [ -f "$SK/probe-hub/scripts/hls_clean.py" ] && ok "hls_clean.py 广告治理引擎（61 域名黑名单）" || no "hls_clean.py 缺失（广告判定退化）"
 [ -f "$SK/probe-hub/scripts/forge_gate.py" ] && ok "forge_gate.py 写源四门禁" || no "forge_gate.py 缺失（forge gate 不可用）"
 [ -d "$SK/probe-hub/forgekit" ] && ok "forgekit 模板库（forge hook 用）" || no "forgekit 缺失（forge hook 不可用）"

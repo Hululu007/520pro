@@ -150,6 +150,207 @@ def _abs(base, href):
     return urljoin(base, href)
 
 
+# ═══════════ S231 移植③：sniff 聚类打分 + 五层详情正则生成 ═══════════
+# 出处：references/S231_物料_OK影视一键写py.py（聚类 L590-687 / 五层决策 L717-771）。
+# 为什么补这条路：`_parse_list` 用的是**固定正则** `(detail|/info/|/vod/detail|/v/)`——
+#   站点形态一变（`/post/3KBddy`、`/mhkh/slug/`、`/movie/9x2`）就一条都取不到，
+#   侦察报告于是写「列表样例为空」，下游只能凭记忆套模板（r147 那个坑的同族）。
+#   聚类打分不假设路径词：按「路径模式键」把全页链接分组，用**唯一 ID 数与 ID 长度**
+#   判断哪一组像详情页，再选该组最长 URL 反推正则 → 任意形态自适应。
+# 三态纪律不变：聚类不出来就返回空（`undetermined` 记原因），**绝不猜一个模板顶上**。
+_S231_WORDS = {}
+
+
+def _s231_words():
+    """惰性读 S231_url_wordlists.json（词表是踩坑沉淀，不在这里复制一份——M2）。"""
+    global _S231_WORDS
+    if not _S231_WORDS:
+        p = os.path.join(os.path.dirname(HERE), 'references', 'S231_url_wordlists.json')
+        try:
+            _S231_WORDS = json.load(open(p, encoding='utf-8'))
+        except Exception:
+            _S231_WORDS = {'CONTENT_DIRS': {'words': []}, 'SNIFF_SCORE': {}}
+    return _S231_WORDS
+
+
+def _content_dirs():
+    return tuple((_s231_words().get('CONTENT_DIRS') or {}).get('words') or ())
+
+
+def _path_key(u):
+    """URL → 路径模式键（把 ID 段归一成 #）。判不出模式返回 ''。
+
+    `/vodplay/123-1-1.html` → `/vodplay/#-#-#.html`；
+    `/post/3KBddy`          → `/post/#`；
+    `/detail-217011.html`   → `/#.html` 之外保留前缀字面量（单段形态按字母前缀归一）。
+    """
+    p = (u or '').split('?')[0].split('#')[0]
+    p = re.sub(r'^https?://[^/]+', '', p)
+    if not p or p == '/':
+        return ''
+    segs = [s for s in p.split('/') if s]
+    if not segs:
+        return ''
+    last = segs[-1]
+    ext = ''
+    m = re.search(r'(\.html?|\.php|\.aspx?)$', last, re.I)
+    if m:
+        ext, last = m.group(1), last[:m.start()]
+    if len(segs) == 1:
+        # 单段形态：只把数字/长 ID 段归一，前缀字面量保留（否则全站塌成一个键）
+        stem = re.sub(r'\d{2,}', '#', last)
+        stem = re.sub(r'[A-Za-z0-9_-]{4,}', '#', stem) if '#' not in stem else stem
+        return '/' + stem + ext
+    parent = '/'.join(segs[:-1]).lower()
+    if last.isdigit():
+        key_last = '#'
+    elif re.fullmatch(r'\d+-\d+-\d+', last):
+        key_last = '#-#-#'
+    elif re.fullmatch(r'\d+-\d+', last):
+        key_last = '#-#'
+    else:
+        key_last = '#'
+    return '/' + parent + '/' + key_last + ext
+
+
+def _id_of(u):
+    """URL → 候选 ID 段（用于判断这组链接是否真是"同一个详情模板"）。
+
+    ★ 末段直接整段返回（不要求 ≥2 字符）：实测 `/detail/id/1.html` 这种单位数 ID
+      若被 `{2,}` 过滤掉，就会回退到父段 `id`——**全站 URL 的"ID"都变成同一个词 `id`**，
+      唯一 ID 数恒为 1，聚类永远不参选（本轮自检就是被这条挡下的）。
+    """
+    p = (u or '').split('?')[0].split('#')[0]
+    p = re.sub(r'^https?://[^/]+', '', p)
+    segs = [s for s in p.split('/') if s]
+    if not segs:
+        return ''
+    last = re.sub(r'\.(html?|php|aspx?)$', '', segs[-1], flags=re.I)
+    if re.fullmatch(r'[A-Za-z0-9_-]+', last or ''):
+        return last
+    for cand in segs[-2::-1]:
+        m = re.search(r'[A-Za-z0-9]{2,}', cand)
+        if m:
+            return m.group(0)
+    return ''
+
+
+def sniff_detail_re(html, base, min_uniq=3, top=80):
+    """全页链接聚类打分 → 最像详情页的样本 URL。判不出返回 ''。
+
+    打分（S231 SNIFF_SCORE，公式原文照抄不改良）：
+      score = 唯一ID数×10 + ID均长×3 + min(链接数,200)×0.2
+    门槛：该组唯一 ID 数 ≥ min_uniq 才参选（两三条链接凑不出"模板"）。
+    """
+    hrefs = [m.group(1) for m in re.finditer(r'href=["\']([^"\']+)["\']', html or '', re.I)]
+    groups = {}
+    for h in hrefs:
+        u = _abs(base, h) if not h.startswith('http') else h
+        k = _path_key(u)
+        if not k or k in ('/', '/#', '/#.html'):
+            continue
+        groups.setdefault(k, []).append(u)
+    best = None
+    for _k, urls in groups.items():
+        uniq = {i for i in (_id_of(u) for u in urls[:top]) if i}
+        if len(uniq) < min_uniq:
+            continue
+        avg = sum(len(x) for x in uniq) / float(len(uniq))
+        score = len(uniq) * 10 + avg * 3 + min(len(urls), 200) * 0.2
+        if best is None or score > best[0]:
+            best = (score, max(urls[:top], key=len), len(uniq))
+    return best[1] if best else ''
+
+
+def build_detail_re(sample):
+    """由样本 URL 反推详情正则（S231 五层决策 L717-771，顺序不可换）。
+
+    五层：①剥扩展名 → ②单段前缀（`/detail-217011`）→ ③MacCMS 占位词
+    （`/index.php/vod/detail/id/123.html`，倒数第二段是占位词）→ ④`/v/1489032/229`
+    短参数（ID 在倒数第二段）→ ⑤slug 整段；兜底只替换**最后一段数字**（避免吃到域名里的数字）。
+    生成的正则用 `[a-zA-Z0-9_-]` 类捕获组，与探源司其余正则口径一致（不写死数字）。
+    """
+    s = (sample or '').split('?')[0]
+    if not s:
+        return ''
+    # ★必须连 host 一起剥：只剥 `https:` 时 host（如 site2024.com）会留在 segs 里，
+    #   生成的正则变成 `/site2024\.com/abc/(...)` —— 域名一换整条正则就废，
+    #   而且域名里的数字会被兜底层当 ID 吃掉（原始注释专门警告过这一点）。
+    m_host = re.match(r'^https?://[^/]+', s, re.I)
+    if m_host:
+        s = s[m_host.end():] or '/'
+    segs = [x for x in s.split('/') if x]
+    if not segs:
+        return ''
+    last = segs[-1]
+    ext = ''
+    m = re.search(r'(\.html?|\.php|\.aspx?)$', last, re.I)
+    if m:
+        ext, last = m.group(1), last[:m.start()]
+    parent = '/'.join(segs[:-1])
+    head = '/' + parent + '/' if parent else '/'
+    if not parent:
+        # ② 单段形态：`/detail-217011` → 前缀字面量 + 数字捕获
+        m2 = re.fullmatch(r'([A-Za-z_-]{3,12}?)(\d{2,12})', last)
+        if m2:
+            return '/' + re.escape(m2.group(1)) + r'(\d{2,12})' + re.escape(ext)
+        return '/' + re.escape(last) + re.escape(ext)
+    # ③ MacCMS 重写：倒数第二段是占位词，最后一节才是 ID
+    if len(segs) >= 3 and segs[-2].lower() in (
+            'id', 'ids', 'vid', 'vodid', 'key', 'code', 'name', 'title'):
+        return re.escape('/' + '/'.join(segs[:-1]) + '/') + r'([A-Za-z0-9_-]{1,60})' + re.escape(ext)
+    # ④ ID 在倒数第二段、末段是短参数（`/v/1489032/229`）
+    if last.isdigit() and len(last) <= 6 and len(segs) >= 3:
+        pp = segs[-3].lower()
+        if pp in ('v', 'd', 'ep', 'eps', 'video', 'watch', 'detail', 'play', 'vod'):
+            return (re.escape('/' + '/'.join(segs[:-2]) + '/')
+                    + r'([A-Za-z0-9_-]{2,60})/' + re.escape(last) + re.escape(ext))
+    # ⑤ 纯 slug / 字母数字混合（含数字，或长度 ≥4）→ 整段替换
+    if re.fullmatch(r'[A-Za-z0-9_-]{3,}', last) and (re.search(r'\d', last) or len(last) >= 4):
+        return re.escape(head) + r'([A-Za-z0-9_-]{2,60})' + re.escape(ext)
+    # 兜底：只替换最后一段数字（注释原文：「避免吃到域名里的数字」）
+    esc = re.escape('/' + '/'.join(segs))
+    found = list(re.finditer(r'\d{3,}', esc))
+    if not found:
+        return esc
+    lastm = found[-1]
+    return esc[:lastm.start()] + r'(\d+)' + esc[lastm.end():]
+
+
+def _parse_list_sniff(html, base, limit=6):
+    """聚类路线的列表解析（S231 移植③）。返回 (items, detail_re)。
+
+    与 `_parse_list` 的区别：**不假设路径词**。先聚类选出最像详情页的模式，
+    再由样本反推正则，然后用这个正则回头抓页面上的条目。
+    聚类不出来 → 返回 ([], '')，由调用方记 undetermined（不猜模板）。
+    """
+    sample = sniff_detail_re(html, base)
+    if not sample:
+        return [], ''
+    dre = build_detail_re(sample)
+    if not dre:
+        return [], ''
+    items, seen = [], set()
+    for m in re.finditer(dre, html, re.I):
+        href = m.group(0)
+        u = _abs(base, href) if not href.startswith('http') else href
+        if u in seen:
+            continue
+        # 标题取链接后 200 字内的 title 属性或可见文本
+        tail = html[m.end():m.end() + 200]
+        t = re.search(r'title="([^"]{2,60})"', tail)
+        txt = re.sub(r'<[^>]+>', ' ', tail)
+        title = (t.group(1) if t else txt).strip()
+        title = re.sub(r'\s+', ' ', title)[:60]
+        if len(title) < 2:
+            continue
+        seen.add(u)
+        items.append({'title': title, 'url': u, 'pic': ''})
+        if len(items) >= limit:
+            break
+    return items, dre
+
+
 def recon(url, *, depth=1, timeout=15):
     """侦察一个站点 → dict（可直接进 evidence 包）。
 
@@ -275,6 +476,18 @@ def recon(url, *, depth=1, timeout=15):
         else:
             out['list_url'] = list_url
             out['list_sample'] = _parse_list(body, list_url)
+            # ★S231 移植③：固定正则取不到时走聚类路线（任意站点形态自适应）。
+            #   只在固定路口空时才触发——两条路线都跑会重复抓取，且正则会互相污染。
+            if not out['list_sample']:
+                items2, dre = _parse_list_sniff(body, list_url)
+                if items2:
+                    out['list_sample'] = items2
+                    out['detail_re'] = dre
+                    out['hits']['list_via'] = f'sniff 聚类（固定正则空→反推 {dre[:60]}）'
+                else:
+                    out['undetermined'].append(
+                        '列表样例为空：固定正则与 sniff 聚类均未认出详情页形态——'
+                        '下游必须人工确认列表结构，不许凭记忆套模板')
             out['page_url_pattern'] = _page_pattern(body, list_url)
             out['hits'].setdefault('list_ok', f'分类页可抓，样例 {len(out["list_sample"])} 条')
             # ── 抓详情页 ──
@@ -466,6 +679,47 @@ def selftest():
     r = recon('http://127.0.0.1:1/', timeout=3)
     chk('不可达 → home_ok=None', r['home_ok'] is None, str(r['home_ok']))
     chk('不可达 → 有 undetermined 说明', bool(r['undetermined']), str(r['undetermined']))
+
+    # ⑥ ★S231 移植③：五层详情正则生成（**五层各一个用例**，缺一层就会在某种站点形态上瞎套）
+    cases = [
+        ('①单段前缀', 'https://a.com/detail-217011.html', 'https://a.com/detail-217012.html', True),
+        ('③MacCMS占位词', 'https://a.com/index.php/vod/detail/id/12345.html',
+         'https://a.com/index.php/vod/detail/id/999.html', True),
+        ('④短参数(/v/ID/ep)', 'https://a.com/v/1489032/229', 'https://a.com/v/777/229', True),
+        ('⑤slug整段', 'https://a.com/mhkh/slug-name', 'https://a.com/mhkh/other-slug', True),
+        ('⑤数字段整段替换', 'https://a.com/abc/12345.html', 'https://a.com/abc/67890.html', True),
+        ('兜底只换末段数字', 'https://a.com/abc/12.34.5678', 'https://a.com/abc/12.34.9999', True),
+    ]
+    for label, s1, s2, want in cases:
+        dre = build_detail_re(s1)
+        got = bool(re.search(dre, s2)) if dre else False
+        chk(f'五层正则 {label}：能匹配同模板另一条', got == want, f'dre={dre!r}')
+    # 反向①：正则**不得**吃掉域名里的数字（兜底层注释的原始动机）
+    dre = build_detail_re('https://site2024.com/abc/12345.html')
+    chk('五层正则 反向：不含域名数字', '2024' not in dre, dre)
+    chk('五层正则 反向：不含 host（换域正则仍可用）',
+        'site2024' not in dre and 'com' not in dre.replace('\\', ''), dre)
+    # 反向②：不同模板不得互匹配（否则聚类会把分类目录和详情页混成一组）
+    dre_a = build_detail_re('https://a.com/index.php/vod/detail/id/12345.html')
+    chk('五层正则 反向：不跨模板误匹配',
+        not re.search(dre_a, 'https://a.com/v/1489032/229'), dre_a)
+
+    # ⑦ sniff 聚类打分：分类目录（唯一 ID 少）不得胜过详情页
+    html = ''.join(f'<a href="/index.php/vod/detail/id/{i}.html">片{i}</a>' for i in range(1, 9))
+    html += ''.join(f'<a href="/index.php/vod/type/id/{i}.html">类{i}</a>' for i in range(1, 3))
+    sample = sniff_detail_re(html, 'https://a.com/')
+    chk('sniff 聚类：选中详情页而非分类目录', '/detail/id/' in sample, sample)
+    _dre = build_detail_re(sample) if sample else ''
+    chk('sniff 聚类：反推正则非空且覆盖同组全部条目',
+        bool(_dre) and len(re.findall(_dre, html)) >= 6, repr(_dre))
+    # 反向：全站只有 2 个 ID（唯一 ID < 3）→ 不参选，返回空（宁可不说，不瞎猜）
+    chk('sniff 聚类 反向：唯一ID不足返回空',
+        sniff_detail_re('<a href="/v/1.html">a</a><a href="/v/2.html">b</a>',
+                        'https://a.com/') == '')
+    # 反向：纯导航页（无 ID 段）返回空
+    chk('sniff 聚类 反向：无ID页返回空',
+        sniff_detail_re('<a href="/about">关于</a><a href="/contact">联系</a>',
+                        'https://a.com/') == '')
 
     print()
     if fails:

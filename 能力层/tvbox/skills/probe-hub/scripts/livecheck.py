@@ -41,6 +41,81 @@ UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
 TIMEOUT = 12
 # ★S169：最近一次 _curl 失败的类别（'' 表示成功）。供上层区分"证书坏了"与"站点死了"。
 _last_err_kind = ''
+# ★S231 移植①：TLS 指纹段是否生效（供证据/自检读，不被静默忽略）
+_tls_fp_used = False
+
+# ── S231 移植①：浏览器 TLS 指纹伪装（WAF 反指纹）──────────────────────────
+# 出处：references/S231_物料_OK影视一键写py.py L104-118（原文 urllib+ssl 版）。
+# 原文注释：「部分站点 WAF 会识别 Python 默认指纹并拒绝」。curl 的默认指纹同样不是
+# 浏览器指纹（OpenSSL 默认 cipher 顺序 + 支持 h2），故按同口径移植成 curl argv。
+#
+# **为什么必须带回退**（这是移植时新增的保险，不是原文有的）：
+#   收紧 cipher 列表本身有代价——只支持老 cipher（如 AES128-SHA 之外的 RC4/3DES-only）
+#   的站会握手失败。若挂段后不加保险，就会「修好 403 的同时弄死一批本来能通的站」，
+#   属于「判据改动引入新失败」，比不改更坏。故：指纹握手失败（tls/cert 类）→
+#   自动去指纹重试一次，并把 `_tls_fp_used` 置 False 如实反映「这站没吃到指纹」。
+TLS_FP_CIPHERS = (
+    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
+    'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
+    'ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384')
+# TLS1.3 套件与 1.2 cipher 名单是两套参数，只给 --ciphers 在纯 1.3 站上不生效
+TLS13_CIPHERS = ('TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:'
+                 'TLS_CHACHA20_POLY1305_SHA256')
+# 可用 LIVECHECK_TLS_FP=0 整体关闭（A/B 实测与排障用；关闭时证据里不出现指纹标记）
+TLS_FP_ON = os.environ.get('LIVECHECK_TLS_FP', '1') != '0'
+
+# 指纹握手失败的成因（这些才回退；dns/refused/timeout 与指纹无关，回退无意义）
+_FP_RETRY_KINDS = ('tls', 'cert_expired', 'cert_invalid')
+
+
+def _build_cmd(url, *, timeout=TIMEOUT, headers=None, rng=None, fp=None, insecure=False):
+    """构造 curl argv —— **argv 单一事实源**（`_curl` 与 `check_auto_ignore_cert` 共用）。
+
+    抽出来的理由（B-15 模式级修）：原来 `check_auto_ignore_cert` 为了插一个 `-k`
+    把整个 argv 复制了一份，于是任何网络层参数改动都要改两处、漏一处就两边口径不一。
+    指纹段若也各写一份，漏的那边会「看起来在测活、实际没带指纹」。
+
+    fp=None → 取模块开关 TLS_FP_ON；显式 True/False 供回退重试与自检用。
+    """
+    if fp is None:
+        fp = TLS_FP_ON
+    cmd = ['curl', '-sS', '-L', '--compressed', '--max-time', str(timeout), '-A', UA,
+           '-w', '\n%{http_code}']
+    if insecure:
+        cmd.append('-k')
+    if fp:
+        cmd += ['--ciphers', TLS_FP_CIPHERS, '--tls13-ciphers', TLS13_CIPHERS, '--http1.1']
+    if rng:
+        cmd += ['-r', rng]
+    if headers:
+        for k, v in headers.items():
+            cmd += ['-H', f'{k}: {v}']
+    cmd.append(url)
+    return cmd
+
+
+def _run(cmd, timeout):
+    """执行 argv → (code, body)。code=0 时同步刷新 `_last_err_kind`。"""
+    global _last_err_kind
+    try:
+        p = subprocess.run(cmd, capture_output=True, timeout=timeout + 4)
+        out = p.stdout.decode('utf-8', 'replace')
+        err = (p.stderr or b'').decode('utf-8', 'replace').lower()
+        if '\n' in out:
+            body, _, tail = out.rpartition('\n')
+        else:
+            body, tail = '', out
+        try:
+            code = int(tail.strip())
+        except Exception:
+            code = 0
+        # ★S193：把 curl 退出码一并交给分类器（主判据；err 仅兜底）
+        _last_err_kind = '' if code else _classify_err(err, p.returncode)
+        return code, body
+    except Exception:
+        _last_err_kind = 'other'
+        return 0, ''
 
 
 def _curl(url, *, timeout=TIMEOUT, headers=None, want_body=True, rng=None):
@@ -58,34 +133,24 @@ def _curl(url, *, timeout=TIMEOUT, headers=None, want_body=True, rng=None):
     87594 / 302199 条真实数据；加 -k 立刻能拉到。
     故这里把 stderr 的关键词解析成 `_last_err_kind`（模块级，供同线程的调用方读），
     上层可据此把证书类单独标出来，而不是混进"不可达"。
+
+    ★S231 移植①：带浏览器 TLS 指纹（`_build_cmd(fp=True)`）。指纹握手失败
+    （tls/cert 类）→ **自动去指纹重试一次**，避免「修 403 却弄死老站」；
+    `_tls_fp_used` 如实反映这次到底吃没吃到指纹。
     """
-    global _last_err_kind
-    cmd = ['curl', '-sS', '-L', '--compressed', '--max-time', str(timeout), '-A', UA,
-           '-w', '\n%{http_code}']
-    if rng:
-        cmd += ['-r', rng]
-    if headers:
-        for k, v in headers.items():
-            cmd += ['-H', f'{k}: {v}']
-    cmd.append(url)
-    try:
-        p = subprocess.run(cmd, capture_output=True, timeout=timeout + 4)
-        out = p.stdout.decode('utf-8', 'replace')
-        err = (p.stderr or b'').decode('utf-8', 'replace').lower()
-        if '\n' in out:
-            body, _, tail = out.rpartition('\n')
-        else:
-            body, tail = '', out
-        try:
-            code = int(tail.strip())
-        except Exception:
-            code = 0
-        # ★S193：把 curl 退出码一并交给分类器（主判据；err 仅兜底）
-        _last_err_kind = '' if code else _classify_err(err, p.returncode)
-        return code, (body if want_body else '')
-    except Exception:
-        _last_err_kind = 'other'
-        return 0, ''
+    global _tls_fp_used
+    fp = TLS_FP_ON
+    code, body = _run(_build_cmd(url, timeout=timeout, headers=headers, rng=rng, fp=fp),
+                      timeout)
+    _tls_fp_used = bool(fp and code)
+    if code == 0 and fp and _last_err_kind in _FP_RETRY_KINDS:
+        # 指纹可能是失败原因（老 cipher 站）→ 退回默认指纹复验一次
+        code2, body2 = _run(_build_cmd(url, timeout=timeout, headers=headers, rng=rng,
+                                       fp=False), timeout)
+        if code2:
+            code, body = code2, body2
+            _tls_fp_used = False
+    return code, (body if want_body else '')
 
 
 def _classify_err(err, rc=0):
@@ -200,26 +265,11 @@ def check_auto_ignore_cert(api, *, timeout=TIMEOUT):
     _real_kinds = []
 
     def _k(url, **kw):
-        # 在命令里插 -k：复用原实现，只改 argv
-        import subprocess as _sp
-        cmd = ['curl', '-k', '-sS', '-L', '--compressed', '--max-time', str(kw.get('timeout', timeout)),
-               '-A', UA, '-w', '\n%{http_code}']
-        if kw.get('rng'):
-            cmd += ['-r', kw['rng']]
-        for _k2, _v in (kw.get('headers') or {}).items():
-            cmd += ['-H', f'{_k2}: {_v}']
-        cmd.append(url)
-        try:
-            p = _sp.run(cmd, capture_output=True, timeout=kw.get('timeout', timeout) + 4)
-            out = p.stdout.decode('utf-8', 'replace')
-            body, _, tail = out.rpartition('\n') if '\n' in out else ('', '', out)
-            try:
-                code = int(tail.strip())
-            except Exception:
-                code = 0
-            return code, (body if kw.get('want_body', True) else '')
-        except Exception:
-            return 0, ''
+        # 在命令里插 -k：走同一个 argv 构造器（S231 移植①：指纹段不再各写一份，
+        # 否则这条复验路径会「看起来在测、实际没带指纹」，两边口径不一）
+        return _run(_build_cmd(url, timeout=kw.get('timeout', timeout),
+                               headers=kw.get('headers'), rng=kw.get('rng'),
+                               insecure=True), kw.get('timeout', timeout))
 
     try:
         globals()['_curl'] = _k
@@ -462,17 +512,94 @@ def check_vod(api, *, timeout=TIMEOUT):
     if xml_urls:
         return '失败', (f'XML 有{len(xml_urls)}条播放地址但均拉不动（尝试{len(tried)}路）'
                         f'·{xml_urls[0][:70]}')
+    # ★S231 移植②：HTTP 已通但拿不到播放地址时，补一句「列表层还有没有货」——
+    #   否则分不清「接口改道了」与「接口在、内容断」，死因会一路塌成内容层去瞎改。
+    #   只在失败路径调用（正常通过的源零额外开销），且**不改变判定**，只补证据。
+    _sem = ''
+    try:
+        _hit, _sev = probe_site(api, timeout=min(timeout, 6))
+        _sem = f'·{_sev}'      # 命中/未命中都在 _sev 里，证据文案不在这里二次拼
+    except Exception:
+        _sem = ''       # 探针自身异常不许污染主判定（B-02：记空，不折叠成通过/失败）
     if fake_seen:
         return '失败', (f'假活：vod_play_url 取值为空/无http地址，列表可达≠真实可用'
-                        f'（尝试{len(tried)}路）')
+                        f'（尝试{len(tried)}路）{_sem}')
     codes = [c for _, c, _ in tried]
     if codes and all(c in (404, 410, 403, 451) for c in codes):
-        return '失败', f'HTTP {codes[0]}（{len(tried)}路均 4xx）'
+        return '失败', f'HTTP {codes[0]}（{len(tried)}路均 4xx）{_sem}'
     if xml_pages > 0:
         # S142：是真 XML 接口（有 pagecount）但没返回 <dd> 地址 → 分不清"接口薄"与"取参不对"
         return '无法判定', (f'XML 接口可达（pagecount={xml_pages}）但未取到播放地址'
                             f'（尝试{len(tried)}路）')
-    return '失败', f'无vod_play_url/无XML播放地址（尝试{len(tried)}路，末路HTTP{tried[-1][1] if tried else 0}）'
+    return '失败', (f'无vod_play_url/无XML播放地址（尝试{len(tried)}路，'
+                    f'末路HTTP{tried[-1][1] if tried else 0}）{_sem}')
+
+
+# ═══════════ S231 移植②：站点语义测活（ac=list 看「列表有没有货」） ═══════════
+# 出处：references/S231_物料_OK影视一键写py.py L1659-1683（原文 `_probe_site`）。
+# 为什么需要（与 S097 同族，但层级不同）：
+#   S097 判的是「能不能拉到播放地址」（详情层）；本探针判的是「站点还有没有片子」（列表层）。
+#   改版/换接口的站在 ac=detail 上常返回 200 + 空 body 或 HTML 错误页，单看 HTTP 码
+#   判不出「站点在、接口没了」——这正是 S231 待办里说的「内容层死因的零成本前置探针」。
+# 三态纪律：返回 '' 只表示「4 路标准接口都没给出列表」，**不据此判死**；
+#   是「接口改道」还是「整站没了」，由上层结合 HTTP/域名证据再分型（本函数不越权）。
+SITE_API_PATHS = ('/api.php/provide/vod', '/api.php/provide/vod/at/json',
+                  '/provide/vod', '/api/vod')
+
+
+def _list_count(body):
+    """从 ac=list 响应里数条目。返回 int（0 表示没有货）；**解析不了返回 -1**（≠0）。
+
+    三态不能折叠：`-1 解析不了` 与 `0 列表为空` 是两件事——
+    前者可能是 HTML 错误页（改道/被墙），后者是接口活着但真没内容。
+    """
+    b = (body or '').lstrip('\ufeff').strip()
+    if not b:
+        return -1
+    try:
+        d = json.loads(b)
+    except Exception:
+        return -1
+    if not isinstance(d, dict):
+        return -1
+    for v in (d.get('list'), (d.get('data') or {}).get('list') if isinstance(d.get('data'), dict) else None):
+        if isinstance(v, list):
+            return len(v)
+    # 苹果CMS 部分站把 list 挂在 data 下且 data 直接是数组
+    if isinstance(d.get('data'), list):
+        return len(d['data'])
+    return -1
+
+
+def probe_site(api, *, timeout=8, paths=None):
+    """站点语义测活：4 条 MacCMS 标准路径逐个 `ac=list`，看列表有没有货。
+
+    返回 (命中接口URL, 证据)。命中 = 解析出列表且**非空**；
+    `-1（解析不了）` 与 `0（空列表）` 都算未命中，但证据分开写清——不许混成一句「接口死」。
+    """
+    site = (api or '').split('?')[0].rstrip('/')
+    # 传进来的若是完整采集接口，先剥回到站点根
+    for suf in ('/api.php/provide/vod/at/json', '/api.php/provide/vod', '/provide/vod', '/api/vod'):
+        if site.endswith(suf):
+            site = site[:-len(suf)]
+            break
+    if not re.match(r'^https?://[^/]+', site):
+        return '', f'语义测活跳过：非 http 站点地址（{api[:50]}）'
+    notes = []
+    for p in (paths or SITE_API_PATHS):
+        u = site + p
+        code, body = _curl(f'{u}?ac=list', timeout=timeout)
+        if code == 0:
+            notes.append(f'{p} 不可达')
+            continue
+        n = _list_count(body)
+        if n > 0:
+            return u, f'语义测活命中 {p}·列表 {n} 条·HTTP {code}'
+        if n == 0:
+            notes.append(f'{p} 列表为空(HTTP {code})')
+        else:
+            notes.append(f'{p} 非JSON/解析不了(HTTP {code})')
+    return '', f'语义测活 4 路均未出列表：{"；".join(notes[:4])}'
 
 
 # ═══════════ 死因分型（S221·AI修源四路由的前置判据） ═══════════
@@ -501,6 +628,8 @@ def death_cause(verdict, evidence, kind=''):
       · 通过            → ''（无死因）
       · 无法判定        → '未定·网络'（不算死，M-R60；证书类已在证据里单独标注）
       · 失败 + py/js    → '语法层'（源码崩/解析崩，代码补丁可修）
+      · 失败 + 语义测活命中 → '内容层'（列表层有货、详情层断，改走采集接口）
+      · 失败 + 语义测活全空 → '接口层'（采集接口整片没了，先改道）
       · 失败 + 4xx证据   → '接口层'（路径/前缀改版，接口改道可修）
       · 失败 + 字段空/拉不动 → '内容层'（接口活但内容断，改走采集接口）
       · 失败 + XML可达无地址 → '结构性'（接口形态存疑，整站重写档）
@@ -514,6 +643,13 @@ def death_cause(verdict, evidence, kind=''):
     # —— 以下均为"失败" ——
     if kind in ('py', 'js'):
         return '语法层'
+    # ★S231 移植②：语义测活证据优先于关键词兜底——它比"假活/无地址"更具体：
+    #   列表层还有货 → 站点在、只是详情这层断了（内容层，改走采集接口）；
+    #   4 条标准路径全无列表 → 采集接口整片没了（接口层，先改道再谈内容）。
+    if '语义测活命中' in ev:
+        return '内容层'
+    if '语义测活 4 路均未出列表' in ev:
+        return '接口层'
     if re.search(r'HTTP 4\d\d|4xx|无地址字段|配置错误', ev):
         return '接口层'
     if re.search(r'假活|拉不动|无播放地址|无vod_play_url|无真实播放地址', ev):
@@ -1205,6 +1341,115 @@ def _archive_livecheck(path, res):
         print(f'  ⚠️ 归档门面异常（{type(e).__name__}: {str(e)[:60]}），测活结果不受影响')
 
 
+def selftest():
+    """离线自检（S231 移植①/②）：只测纯逻辑与 argv 构造，**不联网**。
+
+    正反向各有用例：正向证明「该有的有」，反向证明「不该有的没有」——
+    只测正向（参数里有 --ciphers）挡不住「指纹段挂错位置/永远生效关不掉」这类缺陷。
+    """
+    fails = []
+
+    def chk(name, cond, detail=''):
+        print(f'[{"OK " if cond else "FAIL"}] {name}' + ('' if cond else f'  {detail}'))
+        if not cond:
+            fails.append(name)
+
+    # ①-a 指纹段在 argv 里的位置与内容（正向）
+    c = _build_cmd('https://x.com/a', fp=True)
+    chk('①指纹: 带 --ciphers', '--ciphers' in c and TLS_FP_CIPHERS in c, str(c[:6]))
+    chk('①指纹: 带 --tls13-ciphers（纯 1.3 站才生效）', '--tls13-ciphers' in c and TLS13_CIPHERS in c)
+    chk('①指纹: 强制 http/1.1（h2 指纹不像浏览器）', '--http1.1' in c)
+    chk('①指纹: 参数在 URL 之前（curl 要求）', c[-1] == 'https://x.com/a' and c.index('--ciphers') < len(c) - 1)
+    # ①-b 反向：关掉后一个都不许留
+    c2 = _build_cmd('https://x.com/a', fp=False)
+    chk('①指纹: fp=False 无任何指纹参数',
+        not ({'--ciphers', '--tls13-ciphers', '--http1.1'} & set(c2)), str(c2))
+    # ①-c insecure 只加 -k，不得影响指纹段
+    c3 = _build_cmd('https://x.com/a', fp=True, insecure=True)
+    chk('①指纹: insecure 只插 -k 且指纹仍在', '-k' in c3 and '--ciphers' in c3)
+    # ①-d 回退保险：tls 类失败必须去指纹重试（否则修 403 会弄死老 cipher 站）
+    chk('①回退: tls/cert 类才回退', set(_FP_RETRY_KINDS) == {'tls', 'cert_expired', 'cert_invalid'},
+        str(_FP_RETRY_KINDS))
+    # ①-e 回退**行为**（注入假 _run，确定性复现，不依赖网络）：
+    #     指纹路 tls 失败 → 自动去指纹重试并成功；且 _tls_fp_used 如实为 False。
+    #     反向：dns/timeout 类失败**不许**回退（与指纹无关，重试是浪费且掩盖真因）。
+    global _run, _last_err_kind, _tls_fp_used
+    _real_run = _run
+    seen = []
+
+    def _fake_run(cmd, timeout, _fail_kind='tls'):
+        seen.append(bool('--ciphers' in cmd))
+        if '--ciphers' in cmd:
+            globals()['_last_err_kind'] = _fail_kind
+            return 0, ''
+        globals()['_last_err_kind'] = ''
+        return 200, 'BODY'
+    try:
+        globals()['_run'] = _fake_run
+        code, body = _curl('https://x.com/a', timeout=2)
+        chk('①回退: tls 失败→去指纹重试并成功',
+            code == 200 and body == 'BODY' and seen == [True, False] and _tls_fp_used is False,
+            f'code={code} seen={seen} fp_used={_tls_fp_used}')
+        seen.clear()
+
+        def _fake_dns(cmd, timeout):
+            seen.append(bool('--ciphers' in cmd))
+            globals()['_last_err_kind'] = 'dns'
+            return 0, ''
+        globals()['_run'] = _fake_dns
+        code2, _ = _curl('https://x.com/a', timeout=2)
+        chk('①回退: dns 失败不回退（与指纹无关）',
+            code2 == 0 and seen == [True] and _last_err_kind == 'dns',
+            f'code={code2} seen={seen} kind={_last_err_kind}')
+        seen.clear()
+
+        def _fake_ok(cmd, timeout):
+            seen.append(bool('--ciphers' in cmd))
+            globals()['_last_err_kind'] = ''
+            return 200, 'OK'
+        globals()['_run'] = _fake_ok
+        code3, _ = _curl('https://x.com/a', timeout=2)
+        chk('①指纹: 正常通过时只打一次且吃到指纹',
+            code3 == 200 and seen == [True] and _tls_fp_used is True, f'seen={seen}')
+    finally:
+        globals()['_run'] = _real_run
+
+    # ②-a 列表计数三态（-1 解析不了 ≠ 0 列表为空）
+    chk('②语义: 顶层 list', _list_count('{"list":[{"vod_id":1},{"vod_id":2}]}') == 2)
+    chk('②语义: data.list', _list_count('{"data":{"list":[{"vod_id":1}]}}') == 1)
+    chk('②语义: data 直接是数组', _list_count('{"data":[{"a":1},{"a":2},{"a":3}]}') == 3)
+    chk('②语义: BOM 前缀能剥', _list_count('\ufeff{"list":[1]}') == 1)
+    chk('②语义: 空列表=0（活着但没货）', _list_count('{"list":[]}') == 0)
+    chk('②语义: HTML 错误页=-1（解析不了，≠0）', _list_count('<html>404</html>') == -1)
+    chk('②语义: 空体=-1', _list_count('') == -1)
+    chk('②语义: 无 list 字段=-1', _list_count('{"code":1,"msg":"ok"}') == -1)
+
+    # ②-b probe_site 的路径表与原正一致（4 条标准 MacCMS 路径）
+    chk('②语义: 4 条标准路径', len(SITE_API_PATHS) == 4, str(SITE_API_PATHS))
+    # 反向：非 http 地址不得发请求（返回空 + 明说跳过）
+    hit, ev = probe_site('not-a-url', timeout=1)
+    chk('②语义: 非 http 直接跳过', hit == '' and '跳过' in ev, ev)
+
+    # ②-c 死因分型必须吃语义证据（正向 mapped，反向不被兜底吃掉）
+    chk('②死因: 语义命中→内容层',
+        death_cause('失败', '无vod_play_url（尝试4路）·语义测活命中 /api.php/provide/vod·列表 12 条') == '内容层',
+        death_cause('失败', '语义测活命中'))
+    chk('②死因: 语义全空→接口层',
+        death_cause('失败', '无vod_play_url（尝试4路）·语义测活 4 路均未出列表：a 不可达') == '接口层',
+        death_cause('失败', '语义测活 4 路均未出列表'))
+    chk('②死因: 无语义证据时旧判据不变（不回归）',
+        death_cause('失败', '假活：vod_play_url 取值为空') == '内容层')
+    chk('②死因: 无法判定永远优先（三态不塌）',
+        death_cause('无法判定', '语义测活命中 列表 3 条') == '未定·网络')
+
+    print()
+    if fails:
+        print(f'✗ livecheck 离线自检 {len(fails)} 项失败：{fails}')
+        return 1
+    print('✓ livecheck 离线自检全部通过（S231 移植①②）')
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description='真实可用测活引擎（点播拉片/直播拉流）')
     ap.add_argument('url', nargs='?', help='单条 URL')
@@ -1216,8 +1461,21 @@ def main():
                     help='kind=parse 时的测试影片页（默认开端 S01）')
     ap.add_argument('--wait', type=int, default=12,
                     help='kind=parse 时等 JS 出流的秒数（实测 9s 才出 blob，少于 8 会误判死）')
+    ap.add_argument('--probe-site', dest='probe_site_only',
+                    help='只做语义测活：给站点/接口地址，判 4 条标准路径有没有货')
+    ap.add_argument('--selftest', action='store_true', help='离线自检（不联网）')
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
+    if a.selftest:
+        return selftest()
+    if a.probe_site_only:
+        hit, ev = probe_site(a.probe_site_only)
+        if a.json:
+            print(json.dumps({'site': a.probe_site_only, 'api': hit, 'evidence': ev},
+                             ensure_ascii=False))
+        else:
+            print(f'{"✅" if hit else "·"} {ev}' + (f'\n   接口：{hit}' if hit else ''))
+        return 0 if hit else 1
     if a.batch:
         return cmd_batch(a)
     if a.url:

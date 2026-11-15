@@ -6,7 +6,7 @@
 
 ## 1. 当前主线（一句话）
 
-v0.8.67 批3 探测器链落地（内容流自动化闭环）：四轮漏检排查后按优先级施工，**批1 接电**（M12 经验门进 verify 必经链路 / commit-msg 接复发记账 / 痊愈机判 chk_cure / 硬化矩阵回写 / B-07 SessionStart 实测）、**批2 还债**（版本台账补记、22 条死账处置、71 件 .md 改名）之后，本轮完成**批3 自动化链**：①`verify/content_sources.json` v2.0.0 把 8 条流全部改成**机器可测 signal**（lesson/message/diff_paths/version_bump），并补登第 9、10 条流（版本演化台账、产物索引）——此前未登记的流永远是盲区；②新建**欠账负账本** `verify/delivery_debt.json`（open/closed/waived 三态 + age_commits 增龄 + 豁免到期自动转 open）；③新建探测器 `verify/delivery_probe.py`（纯函数 `probe_commit` + 8 例正反向 selftest + 机器核销）；④`gate_archive_ledger` 主判据由「近 3 天窗口」改为**账本制**（窗口会把长期欠债洗白）；⑤next_anchor 加**欠账注入**（每轮红着提醒，销账才消）。**落地实证**：探测器扫出并清偿 43 条真实欠账——版本台账 git 里 55 版 vs 台账 20 条（**缺 36 版**，批2 只按范围补了 12 版）、18 个 commit 的 Lesson 从未转资产、22 条 failed。三项资产已落库：01-方法论《方法论总编·历史 Lesson 提炼》（18 条归 6 类）、00-SOP《Stop 钩子完成态判据》、02-生态总览与 07-落地监测快照。**过程中修掉的真缺陷**：evolve-log 只写云端不写仓级账（新增 `write_ledger` 自动回执，space-hub v2.7.9）；核销判据用「同夹+同日」把他人回执当自己的（改为必须能指回 commit，病15 第 8 例）。**遗留**：探源司代码级移植 4 项、91探花悬案、187 仓云端写回待用 db_edit 补。
+v0.8.68 批4 **S231 四项代码级移植落地 + 全量复盘收口**：前三批把「内容流自动化闭环」基建做完（批1 接电 / 批2 还债 / 批3 探测器链），本轮把 v1.28.5 只写在 references 里的六层资产中**代码可移植的四项**真正做进执行路径：①**TLS 指纹段**挂 `livecheck` 网络层（新增 `_build_cmd` 作 **argv 单一事实源**，`_curl` 与 `check_auto_ignore_cert` 共用，此前两个函数各复制一份 argv；配**指纹失败自动回退**——收紧 cipher 会弄死只支持老套件的站，"修好 403 却弄死一批"比不改更坏，这是移植时新增的保险，原文没有）；②**`ac=list` 语义测活**并入死因分型（`probe_site` + `--probe-site` 正门；`_list_count` 三态 `-1 解析不了 ≠ 0 列表为空`；`death_cause` 新增两条映射，把「接口改道」与「接口在、内容断」分开）；③**sniff 聚类打分 + 五层详情正则**进 `repair/recon.py`（固定正则取空才走聚类，仍取不到就记 undetermined 明说"必须人工确认"）；④**6 层播放集兜底 + 跨域广告排除**进 `shellcrack.play_sets`。**过程中自检照出 3 个真缺陷**：`_id_of` 对单位数 ID 用 `{2,}` 过滤 → 回退到父段占位词 `id` → 全站"ID"同一个词、聚类恒不参选（病15 第 10 例）；`build_detail_re` 只剥 `https:` 没剥 host → 正则带域名、换域即废；自检用例 `findall(空正则)` 恒多命中造成假绿、层序自造 A2 层把 B 层用例吃掉使"广告剔除计数"永不触发。**接电**：三项 `--selftest` 进 `verify.sh` 探源司段，反向实测（摘掉指纹段 → verify rc=2 且红项点名，还原 → rc=0）。**探测器稳定判据**：连续两轮 `--scan` 零新增（open 0 / closed 48）。**遗留**：91探花悬案 v4 修复包未部署、187 仓云端写回待用 db_edit 补、3 条待删清单等用户处置。
 
 **下一步**：`git log -1 --format=%B | sed -n 's/^Next: //p'`（正文即细则）
 
@@ -16,7 +16,7 @@ v0.8.67 批3 探测器链落地（内容流自动化闭环）：四轮漏检排�
 ## 2. 版本与位置
 
 - 仓库根：当前 clone 目录（用 `pwd -P` 确认，不在本文件写死绝对路径）
-- 版本：0.8.67
+- 版本：0.8.68
 - 远端：核对口径是 `git rev-parse HEAD` 与 `gh api repos/tvbox342078879/520pro/commits/main --jq .sha` **两值相等**——本文件不写死 sha，因为任何一次收尾提交都会让写死值过期（写方法不过期）；`ls-remote` 常因网络抖动超时，超时记「无法判定」不算通过
 - 推送一律走 `hooks/git_push_safe.sh`，不裸 push
 - 当前主线自检口径：`bash verify.sh` 应 **0 ✗ / 0 ⚠**；`python3 verify/skill_contract_check.py --require-mirror` 应无 ✗（体积项允许 ⚠）

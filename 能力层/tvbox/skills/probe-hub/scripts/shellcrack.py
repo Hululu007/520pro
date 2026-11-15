@@ -131,6 +131,133 @@ def crack(name, page):
                 'template': TEMPLATES.get(key, ''), 'note': f'{type(e).__name__}:{str(e)[:40]}'}
 
 
+# ═══════════ S231 移植④：6 层播放集兜底 + 跨域广告排除 ═══════════
+# 出处：references/S231_物料_OK影视一键写py.py L972-1019（`_shows` 六层兜底）+ L999-1002（跨域广告排除）。
+# 为什么补：`crack()` 解的是**播放页**（壳页里已经拿到 m3u8）；而**详情页**上的选集
+#   结构（几线路/几集/链接怎么拼）此前没有实现——于是「站点能进、播放页也能开，
+#   但选不出集」这类站在探源司眼里只剩一个"待抠"，看不出到底缺哪一层。
+#   六层是从实站归纳的**兜底顺序**（先精确模板、后宽泛扫描），不是六个独立方案：
+#   前一层出结果就停——顺序颠倒会把推荐位/广告卡片当成选集（S196 同族坑）。
+_AD_WORDS = ('教程', '帮助', '下载', '注册', '登录', '充值', '公告', 'APP', '求片')
+
+
+def _txt(s):
+    """去标签取纯文本（六层里每层都要用，收敛到一处）。"""
+    return re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', s or '')).strip()
+
+
+def _is_ad(text, href, bases):
+    """跨域广告/推广判定（S231 L999-1002 的分型，逐条给理由）。
+
+    三类：①绝对地址且不在站点域名内 → 站外推广；②文案含推广/年份评分 → 推荐卡片；
+    ③文案过长（>20 字）→ 不是集名（集名极少超过 20 字）。
+    """
+    if href.startswith('http') and bases and not any(
+            href.rstrip('/').startswith(b.rstrip('/')) for b in bases):
+        return True
+    if re.search(r'\d\.\d\s*分|\b(19|20)\d{2}\b', text or ''):
+        return True
+    if any(w in (text or '') for w in _AD_WORDS):
+        return True
+    return len(text or '') > 20
+
+
+def play_sets(html, page, bases=None):
+    """详情页 → 播放集结构。返回 {'layer': 层级名, 'groups': {sid: [[集名, 绝对URL], ...]}}。
+
+    六层顺序（**不可换**，前一层出结果即停）：
+      A0 通用苹果CMS 三数字模板 `ID-SID-EID.html`（`/vodplay/` 与 `/play/` 都收）
+      A  同一模板的 `data-line`/`data-episode` 锚点（字母 ID 站常见）
+      A2 `vodplay` 相对地址重写（页面只给相对地址、没给完整路径）
+      B  带数字的 play 链接（`/play?xx=1&ep=2` 这类，排除站外/推广）
+      C  iframe / JSON 里的直链（`"url":"...m3u8"`，最后一层：拿到的是播放器地址）
+    跨域广告在 B/C 层按 `_is_ad` 剔除，**并统计剔除条数**——静默丢弃是另一种骗人。
+    """
+    bases = [b.rstrip('/') for b in (bases or []) if b]
+    if not bases:
+        m = re.match(r'^(https?://[^/]+)', page or '')
+        bases = [m.group(1)] if m else []
+    html = html or ''
+
+    def _abs(u):
+        return urljoin(page, u)
+
+    # ── A0/A：三数字模板（苹果CMS 重写 / play 路径）──
+    groups = {}
+    for m in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.S | re.I):
+        href, inner = m.group(1), m.group(2)
+        mm = re.search(r'/(?:vodplay|play)/?(\d+)[-_/](\d+)[-_/](\d+)', href)
+        if not mm:
+            continue
+        t = _txt(inner)
+        if _is_ad(t, _abs(href) if not href.startswith('http') else href, bases):
+            continue
+        pid, sid, eid = mm.group(1), mm.group(2), mm.group(3)
+        u = _abs(href.split('?')[0])
+        groups.setdefault(sid, {})
+        groups[sid].setdefault(u, [t or f'第{eid}集', u, int(eid)])
+    if groups:
+        return {'layer': 'A0 三数字模板', 'groups': _finish(groups)}
+
+    # ── A：data-line / data-episode 锚点（按线路分组）──
+    for chunk in re.split(r'<a\s', html):
+        tag = chunk.split('>')[0]
+        m1 = re.search(r'href="([^"]*?/play/[A-Za-z0-9]{5,}[^"]*)"', tag)
+        m2 = re.search(r'data-line="(\d+)"', tag)
+        m3 = re.search(r'data-episode="(\d+)"', tag)
+        if m1 and m2 and m3:
+            sid, ep = m2.group(1), m3.group(1)
+            u = _abs(m1.group(1))
+            groups.setdefault(sid, {})
+            groups[sid].setdefault(u, [f'第{ep}集', u, int(ep)])
+    if groups:
+        return {'layer': 'A data-line 锚点', 'groups': _finish(groups)}
+
+    # ── B：带数字的 play 链接（最后一道选集兜底；跨域广告在此剔除并计数）──
+    #   原文分层只有 A0/A/A2锚点/B/C 四段；「A2 vodplay 重写」已在 A0 一并覆盖，
+    #   不再单列一层——单列会把本层用例提前吃掉，让「广告剔除计数」永远不触发。
+    dropped = 0
+    for href, inner in re.findall(
+            r'<a[^>]+href="([^"]*(?:play|vodplay)[^"]*)"[^>]*>(.*?)</a>', html, re.S | re.I):
+        if not re.search(r'\d', href):
+            continue
+        t = _txt(inner)
+        if _is_ad(t, _abs(href) if not href.startswith('http') else href, bases):
+            dropped += 1
+            continue
+        u = _abs(href)
+        groups.setdefault('1', {})
+        groups['1'].setdefault(u, [t or '播放', u, len(groups['1'])])
+    if groups:
+        return {'layer': f'B play 链接（广告剔除 {dropped}）', 'groups': _finish(groups)}
+
+    # ── C：iframe / JSON 直链 ──
+    for src in re.findall(r'(?:iframe[^>]+src\s*=\s*|"url"\s*:\s*)"([^"]*(?:m3u8|player|play)[^"]*)"',
+                          html, re.I):
+        u = _abs(src)
+        groups.setdefault('1', {})
+        groups['1'].setdefault(u, [_txt(src)[:12] or '线路', u, len(groups['1'])])
+    if groups:
+        return {'layer': 'C iframe/JSON 直链', 'groups': _finish(groups)}
+    return {'layer': '', 'groups': {}}
+
+
+def _finish(groups):
+    """组内按集号排序、丢集号，补全为绝对地址前的收尾（与原文结构一致）。"""
+    out = {}
+    for sid, eps in groups.items():
+        out[sid] = [[n, u] for n, u, _i in sorted(eps.values(), key=lambda x: x[2])]
+    return out
+
+
+def play_sets_shows(ps):
+    """把 play_sets 结果转成 TVBox shows/urls 结构（层名也带上，便于复核走的哪一层）。"""
+    keys = sorted(ps['groups'], key=lambda x: (len(x), x))
+    shows = [f'线路{i + 1}' for i in range(len(keys))]
+    urls = [ps['groups'][k] for k in keys]
+    return shows, urls
+
+
 def triage(name, api):
     """形态分诊：ac=detail 取中间一片，判 直链站 / 壳 / API死。返回 (形态, 详情dict)。"""
     try:
@@ -387,3 +514,88 @@ def cmd_shellcrack(a):
     if op == 'status':
         return status()
     print(f'未知子命令 {op}'); return 2
+
+
+def selftest():
+    """离线自检（S231 移植④）：六层播放集兜底 + 跨域广告排除，全部离线。
+
+    每层一个正向用例（造该层特征的最小 HTML）+ 每条排除规则一个反向用例。
+    """
+    fails = []
+
+    def chk(name, cond, detail=''):
+        print(f'[{"OK " if cond else "FAIL"}] {name}' + ('' if cond else f'  {detail}'))
+        if not cond:
+            fails.append(name)
+
+    page = 'https://v.example.com/v/9.html'
+    B = ['https://v.example.com']
+
+    # A0：三数字模板 + 同集去重（同一 URL 出现两次只能算一集）
+    html = ('<a href="/vodplay/9-1-1.html">第1集</a>'
+            '<a href="/vodplay/9-2-1.html">第1集</a>'
+            '<a href="/vodplay/9-1-1.html">第1集</a>')
+    r = play_sets(html, page, B)
+    chk('A0 命中三数字模板', 'A0' in r['layer'], r['layer'])
+    chk('A0 按 sid 分两组', len(r['groups']) == 2, str(r['groups']))
+    chk('A0 同集去重（1 集不重复）', len(r['groups'].get('1', [])) == 1, str(r['groups'].get('1')))
+
+    # A：data-line/data-episode 锚点
+    html = ('<a href="/play/abcDEF123" data-line="2" data-episode="3">x</a>'
+            '<a href="/play/abcDEF124" data-line="2" data-episode="1">y</a>')
+    r = play_sets(html, page, B)
+    chk('A 命中 data-line 锚点', 'data-line' in r['layer'], r['layer'])
+    chk('A 按集号排序（1 在 3 前）', [e[0] for e in r['groups']['2']] == ['第1集', '第3集'],
+        str(r['groups']))
+
+    # B：非三数字、非 data-line 的普通 play 链接（原文 A2/B 合并后的第一道兜底）
+    r = play_sets('<a href="/play/someLongId9">第5集</a>', page, B)
+    chk('B 命中普通 play 链接', r['groups'] and '第5集' in str(r['groups']), r['layer'])
+
+    # B：跨域广告必须剔除，且被计入剔除数（不许静默丢）
+    html = ('<a href="https://ad.example.net/play/123">推广影片 9.9分</a>'
+            '<a href="/play/1?ep=2">第2集</a>')
+    r = play_sets(html, page, B)
+    chk('B 跨域广告被剔除', '推广' not in str(r['groups']), str(r['groups']))
+    chk('B 同域选集保留', '第2集' in str(r['groups']), str(r['groups']))
+    chk('B 剔除数写进层名（可见不静默）', '广告剔除' in r['layer'], r['layer'])
+
+    # B 反向：广告词/年份评分/长文案三种都要挡
+    chk('广告词被挡', _is_ad('注册送会员', '/play/1', B))
+    chk('年份评分被挡', _is_ad('某片 2024 8.9分', '/play/1', B))
+    chk('超长文案被挡', _is_ad('这是一个非常长的推荐位文案超过了二十个字符限制', '/play/1', B))
+    chk('正常集名不挡', not _is_ad('第12集', '/play/12', B))
+    chk('同域绝对地址不挡', not _is_ad('第3集', 'https://v.example.com/play/3', B))
+
+    # C：iframe/JSON 直链
+    r = play_sets('<iframe src="https://cdn.example.com/x.m3u8"></iframe>', page, B)
+    chk('C 命中 iframe 直链', 'C ' in r['layer'] and 'x.m3u8' in str(r['groups']), r['layer'])
+    r = play_sets('<script>var c={"url":"https://cdn.ex.com/y.m3u8"}</script>', page, B)
+    chk('C 命中 JSON 直链', 'C ' in r['layer'] and 'y.m3u8' in str(r['groups']), r['layer'])
+
+    # 反向：六层全不命中 → layer 为空、groups 为空（不硬凑）
+    r = play_sets('<p>本站没有播放按钮</p>', page, B)
+    chk('全不命中返回空（不硬凑）', r['layer'] == '' and r['groups'] == {}, str(r))
+
+    # 相对地址必须补全成绝对（播放器拿相对地址直接哑）
+    r = play_sets('<a href="/vodplay/9-1-1.html">第1集</a>', page, B)
+    u = r['groups']['1'][0][1]
+    chk('地址补全为绝对', u.startswith('https://v.example.com/'), u)
+
+    # shows/urls 转换对齐 TVBox 结构
+    shows, urls = play_sets_shows(r)
+    chk('playsets→shows/urls 结构', shows == ['线路1'] and len(urls) == 1, f'{shows} {urls}')
+
+    print()
+    if fails:
+        print(f'✗ shellcrack 离线自检 {len(fails)} 项失败：{fails}')
+        return 1
+    print('✓ shellcrack 离线自检全部通过（S231 移植④）')
+    return 0
+
+
+if __name__ == '__main__':
+    if '--selftest' in sys.argv:
+        raise SystemExit(selftest())
+    print(__doc__ or 'shellcrack：由 probe.py shellcrack 子命令调用；独立运行只支持 --selftest')
+    raise SystemExit(2)
