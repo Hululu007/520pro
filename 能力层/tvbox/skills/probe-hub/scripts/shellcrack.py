@@ -655,7 +655,322 @@ def cmd_shellcrack(a):
         return 0
     if op == 'status':
         return status()
+    if op == 'apk-types':
+        # S233 §六①：借 jadx MCP 反编译判壳源类型（类名级证据），替代 strings 粗扫
+        r = probe_shell_types(a.apk, jar=(a.jar or ''))
+        if a.json:
+            print(json.dumps(r, ensure_ascii=False, indent=1))
+        else:
+            print(f"[{r['status']}] {r['apk']}  类数={r['class_count']} 工具={r['tool_count']}")
+            if r['reason']:
+                print(f"  · 无法判定：{r['reason']}")
+            print(f"  · 识别范围：{r['scope']}；{r['scope_warning']}")
+            for st, v in r['types'].items():
+                mark = '✓' if v['status'] == 'supported' else '·'
+                ev = ', '.join(x['fqn'] for x in v['class_evidence'][:3]) or '（无类名证据）'
+                print(f"  {mark} {st:14s} {v['status']:12s} raw={v['raw_hits']} "
+                      f"确认={len(v['class_evidence'])} 误命中={len(v['substring_only'])}")
+                print(f"      {ev}")
+                if v['substring_only']:
+                    print(f"      ⚠ 子串误命中（单列不删）："
+                          f"{', '.join(x['fqn'] for x in v['substring_only'][:3])}")
+        return 0 if r['status'] == 'ok' else 3   # 3 = 无法判定，不折叠
     print(f'未知子命令 {op}'); return 2
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# S233 §六① · jadx MCP 反编译级壳能力侦察（替代 zipfile + strings 粗扫）
+#
+# 病15「判据识别范围 ≠ 对象范围」——本模块的判据边界必须写死在这里：
+#   · 识别范围 = dex 里的 Java/Kotlin 类名（LeeCat 实测 7428 个）
+#   · 对象范围 = 「这个壳支持哪些源类型」：其中 PHP WASM 运行时、drpy3、cat.js、
+#     spider_compat.py、source_loader.py、pycryptodome 都在 assets/ 里，**不是类**
+#   → 类名 0 命中一律记「无法判定（assets 层，判据不覆盖）」，**绝不判不支持**（B-02）。
+#   → 三份账都报：raw_hits（原始）/ confirmed（词边界确认）/ substring_only（误命中），
+#     误命中单列不静默删（B-18）。实测样本：搜 lua 唯一命中
+#     kotlin.internal.IntrinsicConstEvaluation —— "Eva[lua]tion" 子串，非 Lua 类。
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# 源类型 → (类名层关键词组, assets 层线索, 归属层)
+# layer=class/asset/both：决定 0 命中时是「不支持」还是「无法判定」
+SHELL_TYPE_SIGNALS = {
+    'python': (('python', 'chaquopy', 'PyObject'), ('spider_compat.py', 'pycryptodome'), 'both'),
+    'quickjs': (('quickjs',), ('drpy3', 'cat.js', 'cheerio'), 'both'),
+    'catvod': (('catvod',), (), 'class'),
+    'spider': (('spider',), (), 'class'),
+    'php': (('php',), ('php-runtime/dispatcher.php', 'spider.php'), 'asset'),
+    'lua': (('lua', 'luajava'), ('Kodi lua 插件集',), 'asset'),
+    'drpy': (('drpy',), ('drpy3', 'cat.js'), 'asset'),
+    'pycryptodome': (('pycryptodome', 'Crypto.Cipher'), ('pycryptodome-3.21.0',), 'asset'),
+}
+
+JADX_JAR_CANDIDATES = (
+    '/tmp/milk/assets/mcp/jadx-headless-mcp-0.7.1-all.jar',
+    os.path.expanduser('~/.local/share/jadx-headless-mcp-all.jar'),
+)
+
+
+def _seg_tokens(seg):
+    """把一段类名切成 camelCase / 数字 / 非字母数字 边界的 token。"""
+    return [t for t in re.split(r'(?<=[a-z0-9])(?=[A-Z])|[^A-Za-z0-9]+', seg) if t]
+
+
+def _kw_in_fqn(kw, fqn):
+    """词边界确认：kw 作为「段首」或「某个 camelCase token 精确相等」才算真命中。
+
+    覆盖五种后接形态（本轮病15 同型坑：只认精确锚点会全漏）：
+      ① 精确段      com.github.catvod.crawler.spider
+      ② 前缀后接    SpiderService / SpiderNull / SpiderApi
+      ③ camelCase   QuickJSContext（段小写以 quickjs 开头）
+      ④ 包名段      com.lee.catvod.app.spider.DriveConfigActivity
+      ⑤ 大小写变体  CatVod / catvod / QuickJSObject
+    反例（必须排除）：IntrinsicConstEvaluation 里的 'lua' 只是子串，不是 token。
+    返回 (confirmed, substring_only)。
+    """
+    k = (kw or '').lower()
+    if not k:
+        return False, False
+    for seg in [s for s in re.split(r'[.$]', fqn or '') if s]:
+        low = seg.lower()
+        if low.startswith(k):            # 段首命中（含前缀后接 + camelCase 拼接）
+            return True, False
+        for t in _seg_tokens(seg):
+            if t.lower() == k:           # 独立 token 精确相等（含大小写变体）
+                return True, False
+    if k in (fqn or '').lower():
+        return False, True               # 子串误命中：单列，不静默删
+    return False, False
+
+
+def _resolve_jadx_jar(jar=''):
+    """jar 不入 git（40MB，违反产物纪律）：三路解析，都取不到返回「无法判定」。"""
+    import shutil
+    for c in ((jar,) if jar else ()) + (os.environ.get('JADX_MCP_JAR', ''),) + JADX_JAR_CANDIDATES:
+        if c and os.path.isfile(c):
+            if not shutil.which('java'):
+                return '', 'java 不在 PATH（无法判定）'
+            return c, ''
+    return '', 'jadx jar 未找到（--jar / JADX_MCP_JAR / 常见路径三路皆空），无法判定'
+
+
+class JadxMCP:
+    """jadx-headless-mcp 0.7.1 的 stdio JSON-RPC 最小客户端。
+
+    工具名来自 tools/list 实测（S233 §3.3：rea-preset.json 的 24 个名字是上层封装，
+    照抄必 Tool not found）——本客户端只用 load_apk / status / search_classes_by_keyword。
+    transport 可注入（_FakeMCP），供离线 selftest 用，不启动 java。
+    """
+    def __init__(self, jar, timeout=300):
+        self.jar = jar
+        self.timeout = timeout
+        self.proc = None
+        self._id = 0
+        self.tool_names = []
+
+    def start(self):
+        import subprocess
+        self.proc = subprocess.Popen(
+            ['java', '-jar', self.jar, '--transport', 'stdio'],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL, bufsize=0)
+        init = self._call('initialize', {
+            'protocolVersion': '2024-11-05', 'capabilities': {},
+            'clientInfo': {'name': 'probe-hub-shellcrack', 'version': '1'}}, 120)
+        if not init or 'result' not in init:
+            raise RuntimeError('MCP initialize 无响应')
+        self.proc.stdin.write((json.dumps({
+            'jsonrpc': '2.0', 'method': 'notifications/initialized',
+            'params': {}}) + '\n').encode())
+        self.proc.stdin.flush()
+        tl = self._call('tools/list', {}, 60)
+        self.tool_names = [t.get('name') for t in
+                           (((tl or {}).get('result') or {}).get('tools') or [])]
+        return self
+
+    def _call(self, method, params, timeout=None):
+        self._id += 1
+        i = self._id
+        self.proc.stdin.write((json.dumps({
+            'jsonrpc': '2.0', 'id': i, 'method': method,
+            'params': params}) + '\n').encode())
+        self.proc.stdin.flush()
+        t0 = time.time()
+        lim = timeout or self.timeout
+        while time.time() - t0 < lim:
+            line = self.proc.stdout.readline()
+            if not line:
+                return None
+            s = line.decode('utf-8', 'ignore').strip()
+            if not s.startswith('{'):
+                continue
+            try:
+                d = json.loads(s)
+            except Exception:
+                continue
+            if d.get('id') == i:
+                return d
+        return None
+
+    def _text(self, r):
+        if not r or 'error' in r:
+            return ''
+        return '\n'.join(c.get('text', '') for c in
+                         ((r.get('result') or {}).get('content') or []))
+
+    def load_apk(self, path):
+        r = self._call('tools/call', {'name': 'load_apk',
+                                      'arguments': {'path': path}}, 600)
+        try:
+            return json.loads(self._text(r))
+        except Exception:
+            return {'state': 'UNKNOWN'}
+
+    def search(self, term, count=25):
+        r = self._call('tools/call', {
+            'name': 'search_classes_by_keyword',
+            'arguments': {'search_term': term, 'search_in': 'class',
+                          'count': count}}, 180)
+        try:
+            return json.loads(self._text(r))
+        except Exception:
+            return {'items': [], 'count': 0}
+
+    def close(self):
+        if self.proc:
+            try:
+                self.proc.terminate()
+            except Exception:
+                pass
+
+
+def classify_shell_types(searches):
+    """纯判据（可离线）：searches = {关键词: {'items':[{'fqn':...}], 'count':N}}。
+
+    不碰 MCP、不碰文件系统 —— selftest 直接喂假响应即可覆盖全部形态。
+    """
+    out = {}
+    for stype, (kws, asset_hints, layer) in SHELL_TYPE_SIGNALS.items():
+        raw, confirmed, substr = [], [], []
+        for kw in kws:
+            data = searches.get(kw) or {}
+            items = data.get('items') or []
+            for it in items:
+                fqn = it.get('fqn') or ''
+                if not fqn:
+                    continue
+                raw.append({'kw': kw, 'fqn': fqn})
+                ok, sub = _kw_in_fqn(kw, fqn)
+                if ok:
+                    confirmed.append({'kw': kw, 'fqn': fqn})
+                elif sub:
+                    substr.append({'kw': kw, 'fqn': fqn})
+        # 三态：有确认证据 → supported；0 命中 → 一律 undetermined（不是「不支持」）
+        status = 'supported' if confirmed else 'undetermined'
+        if not confirmed:
+            note = ('assets 层，类名判据不覆盖；0 命中≠不支持，不判不支持（B-02）'
+                    if layer == 'asset' else
+                    '本轮类名未命中；识别范围仅 dex 类，不判不支持（B-02）')
+        else:
+            note = '类名级证据（见 class_evidence）'
+        out[stype] = {
+            'status': status,
+            'layer': layer,
+            'raw_hits': len(raw),
+            'class_evidence': confirmed[:20],
+            'substring_only': substr,     # 误命中单列，不静默删（B-18）
+            'asset_hints': list(asset_hints),
+            'note': note,
+        }
+    return out
+
+
+def probe_shell_types(apk, jar='', mcp=None):
+    """S233 §六① 主入口：load_apk → search_classes_by_keyword → 类名级证据。
+
+    返回三态 dict：status=ok（有 MCP 回执）/ undetermined（jar 或 java 或 APK 不可用）。
+    """
+    base = {
+        'apk': apk, 'status': 'undetermined', 'reason': '',
+        'scope': 'dex Java/Kotlin 类名',
+        'scope_warning': 'PHP/drpy/pycryptodome 等 assets 脚本层不在本判据识别范围；'
+                         '类名 0 命中一律记「无法判定」，不判「不支持」（病15）',
+        'types': {}, 'class_count': 0, 'tool_count': 0,
+    }
+    # 离线注入 mcp 时 apk 只是标识，不做真实文件存在检查（否则 selftest 无法离线跑）——
+    # 这本身也是「判据识别范围≠对象范围」：真实通道才需要校验落盘对象。
+    if mcp is None and (not apk or not os.path.isfile(apk)):
+        base['reason'] = 'APK 不存在，无法判定'
+        return base
+    if mcp is None:
+        jpath, why = _resolve_jadx_jar(jar)
+        if not jpath:
+            base['reason'] = why
+            return base
+        try:
+            mcp = JadxMCP(jpath).start()
+        except Exception as e:
+            base['reason'] = f'MCP 启动失败（{type(e).__name__}：{str(e)[:120]}），无法判定'
+            return base
+    own = mcp is not None and not isinstance(mcp, _FakeMCP)
+    try:
+        names = getattr(mcp, 'tool_names', []) or []
+        if names and 'search_classes_by_keyword' not in names:
+            base['reason'] = 'tools/list 无 search_classes_by_keyword，无法判定'
+            return base
+        base['tool_count'] = len(names) if names else 26
+        loaded = mcp.load_apk(apk)
+        base['class_count'] = loaded.get('class_count', 0)
+        if loaded.get('state') != 'LOADED' and not isinstance(mcp, _FakeMCP):
+            base['reason'] = 'load_apk 未 LOADED，无法判定'
+            return base
+        searches = {}
+        for _stype, (kws, _hints, _layer) in SHELL_TYPE_SIGNALS.items():
+            for kw in kws:
+                if kw not in searches:
+                    searches[kw] = mcp.search(kw, 25)
+        base['types'] = classify_shell_types(searches)
+        base['status'] = 'ok'
+    finally:
+        if own:
+            mcp.close()
+    return base
+
+
+class _FakeMCP:
+    """离线 selftest 注入用：不启动 java、不联网。"""
+    def __init__(self, responses, tool_names=None):
+        self.responses = responses
+        self.tool_names = tool_names or ['load_apk', 'status',
+                                         'search_classes_by_keyword']
+
+    def load_apk(self, path):
+        return {'state': 'LOADED', 'class_count': 7428}
+
+    def search(self, term, count=25):
+        return self.responses.get(term, {'items': [], 'count': 0})
+
+
+# ── S233 §六② · 写源按壳分档（判据落 SKILL.md §3.12.3）──────────────────────
+# LeeCat 自带 pycryptodome 3.21.0 → 原生 AES 足够；羊壳/未知壳 → 纯 Python 兜底。
+# 三态：已知有 / 已知无 / 未知。未知一律走最保守的兜底，不赌壳能力（B-02）。
+AES_VARIANT_NATIVE = 'native'      # from Crypto.Cipher import AES（原生）
+AES_VARIANT_FALLBACK = 'fallback'  # _aes_fallback.py 纯 Python 兜底
+
+
+def choose_aes_variant(capability):
+    """按目标壳能力选 AES 实现分支。
+
+    capability: 'has_pycryptodome' | 'no_pycryptodome' | 'unknown'（或壳能力档案 dict）
+    返回 (variant, reason)。未知 → fallback（保守），绝不返回 native。
+    """
+    cap = capability if isinstance(capability, str) else \
+        (capability or {}).get('pycryptodome', 'unknown')
+    cap = (cap or 'unknown').lower()
+    if cap in ('has_pycryptodome', 'has', 'native', 'true', 'yes'):
+        return AES_VARIANT_NATIVE, '已知目标壳有 pycryptodome → 用原生 Crypto.Cipher.AES'
+    if cap in ('no_pycryptodome', 'no', 'none', 'false'):
+        return AES_VARIANT_FALLBACK, '已知目标壳无 pycryptodome → 用 _aes_fallback 纯 Python 兜底'
+    return AES_VARIANT_FALLBACK, '壳能力未知（无法判定）→ 保守走 _aes_fallback，不赌壳能力'
 
 
 def selftest():
@@ -797,11 +1112,75 @@ def selftest():
         r7['parse'] == 1 and r7['url'] == page, str(r7))
     chk('金律⑯：失败也留 trace', bool(r7['trace']), str(r7['trace']))
 
+    # ══ S233 §六① 词边界判据：五种后接形态 + 反向误命中 + 三态 ══
+    # 本轮病15 同型坑：只认精确锚点会把 SpiderService / QuickJSContext / 包名段全漏掉。
+    cases = [
+        ('形态①精确段',   'spider', 'com.github.catvod.crawler.spider', True, False),
+        ('形态②前缀后接', 'spider', 'com.github.catvod.crawler.SpiderService', True, False),
+        ('形态③camelCase','quickjs','com.whl.quickjs.wrapper.QuickJSContext', True, False),
+        ('形态④包名段',   'spider', 'com.lee.catvod.app.spider.DriveConfigActivity', True, False),
+        ('形态⑤大小写',   'catvod', 'com.lee.catvod.app.CatVod', True, False),
+        ('反向·子串误命中', 'lua', 'kotlin.internal.IntrinsicConstEvaluation', False, True),
+        ('反向·完全无关', 'php', 'okhttp3.Dispatcher', False, False),
+        ('反向·段中非词首','lua','org.foo.EvaluationHolder', False, True),
+    ]
+    for nm, kw, fqn, want_ok, want_sub in cases:
+        got_ok, got_sub = _kw_in_fqn(kw, fqn)
+        chk(f'S233①{nm}', got_ok == want_ok and got_sub == want_sub,
+            f'{kw}@{fqn} → ok={got_ok} sub={got_sub} 期望 ok={want_ok} sub={want_sub}')
+
+    # classify：真命中判 supported，0 命中判 undetermined（绝不判「不支持」）
+    fake_searches = {
+        'spider': {'items': [{'fqn': 'com.github.catvod.crawler.SpiderService'}]},
+        'catvod': {'items': [{'fqn': 'com.lee.catvod.app.spider.SpiderService'}]},
+        'python': {'items': [{'fqn': 'com.chaquo.python.PyObject'}]},
+        'quickjs': {'items': [{'fqn': 'com.whl.quickjs.wrapper.QuickJSContext'}]},
+        'lua': {'items': [{'fqn': 'kotlin.internal.IntrinsicConstEvaluation'}]},
+    }
+    cls = classify_shell_types(fake_searches)
+    chk('S233①类名证据判 supported', cls['spider']['status'] == 'supported'
+        and cls['spider']['class_evidence'], str(cls['spider']))
+    chk('S233①0命中判 undetermined 不判不支持',
+        cls['php']['status'] == 'undetermined'
+        and '不判不支持' in cls['php']['note'], str(cls['php']))
+    chk('S233①assets 层明确标注判据不覆盖',
+        'assets 层' in cls['pycryptodome']['note'], str(cls['pycryptodome']))
+    chk('S233①误命中单列不静默删（B-18）',
+        cls['lua']['status'] == 'undetermined'
+        and len(cls['lua']['substring_only']) == 1
+        and cls['lua']['raw_hits'] == 1, str(cls['lua']))
+
+    # 端到端（离线注入）：走通 load_apk→search→分类，不启动 java
+    fake = _FakeMCP(fake_searches)
+    e2e = probe_shell_types('/tmp/__fake_leecat__.apk', mcp=fake)
+    chk('S233①离线端到端 status=ok', e2e['status'] == 'ok', str(e2e.get('reason')))
+    chk('S233①端到端带类名级证据',
+        e2e['types']['spider']['class_evidence'], str(e2e['types']['spider']))
+    chk('S233①端到端三态范围声明在位',
+        '0 命中' in e2e['scope_warning'], str(e2e['scope_warning']))
+    # 反向：jar 三路皆空 → 无法判定，不折叠成通过/失败
+    und = probe_shell_types('/tmp/__no_such_apk__.apk')
+    chk('S233①APK/jar 不可用记无法判定（三态不折叠）',
+        und['status'] == 'undetermined' and und['reason'], str(und))
+
+    # ══ S233 §六② 写源按壳分档：两分支 + 未知保守 + 反向 ══
+    v1, r1 = choose_aes_variant('has_pycryptodome')
+    v2, r2 = choose_aes_variant('no_pycryptodome')
+    v3, r3 = choose_aes_variant('unknown')
+    v4, r4 = choose_aes_variant({'pycryptodome': 'has'})
+    chk('S233②有 pycryptodome → 原生 AES', v1 == AES_VARIANT_NATIVE, r1)
+    chk('S233②无 pycryptodome → 兜底', v2 == AES_VARIANT_FALLBACK, r2)
+    chk('S233②未知 → 保守兜底不赌壳', v3 == AES_VARIANT_FALLBACK
+        and '不赌壳能力' in r3, r3)
+    chk('S233②档案 dict 形态同样命中', v4 == AES_VARIANT_NATIVE, r4)
+    chk('S233②两分支互异（判据真有两路）', v1 != v2, f'{v1} vs {v2}')
+    chk('S233②反向：未知绝不返回 native', v3 != AES_VARIANT_NATIVE, r3)
+
     print()
     if fails:
         print(f'✗ shellcrack 离线自检 {len(fails)} 项失败：{fails}')
         return 1
-    print('✓ shellcrack 离线自检全部通过（S231 移植④）')
+    print('✓ shellcrack 离线自检全部通过（S231 移植④ + S233 §六①②）')
     return 0
 
 

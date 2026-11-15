@@ -1,3 +1,10 @@
+## v1.28.9 — S233 §六 收口：jadx 类名级壳侦察 + 写源按壳分档（2026-11-15）
+- **需求**：S233 §六 两件事收口——①jadx MCP 接 `probe shellcrack`（`load_apk`→`search_classes_by_keyword` 判源类型，替代 `strings` 粗扫），对 LeeCat 真壳走通并给出类名级证据；②写源按壳分档（有 pycryptodome 用原生 AES，未知用 `_aes_fallback`），判据落 SKILL.md 且 selftest 覆盖两分支。
+- **①落地**：`scripts/shellcrack.py` 增 `JadxMCP` / `_kw_in_fqn` / `classify_shell_types` / `probe_shell_types`；`probe.py` 注册 `shellcrack apk-types <APK> [--jar]`。LeeCat 真壳端到端 rc=0（7428 类 / 26 工具）：`python`→`com.chaquo.python.*`、`quickjs`→`com.whl.quickjs.wrapper.*`、`catvod`/`spider`→`com.lee.catvod.app.spider.*` 判 supported；`php`/`drpy`/`pycryptodome` 属 assets 脚本层，类名 0 命中记「无法判定」**不判不支持**（病15 同型：识别范围仅 dex 类名 ≠ 对象范围含 assets 脚本）。词边界确认覆盖 5 种后接形态、8 形态正反向进 `--selftest`；真壳抓到 2 处子串误命中（`kotlin.internal.IntrinsicConstEvaluation` / `org.bouncycastle.crypto.CipherParameters`）单列不删（B-18）。
+- **②落地**：`choose_aes_variant(capability)` 三态——已知**有** pycryptodome→`native`、已知**无**/**未知**→`fallback`，**未知一律保守兜底、不赌壳能力**（B-02）；两分支+反向+dict 共 6 项进 selftest。判据落 `SKILL.md §3.12.3`。
+- **收口**：补 `43570e8` 两条落库欠账（F02 方法论 / F04 演进时间线，经 space-hub `archive` 正门核销，open 0）；`SKILL.md` 41.0→39.74KB 消掉 C7 WARN（12 处史料段按 M2 指针化，判据主干全留）；存证 `references/S234_jadx类名级壳侦察与写源分档.md`。
+- **判据**：`shellcrack.py --selftest` 全绿、真壳 `apk-types` rc=0、`bash verify.sh` 0 ✗；版本四处 v0.8.72 / v1.28.9 一致。
+
 ## v1.28.8 — 第二立项：四壳逐个深入（两个纠正 + 一个可用工具）（2026-11-15）
 - **需求**：用户第二立项「4 个 APK 深入，按顺序单独深入」——LeeCat → 云取 → MilkCode → Muse，每个出四栏（出厂自带证据 / 对探源司意义 / 可吸收项 / 明确不吸收项）。产物 `references/S233_四壳深入_LeeCat云取MilkCodeMuse.md`。
 - **LeeCat（294MB）**：实测**四种源语言**。新发现两样 S231 没记的：**PHP 8.4 WASM 运行时 26MB**（`php-runtime/` + `dispatcher.php` 常驻循环 + `spider.php`，协议与 py 完全同构，连 `pdfh/pdfa/pd` 都同名）与 `libfjs.so` 8.2MB。更有用的两条：①`spider_compat.py` 的 `Spider` 基类 + `source_loader.py` 的 `dialect='catvod'|'drpy'` → **`forge` 生成的源可直接跑，不需适配层**；②自带 `pycryptodome 3.21.0` → AES 兜底在此壳上不必要，**写源应按目标壳分档**而非一律最保守写法。

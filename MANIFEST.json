@@ -1,6 +1,6 @@
 {
  "ecosystem": "520pro",
- "version": "0.8.71",
+ "version": "0.8.72",
  "fusion": "把平台硬机制（账号指令/用户级技能路由/子代理/云端沙箱）接到新生态的可移植业务（core-8/薄壳/业务脚本）上",
  "based_on": [
   "WorkBuddy 平台运行时",
@@ -107,7 +107,7 @@
      "entry": "scripts/probe.py",
      "critical": "单独安装必报 ModuleNotFoundError: No module named 'core'",
      "contains": "SKILL.md · scripts/probe.py · scripts/{forge,quality,livecheck,hls_clean,forge_gate,shellcrack,atomicio,pushconfig,imgproxy}.py · repair/ · forgekit/ · verify/ · references/",
-     "version": "1.28.8"
+     "version": "1.28.9"
     },
     "tvbox/skills/tvbox-pipeline/": {
      "user_install": "~/.codebuddy/skills/tvbox-pipeline/",
@@ -551,5 +551,6 @@
  "changelog_0_8_61": "旧生态 74 条「坑→解法」从 tvbox-skills-eco/rules_full.json 迁入 docs/通病台账.md 附节（不占病号，20 条与现有病历同型 / 54 条新坑）；按 rule_map 18 条逐条判定生效形态（硬阻断 2、拽回 1、提交闸 1、验收入口 4、脚本内建 2、纯人工 10、仅登记 1）；三条新发现进 docs/遗留登记.md（B-19 编号越界 5 处、B-02 虚标 machine、B-13 漏登 machine）",
  "changelog_0_8_62": "规则生效闭环：rule_map 加 strength/impl/proven_by/retire_if 四字段；代码写 # impl: B-xx Sn 自报标记；gate_scan 第五闸 impl-reconcile 双向对账（虚标/漏登/过期/没挂/编造五种红，两种违例实测各报红一次）；B-02 虚标改真断言（test_three_state）、B-13 漏登改 machine、B-05/B-14/B-16 补 S1；core-8 规则预算上限 20；B-19 六处悬空引用清账",
  "changelog_0_8_70": "S231 六层全落地：通道三件代码化（atomicio 原子写+内容不变不重写／pushconfig FongMi 推送三态端口／imgproxy wsrv.nl 图代理默认 dry-run）；第 7 条金律升判据（bdb 46 个真实 py 源实测出 5 处原文缺口，最刺眼是苹果CMS player_aaaa 字段是 link 不是 url，原文对标准模板恒失败且无声）；bdb 包立项 S232（第二种写源范式：JSON 模板 DSL，与 S231 代码生成并行；但仓内铁律 §3.12③ 明写不做配置驱动自动生成源，故吸收方向是「认形态判路线」的侦察而非施工）；订正 S231 过期标注（六层总账原全标待移植而代码早已落地）；修三个真缺陷（金律用例只断言 url 致摘层级也不红→改断言层名／imgproxy 三态折叠把「没这行」与「读不了」混成一个 None／install.sh 引号提前闭合致 search_results.json 被当命令执行、每次覆盖安装丢一次搜索候选）；SKILL.md 40.8→39.96KB 消掉长期 C7 WARN",
- "changelog_0_8_71": "第二立项 四壳逐个深入：LeeCat 实测四种源语言（新发现 PHP8.4 WASM 26MB + libfjs 8.2MB；py 协议=CatVod+drpy 双方言故 forge 生成的源可直接跑；自带 pycryptodome 故 AES 应按壳分档）；云取纠正——不是壳而是 QuickJS 插件化下载器（catvod/tvbox/spider/drpy 全 0 命中，turbodl 190 处）；MilkCode 的 42MB jadx jar 抽出并实测可用（26 工具，load_apk 云取 22432 类 14.8s），但不入 git；Muse 除名确认并订正 S231 的 dex 计数口径（43588/765/19）；S231 壳矩阵同步订正四处"
+ "changelog_0_8_71": "第二立项 四壳逐个深入：LeeCat 实测四种源语言（新发现 PHP8.4 WASM 26MB + libfjs 8.2MB；py 协议=CatVod+drpy 双方言故 forge 生成的源可直接跑；自带 pycryptodome 故 AES 应按壳分档）；云取纠正——不是壳而是 QuickJS 插件化下载器（catvod/tvbox/spider/drpy 全 0 命中，turbodl 190 处）；MilkCode 的 42MB jadx jar 抽出并实测可用（26 工具，load_apk 云取 22432 类 14.8s），但不入 git；Muse 除名确认并订正 S231 的 dex 计数口径（43588/765/19）；S231 壳矩阵同步订正四处",
+ "changelog_0_8_72": "S233 §六 两件事收口：①jadx MCP 类名级壳侦察接入 shellcrack apk-types（LeeCat 真壳 7428 类给出 python/quickjs/catvod 类名级证据，assets 脚本层 0 命中记无法判定不判不支持，词边界+8 形态 selftest 防子串误命中）；②写源按壳分档 choose_aes_variant 三态（未知保守兜底 B-02），判据落 SKILL.md §3.12.3 且 selftest 覆盖两分支；补 43570e8 两条落库欠账核销；SKILL.md 41.0→39.74KB 按 M2 指针化消 C7 WARN；存证 S234"
 }

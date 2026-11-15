@@ -2268,6 +2268,39 @@
    "result": "ok",
    "event_ref": "commit 1c42310",
    "note": "jadx MCP 踩坑方法论：preset 的 24 个工具名与 jar 原生 26 个零交集；覆盖 commit 1c42310 的 F02 欠账"
+  },
+  {
+   "ts": "2026-11-15T13:11:42",
+   "round": "archive 方法论_能力清单不等于实际接口_43570e8实例坐标.md @43570e8",
+   "artifact": "方法论_能力清单不等于实际接口_43570e8实例坐标.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "XHJpmhpJxhNUQdLCpecMI4",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 43570e8",
+   "note": "方法论条目（形态+修法+实例坐标）：配置能力清单≠运行时实际接口，43570e8 第2次命中；覆盖 D-43570e8-F02"
+  },
+  {
+   "ts": "2026-11-15T13:12:11",
+   "round": "archive 演进时间线_0.8.69至0.8.71逐版交付说明.md @43570e8",
+   "artifact": "演进时间线_0.8.69至0.8.71逐版交付说明.md",
+   "target": "🧬 520进化论/03-子项目演进",
+   "node_id": "PFQdJKa3qLf8CG1lpJa04K",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit 43570e8",
+   "note": "演进时间线/逐版交付说明：0.8.69→0.8.70→0.8.71，对应 probe-hub CHANGELOG v1.28.8；覆盖 D-43570e8-F04；版本 0.8.71 / v1.28.8"
+  },
+  {
+   "ts": "2026-11-15T14:08:49",
+   "round": "evolve-log 0.8.72",
+   "artifact": "版本演化台账记录 0.8.72",
+   "target": "🧬 520进化论/版本演化台账",
+   "node_id": "E0GETdD3JaFiEQg6y0MqlO",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "VERSION=0.8.72 · VERSION=0.8.72 · 技能快照 7911cbf06d92 · 技能 19 个",
+   "note": "evolve-log 正门写入（v2.7.9 起自动回执）"
   }
  ]
 }

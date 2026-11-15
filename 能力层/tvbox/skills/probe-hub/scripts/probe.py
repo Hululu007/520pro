@@ -9069,6 +9069,10 @@ def build_parser():
     sh_s.add_argument('--in', dest='infile', help='候选清单 json：[[名称,接口],...]（缺省用内置 shellcrack_cands.json）')
     sh_s.add_argument('--save', action='store_true', help='抠出的壳入库')
     sh_sub.add_parser('status', help='壳库 readback（入库后必须回读，不许只看回执）')
+    sh_a = sh_sub.add_parser('apk-types', help='★S233 §六①：借 jadx MCP 反编译判壳源类型（类名级证据，替代 strings 粗扫）')
+    sh_a.add_argument('apk', help='APK 绝对路径')
+    sh_a.add_argument('--jar', default='', help='jadx-headless-mcp jar 路径（jar 不入 git，缺省走 JADX_MCP_JAR / 常见路径）')
+    sh_a.add_argument('--json', action='store_true', help='输出结构化 JSON（含 raw/确认/误命中三份账）')
 
     tk = sub.add_parser('token', help='GitHub 凭据：查看状态/配置/写入/清除')
     tk.add_argument('--set', metavar='TOKEN', help='写入 token 文件（0600）')
@@ -9165,6 +9169,7 @@ DISPATCH = {
     ('shellcrack', 'probe'): cmd_shellcrack,
     ('shellcrack', 'scan'): cmd_shellcrack,
     ('shellcrack', 'status'): cmd_shellcrack,
+    ('shellcrack', 'apk-types'): cmd_shellcrack,  # S233 §六① jadx MCP 类名级壳能力侦察
     ('harvest', 'splitjsm'): cmd_harvest_splitjsm,
     ('quality', None): cmd_quality_one,             # C8 S110 单条质量评测
     ('quality-batch', None): cmd_quality_batch_run,  # C8 S110 批量评测回填
