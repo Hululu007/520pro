@@ -13,8 +13,8 @@
   "waive_max_days": 90
  },
  "scan_state": {
-  "last_sha": "dd6758d342ac0db2590085688f7e9aa4aafd3ab1",
-  "last_scan_ts": "2026-11-15T11:45:00"
+  "last_sha": "bce02ae59aea4209b5da9131824f6d1d7fff34f8",
+  "last_scan_ts": "2026-11-15T11:46:32"
  },
  "debts": [
   {
@@ -830,6 +830,23 @@
    "age_commits": 0,
    "first_seen": "2026-11-15",
    "closed_by": "批3-欠账清偿 adfc4c9 @ 2026-11-15",
+   "waived_until": "",
+   "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-bce02ae-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "bce02ae",
+   "commit_date": "2026-11-15",
+   "target_version": "",
+   "title": "v0.8.68-批4c 补 archive/move 两个正门缺口（回执与落点脱钩）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 「看起来执行了、实际什么都没做」的形态极难自查——上溯循环里把 break 写成 return，链已集齐却整个放弃。凡是循环里出现终止分支，都要问一句「这里该停",
+   "status": "closed",
+   "age_commits": 0,
+   "first_seen": "2026-11-15",
+   "closed_by": "archive 方法论_看起来执行了实际没做.md @bce02ae @ 2026-11-15",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
   },

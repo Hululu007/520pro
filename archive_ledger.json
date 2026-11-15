@@ -2147,6 +2147,17 @@
    "event_ref": "commit dd6758d",
    "note": "v0.8.68 · 补出口先数同类出口 + 修在底层 3 条修法",
    "moved_from": "📦 产物归档/01-方法论"
+  },
+  {
+   "ts": "2026-11-15T11:46:26",
+   "round": "archive 方法论_看起来执行了实际没做.md @bce02ae",
+   "artifact": "方法论_看起来执行了实际没做.md",
+   "target": "🧬 520进化论/01-方法论",
+   "node_id": "AXNNoVfQgwWBDD1NZ7gTql",
+   "idx_row": "",
+   "result": "ok",
+   "event_ref": "commit bce02ae",
+   "note": "v0.8.68 · 终止分支 break/return + 三条自问判据 + 「看落点不看日志」"
   }
  ]
 }
