@@ -111,7 +111,7 @@ def cmd_status():
               f'{t["refs"]} refs / {t["exe_scripts"]} 脚本（W3 全量登记）')
         print(f'  能力面判定 : {"63/63 登记齐全且机检可回读" if uok else "红 → " + umsg}')
         nport = sum(1 for x in surf['directories'] if x.get('ported'))
-        print(f'  补码转正   : {nport}/63（port_ok 正向判据背书：资产落点+分级+签名+sha）')
+        print(f'  补码转正   : {nport}/63（port_ok 正向判据背书：资产落点+签名+sha+六维，中性摆出）')
         try:
             assets = core.load_assets()
             pok, pmsg = core.port_ok(surf, assets)
@@ -119,11 +119,17 @@ def cmd_status():
                   f'｜foundry.py cap [id] 可检索')
         except Exception as e:
             print(f'  补码资产层 : 无法判定（{type(e).__name__}: {e}）')
+        # W7-B：正文落点（防 ghost-port 空架子）
+        try:
+            bok, bmsg = core.body_ok()
+            print(f'  正文落点   : {"绿 · " + bmsg if bok else "红 → " + bmsg}')
+        except Exception as e:
+            print(f'  正文落点   : 无法判定（{type(e).__name__}: {e}）')
     except Exception as e:
         uok = False
         print(f'  能力面判定 : 无法判定（{type(e).__name__}: {e}）')
     print('  引擎真源   : 通用层 foundry-core/scripts/jadx_engine.py（能力层 shellcrack 反向复用）')
-    print('  当前阶段   : W6 补码做实（一手真源落仓 + port_ok 正向判据 + 检索接线；W0→W6）')
+    print('  当前阶段   : W7-B 正文落库做实（63 域 349 正文解仓 + body_ok 逐条对账 + ghost-port 防线；W0→W7-B）')
     print('  产出落点   : 🧬 520进化论/03·04·05 + 📦 产物归档/清单（见 artifacts.json）')
     return 0 if (ok and dok and nok and sok and uok) else 2
 
@@ -191,10 +197,25 @@ def cmd_cap(argv=None):
               f'{a["n_sections"]} 章节 / {a["n_mech"]} 机制点')
         sigs = a.get('script_signatures') or []
         if sigs:
-            print('  脚本签名   :（只登记签名，不搬正文）')
+            print('  脚本签名   :（签名层登记）')
             for sg in sigs:
                 defs = ','.join(sg.get('defs', [])) or '—'
                 print(f'    - {sg.get("file", "?"):46s} {sg.get("bytes", 0):6d}B  defs={defs}')
+        # W7-B：正文回读——签名对应的正文文件是否真实在册
+        try:
+            mf = json.load(open(core.V4_MANIFEST, encoding='utf-8'))
+            hit = [r for r in mf['files'] if r['path'].startswith(want + '/')]
+            if hit:
+                print(f'  正文落点   : {len(hit)} 个文件在册（v4_skills/{want}/）')
+                for r in hit[:8]:
+                    tag = '正文' if r['path'].endswith(core._BODY_SCRIPT_EXT) else '文档'
+                    print(f'    - {r["path"]:52s} {r["bytes"]:6d}B  {tag}  sha={r["sha256"][:10]}')
+                if len(hit) > 8:
+                    print(f'    … 另 {len(hit) - 8} 个（见 v4_skills_manifest.json）')
+            else:
+                print('  正文落点   : 该域无正文落点')
+        except Exception as e:
+            print(f'  正文落点   : 无法判定（{type(e).__name__}: {e}）')
         print(f'  一手真源   : {assets["origin"]}')
         return 0
     # 无参：清单

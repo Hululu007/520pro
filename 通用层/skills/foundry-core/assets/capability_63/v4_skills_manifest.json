@@ -1,0 +1,1751 @@
+{
+ "source": "MilkCode APK assets/breaker/v4-skills (本地 weixin.zip)",
+ "count": 349,
+ "files": [
+  {
+   "path": "adult-fiction/SKILL.md",
+   "bytes": 955,
+   "sha256": "de01cca2f51518bcdd448ec26016b95632b64874737f8eadc6f919d41c469e91"
+  },
+  {
+   "path": "anti-cheat/SKILL.md",
+   "bytes": 41829,
+   "sha256": "54300c3addb2b482304d79e3a14b3654f048963f726cb1ef87980a187442ec8e"
+  },
+  {
+   "path": "api-security/SKILL.md",
+   "bytes": 5664,
+   "sha256": "2fbd23b3ffd8a023d79bc16026ddd02a583176c683aa4e8134a1afc6158af8c1"
+  },
+  {
+   "path": "api-security/references/jwt-oauth-testing.md",
+   "bytes": 3388,
+   "sha256": "9fab87da13de01242924a9c9a08903291188c412c18fb6f37b6e9637a390bf46"
+  },
+  {
+   "path": "api-security/references/rest-graphql-testing.md",
+   "bytes": 3741,
+   "sha256": "614e3794abf053ff3eb9193f4f9e44712d0eae9de1e822b6fef43a3afe92ca25"
+  },
+  {
+   "path": "apk-reverse/SKILL.md",
+   "bytes": 10014,
+   "sha256": "27bbdbda1068c8279bd2d5148416f88622d83d6807f5c4a123eb6490c6085588"
+  },
+  {
+   "path": "apk-reverse/debug.keystore",
+   "bytes": 2666,
+   "sha256": "7281608c3b6d3e60244324ab920aaa00855f329a31bcf3bb1f43fbc2fd5702f3"
+  },
+  {
+   "path": "apk-reverse/references/android-advanced.md",
+   "bytes": 11321,
+   "sha256": "d01a8968afe7b2af464124aff85714900bcc9158f30857902768e5c5dc5195ab"
+  },
+  {
+   "path": "apk-reverse/references/apk-security-checklist.md",
+   "bytes": 7424,
+   "sha256": "09bb127283ad476f101f2c2d7c430faeb5be81937a5e29b980b41b8478fa6035"
+  },
+  {
+   "path": "apk-reverse/references/frida-bypass-kit.md",
+   "bytes": 2881,
+   "sha256": "54b2a34ebffcec23c12c1f19d9a696fc671ec0f1ec2920b185786a21fd1d284d"
+  },
+  {
+   "path": "apk-reverse/references/frida-cookbook.md",
+   "bytes": 14594,
+   "sha256": "30e9f1caeeb86cf3443dc69a7b79f69aa09c081edc21c771df0ed455dc03e663"
+  },
+  {
+   "path": "apk-reverse/scripts/decode.ps1",
+   "bytes": 5769,
+   "sha256": "1c4c8bd84b1a90c7eec0b2a8025c7f52913918ac3f32dee3bf53b0f056b95fa8"
+  },
+  {
+   "path": "apk-reverse/scripts/decode.sh",
+   "bytes": 4885,
+   "sha256": "2fb6d214704dcb5e90f6b28024f1518f67164efa877eb3a57adb2345546d764a"
+  },
+  {
+   "path": "apk-reverse/scripts/frida-run.ps1",
+   "bytes": 4233,
+   "sha256": "41eecd92f36052b14cc5ba97025dabe6d712fc19ccd44e8aab71965fc57cd874"
+  },
+  {
+   "path": "apk-reverse/scripts/frida-run.sh",
+   "bytes": 4083,
+   "sha256": "5c688817ae51a78760dfe256a9a4991166915b039b601407e40e3b4582c2a879"
+  },
+  {
+   "path": "apk-reverse/scripts/manifest-summary.ps1",
+   "bytes": 2695,
+   "sha256": "a4a18acfea5a2236345bac44e05e7b1e6c3adbf836c22afa671087d07803d53e"
+  },
+  {
+   "path": "apk-reverse/scripts/rebuild-sign-install.ps1",
+   "bytes": 6866,
+   "sha256": "33ce2941a41ac5b68c14bad9d0c97edf303c0af1070a04cb70dac9b2ee66b68e"
+  },
+  {
+   "path": "apk-reverse/scripts/rebuild-sign-install.sh",
+   "bytes": 6726,
+   "sha256": "abd6d78a48706fbb7bf9247c9aff59bc50e587fff176c88c08ce7787c917250e"
+  },
+  {
+   "path": "attack-chain/SKILL.md",
+   "bytes": 18634,
+   "sha256": "a08fe9f072d5551815fa8958688e235d4ac0f61e6e7b7a16f097813d2a96ef13"
+  },
+  {
+   "path": "attack-chain/references/attack-playbooks.md",
+   "bytes": 4119,
+   "sha256": "67abfb70a2eb1e3ec086b0e8d29d9625e14211b5b15717c4cea7f0597099875e"
+  },
+  {
+   "path": "attack-chain/references/evasion-cheatsheet.md",
+   "bytes": 4999,
+   "sha256": "8e5f6be38e97650cb59c8e33e47add8b61a720c15eb424967a72860163255382"
+  },
+  {
+   "path": "binary-analysis/SKILL.md",
+   "bytes": 1767,
+   "sha256": "6235cac1efad102aa94a4052ebed7dda17548290fafa7dd7b8cdc4ad8b0cd4e6"
+  },
+  {
+   "path": "binary-diff/SKILL.md",
+   "bytes": 11456,
+   "sha256": "267d700483168bd2d0ef84345a660472834a3ea8c805d16e3f671041b80df95c"
+  },
+  {
+   "path": "binary-diff/references/prompt-template.md",
+   "bytes": 5392,
+   "sha256": "030047a2cd683ee62c68196d07173937be2dcd068e09bc0c8fd7e6006a404ed2"
+  },
+  {
+   "path": "border-crossing/SKILL.md",
+   "bytes": 1134,
+   "sha256": "caf00ab58afc573d2bb2f344f25a4935d88d1f1abe039253c344d11177679bfc"
+  },
+  {
+   "path": "crack-keygen/SKILL.md",
+   "bytes": 1224,
+   "sha256": "8ab97df4d202f925cec0e8d153329afa879dda5262f28074d039f237e92c19ad"
+  },
+  {
+   "path": "dma-attack/SKILL.md",
+   "bytes": 73062,
+   "sha256": "f293b877490e469121ce4875e125040a27d169045079aa9f913f951b239ab2df"
+  },
+  {
+   "path": "dotnet-reverse/SKILL.md",
+   "bytes": 9296,
+   "sha256": "05a4a9e60d25d9f19e95b2576ea36bf68716f10c0469330aed0d52e7836014f4"
+  },
+  {
+   "path": "dotnet-reverse/references/common-workflow.md",
+   "bytes": 7401,
+   "sha256": "6dbce1e437172a802ee997e19abc967c509eb5f6ee17a2b5712de91edbd77857"
+  },
+  {
+   "path": "dotnet-reverse/references/obfuscators.md",
+   "bytes": 6398,
+   "sha256": "05b964bb59c90e55e69687015322805de4eec288173888876f59bd639596782d"
+  },
+  {
+   "path": "dotnet-reverse/references/sharp-tools.md",
+   "bytes": 7108,
+   "sha256": "641bd9943f1953589dd537bc0144f9f8c5e6aaea2e538994e07108390c686580"
+  },
+  {
+   "path": "dsl-vm-reverse/SKILL.md",
+   "bytes": 12100,
+   "sha256": "18a60f6381c9601cfe17799154cbf0decaabdee5a2ec19fed5b3bc4ae4206d1d"
+  },
+  {
+   "path": "dynamic-instrumentation/SKILL.md",
+   "bytes": 1608,
+   "sha256": "eff84545abf215503a1c7c42177dbcfd147d63dc7329ef33e8da6b963fc637ec"
+  },
+  {
+   "path": "edr-bypass-re/SKILL.md",
+   "bytes": 9025,
+   "sha256": "6c858a9bd1505dce207139eac25818ad858eedad4b48ee8b82d3e1af306d40c6"
+  },
+  {
+   "path": "edr-bypass-re/references/hook-survey.md",
+   "bytes": 9949,
+   "sha256": "82b2d19aef562d212c8493babfe82ff394c1ed9a5abd9bfed12770f0ad4c4747"
+  },
+  {
+   "path": "edr-bypass-re/references/telemetry-blinding.md",
+   "bytes": 13050,
+   "sha256": "bdf9ece9528278a5492d069652d3686f3fb86a04822c554c8b4d7ce7642744f5"
+  },
+  {
+   "path": "edr-bypass-re/references/unhook-techniques.md",
+   "bytes": 11455,
+   "sha256": "7f401227b1f674949f67ed4aa59028b02a1f65ce4915f49d918c1b4d7993f3c0"
+  },
+  {
+   "path": "finance-movement/SKILL.md",
+   "bytes": 1188,
+   "sha256": "bdbc80727312ea665cade81d0b14e6a4cf2a33e71237b229f99d1085538caa5a"
+  },
+  {
+   "path": "firmware-pentest/SKILL.md",
+   "bytes": 12265,
+   "sha256": "d49e9977c342fd058748c7967e6ff666d89a9539fe0dda3a51aa240f8e599093"
+  },
+  {
+   "path": "firmware-pentest/references/emba-automated-analysis.md",
+   "bytes": 6928,
+   "sha256": "fb01944a6029b46f0c6509174c2e0fe63e1a9bd76a965343976ebe8fb4bedca4"
+  },
+  {
+   "path": "firmware-pentest/references/emulation-and-fuzz.md",
+   "bytes": 9215,
+   "sha256": "ecadaecbebe8efdeceb4b96d531a5388f779564cf8a91c0133a1ba3a45145973"
+  },
+  {
+   "path": "firmware-pentest/references/extraction-methodology.md",
+   "bytes": 7378,
+   "sha256": "e3b0744c5e69fea966e0c12af2c07f10bcebe4c2d61f3f572b36c1c0f9c2647d"
+  },
+  {
+   "path": "full-crack/SKILL.md",
+   "bytes": 1080,
+   "sha256": "708d6fb17273a7eaeb566347207777d1e48b2880fd9f29971fcdb9d5cae565fe"
+  },
+  {
+   "path": "full-pentest/SKILL.md",
+   "bytes": 1177,
+   "sha256": "587be7794fdb1af16feb19734021446203e78e91c1ceca723f69d83a51826eb9"
+  },
+  {
+   "path": "game-cheat/SKILL.md",
+   "bytes": 1280,
+   "sha256": "f1c108af4dcff7cd96b57d80e825f6a3024718964e2921627c1a151d0b075912"
+  },
+  {
+   "path": "game-engine/SKILL.md",
+   "bytes": 10809,
+   "sha256": "ef759d4e75187c3bd7b8002609b5fb157444c806b2f4ceaf231109b26a5f9877"
+  },
+  {
+   "path": "game-hacking/SKILL.md",
+   "bytes": 29066,
+   "sha256": "23c9395505252ff62f8a4b631a8f71a40761fd7c09f2126ff781fc817cead9f1"
+  },
+  {
+   "path": "graphics-api/SKILL.md",
+   "bytes": 16037,
+   "sha256": "7bdb4a8b9db90287f38606bc54f7866af205411fdcc383402334d61bfb33e1a9"
+  },
+  {
+   "path": "ida-reverse/SKILL.md",
+   "bytes": 15173,
+   "sha256": "f4e21f974fdfdf9298f531fce0e63ce88277ff08f9ad7b1a6bb61d04635d97a3"
+  },
+  {
+   "path": "ida-reverse/references/ida-mcp-cheatsheet.md",
+   "bytes": 11508,
+   "sha256": "0047aa5e630d56f8dde8b33376685fd4b1b99137a4b7013bd873f7717ca51f96"
+  },
+  {
+   "path": "ida-reverse/scripts/open.ps1",
+   "bytes": 8138,
+   "sha256": "d62faafc3626c23bece0182447e91f6a150dec7f7b5e81635234ee377533d910"
+  },
+  {
+   "path": "ida-reverse/scripts/start.ps1",
+   "bytes": 6123,
+   "sha256": "f13e526ff325988fc759f17e622a6451ac6ab35e25d682f7742c9f5f8f84b34a"
+  },
+  {
+   "path": "identity-docs/SKILL.md",
+   "bytes": 1153,
+   "sha256": "cf8ef25bc0083992774a4d271a7909e5c0c50fb23199480fe427a188c2eea812"
+  },
+  {
+   "path": "js-reverse/SKILL.md",
+   "bytes": 8550,
+   "sha256": "ec2a814c27ecd8cc8430a2039fea840270e8d50effe3ad7246de173a86afabc4"
+  },
+  {
+   "path": "js-reverse/references/ast-deobfuscation.md",
+   "bytes": 591,
+   "sha256": "711258802ce1e84db8515daebda30adf13ec74c28047b5af129ba364a8f306c2"
+  },
+  {
+   "path": "js-reverse/references/automation-entry.md",
+   "bytes": 943,
+   "sha256": "fb1e7485f424c4809a76fd62adb0305abc2ebb50543f69d426935911b5d6aaf8"
+  },
+  {
+   "path": "js-reverse/references/env-patching.md",
+   "bytes": 677,
+   "sha256": "ec91ad4adcbe538ab896b53443cd63a04d20e7a19c0fa049b8cf49708ef6cf84"
+  },
+  {
+   "path": "js-reverse/references/fallbacks.md",
+   "bytes": 680,
+   "sha256": "a8e35be7aac17ff6b5bbc1618bd18a00fd8a6612b4b4aadd6165db92f0bb9742"
+  },
+  {
+   "path": "js-reverse/references/instrumentation.md",
+   "bytes": 643,
+   "sha256": "20dbf98ddea30b3bf03a7517f56512431f517aba565c426387a683e0088fc374"
+  },
+  {
+   "path": "js-reverse/references/local-rebuild.md",
+   "bytes": 740,
+   "sha256": "1731ebccc83ea3019d710d4b0d33546d6d0a0a4a27363f5eaa1ddb003219d84f"
+  },
+  {
+   "path": "js-reverse/references/mcp-task-template.md",
+   "bytes": 853,
+   "sha256": "27270b85bdb3d46b12e67801b04fa07c08859c670e0803463f7483affaf9ac5a"
+  },
+  {
+   "path": "js-reverse/references/node-env-rebuild.md",
+   "bytes": 636,
+   "sha256": "afd4e05ef71b77201b4ff6adb0cf6052ae2e6d6618902d6426ab57cc0f389eb4"
+  },
+  {
+   "path": "js-reverse/references/output-contract.md",
+   "bytes": 703,
+   "sha256": "9dedcb6ca43388a52c107cc7b7ef737334dbec6821c7a8d5e6244aebf71dcb13"
+  },
+  {
+   "path": "js-reverse/references/task-artifacts.md",
+   "bytes": 666,
+   "sha256": "f04980496d66115543afe6308c660fb0513d157aecb324f3669efb7537b9b75f"
+  },
+  {
+   "path": "js-reverse/references/task-input-template.md",
+   "bytes": 610,
+   "sha256": "a8385f4e20110831e6eeece56dcfe1fd54b1cede776a17e03891375c2cf2b8a3"
+  },
+  {
+   "path": "js-reverse/references/tool-defaults.md",
+   "bytes": 851,
+   "sha256": "21e03541f311b48ddcfec12ca06dd208d71e4666b225c7b4d0fa6e21df0dfba1"
+  },
+  {
+   "path": "l-gameassist/SKILL.md",
+   "bytes": 2571,
+   "sha256": "60aeea59b9248e142a35ecc6773409dc1687caf9ffc30399022cf1c2693069a1"
+  },
+  {
+   "path": "l-license/SKILL.md",
+   "bytes": 9301,
+   "sha256": "b0f605d27b6435d67a3799caeae852e143ed3cc2979aeed698c7fd4825e070a5"
+  },
+  {
+   "path": "l-reverse/SKILL.md",
+   "bytes": 2349,
+   "sha256": "d6f0d34d869cb5c91cf8452cbae4046f5ce5620c40d116a6007e23dcd6ddc7b4"
+  },
+  {
+   "path": "l-webrecon/SKILL.md",
+   "bytes": 5943,
+   "sha256": "649e6b9a814b14de64f84fd35fbe8501604283a0be497c22b18c25d216cfdb35"
+  },
+  {
+   "path": "mobile-competitive-game-security/SKILL.md",
+   "bytes": 6393,
+   "sha256": "23a69b07acff85f14f8c71e92313e0ec87ff74a01284355c447691fa5eb8b8e7"
+  },
+  {
+   "path": "mobile-competitive-game-security/agents/openai.yaml",
+   "bytes": 353,
+   "sha256": "121e24e95c06d5c4d6b21d26e5955d6a56a23e7a00abfb1b42f756d8fb4eb433"
+  },
+  {
+   "path": "mobile-competitive-game-security/references/playbook.md",
+   "bytes": 4124,
+   "sha256": "908829aee735d73b96a35fe2c03dde785673bc4493447229a97f85ecc24363a2"
+  },
+  {
+   "path": "mobile-competitive-game-security/scripts/new_case.py",
+   "bytes": 3300,
+   "sha256": "e8e2ce4a73bc2988208f9d8bfed4e5cd992f2f4428e57e4db173a234a0d72fab"
+  },
+  {
+   "path": "mobile-reverse/SKILL.md",
+   "bytes": 6176,
+   "sha256": "0d4a027559cf8372eb744e895f8f2782acf5c354a1f09a3f566df8423265026d"
+  },
+  {
+   "path": "mobile-reverse/references/anti-detection-bypass.md",
+   "bytes": 6024,
+   "sha256": "c9720e4124b57323a762283228295036c8971cae47d371898a0400cbb238304b"
+  },
+  {
+   "path": "mobile-reverse/references/frida-objection-deep.md",
+   "bytes": 6658,
+   "sha256": "30e6eac979192ca0ae62995bef8085958718cfa5ef53f2a90fd8446815b59ff2"
+  },
+  {
+   "path": "mobile-reverse/references/ios-reverse-guide.md",
+   "bytes": 5796,
+   "sha256": "a4f037654af87798fc6f9091354e67387e6100a044c6ed04d15b4be273b44653"
+  },
+  {
+   "path": "mobile-security/SKILL.md",
+   "bytes": 17272,
+   "sha256": "6d50df229ed7487203ad96531841e51893486f206d4e49f5340b7b4bc4c6a1a0"
+  },
+  {
+   "path": "network-pentest/SKILL.md",
+   "bytes": 1277,
+   "sha256": "3ba1f863474e7b2eeadcfaff4371b9aa986c89db0d0c7f727e2ad2b0feaeb7f6"
+  },
+  {
+   "path": "patch-diff-exploit/SKILL.md",
+   "bytes": 12492,
+   "sha256": "402fdc1c48a9650031baba9e7a632cdae8b02caec44ed49d39e47bcca26c2f43"
+  },
+  {
+   "path": "patch-diff-exploit/references/diff-tools-comparison.md",
+   "bytes": 8927,
+   "sha256": "a2cc91b56956394d3055439d7731dfbc3a31561ee0eca6317885dd6b368f495b"
+  },
+  {
+   "path": "patch-diff-exploit/references/patch-tuesday-workflow.md",
+   "bytes": 9381,
+   "sha256": "8ec709809a59776eb12dd2002a6b584343c9993e5d9c1881a614f2307409eb6a"
+  },
+  {
+   "path": "patch-diff-exploit/references/root-cause-and-poc.md",
+   "bytes": 5708,
+   "sha256": "f234267e473522e6000461c0a2103ed868323033a9880c31d9510e081d4eaea2"
+  },
+  {
+   "path": "pentest-tools/SKILL.md",
+   "bytes": 10892,
+   "sha256": "e8e83992c2a929304939fe1bf7c4d6f7136b4ccfac5f9ce56dc5852f97c54756"
+  },
+  {
+   "path": "pentest-tools/payloads/README.md",
+   "bytes": 1533,
+   "sha256": "cd2bda4d402319f83aa0aa3a434bcb9a0b6c2d5f3c2a9f13fe468f6d332d3fe4"
+  },
+  {
+   "path": "pentest-tools/references/ai-pentest-agents.md",
+   "bytes": 6616,
+   "sha256": "bc6e9c2c7eb0eaaee94389ee3fd0cff27afb648213bc2947ce73c49a07e1db6a"
+  },
+  {
+   "path": "pentest-tools/references/ai-pentesting-landscape-2026.md",
+   "bytes": 3948,
+   "sha256": "d1ac9f156e9f31a37af865529c8295715f191f443d009347453b83ab3205374a"
+  },
+  {
+   "path": "pentest-tools/references/automation-loop-pattern.md",
+   "bytes": 5791,
+   "sha256": "4661c8595b19ef2b8782c92f6774d3b487b61983b20e91e820581858437871ee"
+  },
+  {
+   "path": "pentest-tools/references/awesome-pentest-digest.md",
+   "bytes": 6535,
+   "sha256": "5a956eb8020181d52fd14eb4b6d7bbb610ede73458c2a68cbf62ba2ab1ff5545"
+  },
+  {
+   "path": "pentest-tools/references/burpsuite-mcp-guide.md",
+   "bytes": 29643,
+   "sha256": "a7574990fe0e9978986b23aad1ec994454bf267095e2322780283623d002daa7"
+  },
+  {
+   "path": "pentest-tools/references/kali-mcp-ecosystem.md",
+   "bytes": 4972,
+   "sha256": "28f1e87e491f9a3ddf0ae20a3d3b310bcdaef9877267e7abf0c1863d6375be58"
+  },
+  {
+   "path": "pentest-tools/references/msf-protocol.md",
+   "bytes": 6487,
+   "sha256": "88ea3dda1be58f8f72347fac9b9718f3f8230c9e85d0c928461257120d478956"
+  },
+  {
+   "path": "pentest-tools/references/network-attack-defense.md",
+   "bytes": 10564,
+   "sha256": "f863446dcf5adad95de7ef628dc60557bb31e611d6ce56a9d70a8e1de21a0bde"
+  },
+  {
+   "path": "pentest-tools/references/nuclei-guide-2026.md",
+   "bytes": 4515,
+   "sha256": "6160c705ec7674705b0868788ec8119b54bef1d04d9fe6eacc99ac29b9799fa8"
+  },
+  {
+   "path": "pentest-tools/references/pentest-ai-agents-matrix.md",
+   "bytes": 5519,
+   "sha256": "a4975b347322e5eebf7c155a2f23d67d54fad71385a75f32f87ff4482b142696"
+  },
+  {
+   "path": "pentest-tools/references/pentest-loop.md",
+   "bytes": 7164,
+   "sha256": "ba43bedca4bdeabaeab05946f7b90459951947b3582a2488b0170d2b4085b065"
+  },
+  {
+   "path": "pentest-tools/references/web-attack-cheatsheet.md",
+   "bytes": 8145,
+   "sha256": "8711a6dcc93df893e9caa2747b99377f9c80698cfb3a3ce650b906ca1755c99d"
+  },
+  {
+   "path": "pentest-tools/src-hunter/LICENSE",
+   "bytes": 1067,
+   "sha256": "5b02fedc65e661a7818e303a1e4680927ed5afa636c491b3bdf7d33f41f9f908"
+  },
+  {
+   "path": "pentest-tools/src-hunter/README.en.md",
+   "bytes": 6737,
+   "sha256": "df682aa36f576cc92194a0a6c087c65d0468ec406012d9b17ebb01b715332781"
+  },
+  {
+   "path": "pentest-tools/src-hunter/README.md",
+   "bytes": 6818,
+   "sha256": "c4989510416d403ac79429328221b663cb06cc3eadcec3b8716da951f15d4c44"
+  },
+  {
+   "path": "pentest-tools/src-hunter/SKILL.md",
+   "bytes": 11270,
+   "sha256": "4b11c4b51b5e2920b58e008f45b3ccaf60977b47e96ea1b873f70b23cf10f6d8"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/dictionaries/00-index.md",
+   "bytes": 2733,
+   "sha256": "ec74adfd4e79f383b063e2d84f2cac4f52bff3b22de9bd501f4dca0db9c15a0d"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/dictionaries/chinese-srcfingerprints.md",
+   "bytes": 15320,
+   "sha256": "14dbe99f07d03729bd3eabb4ffc76e37c65b31b0d169d0c2c9b5b30a7c30a3d8"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/dictionaries/default-credentials-cn.md",
+   "bytes": 10582,
+   "sha256": "87cd51fff10b57a87005ed460e061e49caebe3e9d7d954082c4bc6c13aadc19c"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/industry/00-index.md",
+   "bytes": 3208,
+   "sha256": "a49c1a340d113c030f89dcfa1768132806c458ee4781b9c5f58215befee1d3eb"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/industry/banking-finance.md",
+   "bytes": 15379,
+   "sha256": "769f6a1aeb2670b35a6d9457f5911c5065105c3fff9b7954897e3e1337df4d71"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/industry/telecom-isp.md",
+   "bytes": 12238,
+   "sha256": "ccf2904476714bd837edc3a0432f2634dc3aa97903395bb3cee166400828f3f3"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/00-index.md",
+   "bytes": 3387,
+   "sha256": "72a33dd89fd2ebd123f8b8d712d35c482b39773b1615be68bc8c30d08e6fc77c"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/01-attack-priority.md",
+   "bytes": 7073,
+   "sha256": "bae0eb6d1c069189a9739b7912f20aa1c6d7437a8a15af23431207a2d102e820"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/02-bypass-toolkit.md",
+   "bytes": 12062,
+   "sha256": "af6b00154d11fab8846ee1705d90c355e9059bb295bb50152e2b5ba92da6aff4"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/03-evidence-discipline.md",
+   "bytes": 7993,
+   "sha256": "74f821d659090d56cecbc4e7812329c0a8a80570d7471980292721744505166b"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/04-control-gap-hunting.md",
+   "bytes": 9777,
+   "sha256": "cd420c400a3fa111455c86fb57fa2f1d749c27d7b1d182ffa4bf616243b03882"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/methodology/05-srctimebox-priority.md",
+   "bytes": 8359,
+   "sha256": "ee410a12ae3989897a417b95ba774e43504a74071d001f24da7e274817fd25ef"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/adcs-attack.md",
+   "bytes": 6745,
+   "sha256": "b46758d22e5a59a2cb7557e72ce53927cd8d0f1bb9a38ab516881d10bd2c30de"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/credential-theft.md",
+   "bytes": 35435,
+   "sha256": "ed472ea57838a3dc2dd8315fe7c5f54f0beb0f38913ef8a0ce45f0adb9828186"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/domain-pentest-attack.md",
+   "bytes": 18402,
+   "sha256": "d17eca3e9f70bd57f5b402b354c3fa7f0f819c45cad5172900d85ce3de9fac53"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/evasion.md",
+   "bytes": 18728,
+   "sha256": "2485e619ad92861fd0b5679cb7379b3080940aacac7faa370c80792d92dd970b"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/exchange-attack.md",
+   "bytes": 6104,
+   "sha256": "da2797bb4718a1b65204d4eacf480513330c61b09775d36523f27c055d466ebd"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/information-gathering.md",
+   "bytes": 22437,
+   "sha256": "f0e0f8a2305621119b03348a96546e7775b16113253a7f9f57db48345d577c80"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/lateral-movement.md",
+   "bytes": 21778,
+   "sha256": "64fbb1e295a7669abdaf8e7c2ea4d7d021effbdca740574c8cf6e7fc56aa9a3f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/persistence.md",
+   "bytes": 14411,
+   "sha256": "b07cf8baa10f2b01a56e4aa7b5a0b60b72d6f5458105878b3e4ec0c02f51e5ab"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/privilege-escalation.md",
+   "bytes": 22090,
+   "sha256": "bdb5a71394a5126dd796c09da3e58230e96fd630a0028ef07f2f87c332fa79ec"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/sharepoint-attack.md",
+   "bytes": 2983,
+   "sha256": "a9e04e00f4846cf16ec18a92d2e76b06f9a455b5d658054f7a6ccab739b160e7"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/intranet/tunneling.md",
+   "bytes": 13293,
+   "sha256": "ed2b4aacda5a6f2ab14a30dac867efe2fc9e90a97dbc0683071c25c62c5f6f31"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/ai-security.md",
+   "bytes": 32591,
+   "sha256": "10407108496e6a4d211be7c59dd4bad9d19ef365463e4335848859e2e8ea5364"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/api-security.md",
+   "bytes": 46588,
+   "sha256": "648f8ad9dc3a535cea9f28738d11cac6efbb6c18e63abddf502465eb51129e44"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/authentication-flaws.md",
+   "bytes": 65505,
+   "sha256": "0fcf442f4f47bbd6f95b0c12b1c04a783b1e4a8e2186af16737746298083fa38"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/business-logic.md",
+   "bytes": 25801,
+   "sha256": "63c39711bf35879ec39a3735723c377f67eac29766b3f19a5023b255ea075638"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/cache-cdn-security.md",
+   "bytes": 17763,
+   "sha256": "86ddfb9b39e4f1e8c37dc9e28a1a60e225f005ec8ec2716f1cbf800f07876dab"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/clickjacking.md",
+   "bytes": 14452,
+   "sha256": "22a86fcc14b15c94c6f29cc7cb0cde7e59d83786f935cd2bfc8be3957107008b"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/cloud-security.md",
+   "bytes": 26941,
+   "sha256": "06227cb4d026e2c2df16d2bb010349180cc69e2f68f9646edacdc935b18a8723"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/csrf.md",
+   "bytes": 24175,
+   "sha256": "902e611ac1e94675d16d9504942ded4d4ffac5e0b38c91aa64f2f6e68dcdb136"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/file-vulnerabilities.md",
+   "bytes": 48406,
+   "sha256": "6ea96cc504a09d45e39bdbe4015d9fb9b11c47ad198cd3ec3e322d74bbbd582f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/framework-vulnerability.md",
+   "bytes": 69216,
+   "sha256": "f316b3a1c20748923afbb5620a873a6b67aaffe80ccb3553890c3a5956a791ac"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/jwt-security.md",
+   "bytes": 20491,
+   "sha256": "6d849f02137acc38a56d59a7e52f7bfbe69dd009e209d8127b7a1fab10cc6426"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/lfi-rfi.md",
+   "bytes": 36360,
+   "sha256": "3c1528455d594cac01448c3c8f4823add6839fc1d1389fc9b4d69bb538bb3b09"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/open-redirect.md",
+   "bytes": 14407,
+   "sha256": "98ce95b31ef59b65ba7de1eb113c6f4ad26eb650df2e2d16ae57b628342e3fa1"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/prototype-pollution.md",
+   "bytes": 19091,
+   "sha256": "8d74c1d9dbb503deb2af11a4eec5f55083ff35e51c2eec1a7d8d32e276fc4631"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/rce.md",
+   "bytes": 39006,
+   "sha256": "99e3e1232766f5cd0502195341d8749d68c852c0d7f86fe098eeeaeaab157875"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/request-smuggling.md",
+   "bytes": 22870,
+   "sha256": "f0c9dd190ffb976d08548521db68a54c6fe9e8c2aa304c0d69ce75dce1edc44b"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/sql-nosql-injection.md",
+   "bytes": 63526,
+   "sha256": "4ea22aafa63dc0b577183fd618f8e3f944ede3384c9b381c81057fede2cbe064"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/ssrf.md",
+   "bytes": 37718,
+   "sha256": "cb1d17bd8a8e7d55b64d1c6fa42c9cbf61d709f14666241d5045e97cdb793d4a"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/ssti.md",
+   "bytes": 32514,
+   "sha256": "05994dc5b03fcdd1fa948b007d21d2134b0b4a75e97268d4a21bbadbdb6be4f5"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/supply-chain-attack.md",
+   "bytes": 17846,
+   "sha256": "f7acc4df83c0b406475c343df09324834dcbeb86589269b1d4517275f7fd3dc6"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/websocket-security.md",
+   "bytes": 21011,
+   "sha256": "26b406a4198d1573b5db9c2ea7b172a6653589abbf7f10550d5dc6b9825d0dc2"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/xss.md",
+   "bytes": 44940,
+   "sha256": "90885720285d353a86a0d48af4cd23e272c6488709be7af7933298206b6dbe19"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/by-category/web/xxe.md",
+   "bytes": 25321,
+   "sha256": "425792a37f89e98ab7eea7b5331f2f7d273290736eb26c1a8b41295c335c4a1f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/index.md",
+   "bytes": 5292,
+   "sha256": "381d2216f7572cd27a5f7c3e9e04f10b7cd9cbe09a06c8bcfb8afa0a86d70348"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/raw/navigation.json",
+   "bytes": 156130,
+   "sha256": "ffcb11d359554d2e8dd6f35d5121cf52ef4d26f0484fb9d5f30ff1058cd63971"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/raw/tools.json",
+   "bytes": 173565,
+   "sha256": "4cec9f217c270c13aa341ab73d4a74b63ba685bb8a5437c7e6533663d55041e0"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/raw/web.json",
+   "bytes": 1147930,
+   "sha256": "25c5dcb30505f7ff7417d6bee274419fc8730855f33af1c35a89118c02d8de21"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/credential-theft.md",
+   "bytes": 3202,
+   "sha256": "ee9c5d418ef3d922f7268780ca486b528276118fc00c4836ba2680609fdad02e"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/domain-pentest.md",
+   "bytes": 883,
+   "sha256": "8da38326c4a4cfc5d451141ec68242e067199366010e135101caaf65f6ce461d"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/encoding-decoding.md",
+   "bytes": 5118,
+   "sha256": "cf4aaf0cd4a8633cb189f9cffc733ebdc5761f4b3848718b7463a990574b5548"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/information-gathering.md",
+   "bytes": 15919,
+   "sha256": "ad940a25521709d9775fe3068b389ade9e8bfd733a74c747d87e0b5a99ab530c"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/intranet-pentest.md",
+   "bytes": 15296,
+   "sha256": "91b16a15984e7595ac1ae0281d7061638f54b2f272341f9041bc182832d88369"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/password-attack.md",
+   "bytes": 9800,
+   "sha256": "a85324e22a52adc260f8e8d2017265b279352faef4b37ba5b2f43998b16dd6a8"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/privilege-escalation.md",
+   "bytes": 2593,
+   "sha256": "c76ca39a775c0ebccffc90505f247722d7c9dcb095ed203e460301f4d54d5d73"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/red-team-tools.md",
+   "bytes": 1244,
+   "sha256": "0c80334211bca50554fb6efc0f46af64c188f4e7d609f7443203ca55fd6fe72e"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/system-commands.md",
+   "bytes": 8351,
+   "sha256": "06684b6d5ae0811b17b43bad7718add0d9db03b132f264d37cad2a45fd417daa"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/tunneling.md",
+   "bytes": 1567,
+   "sha256": "7c8edc9338a9b96c37b40e742a60b00ea919b53379eaf5ec013baba307cd2d9e"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/vulnerability-exploit.md",
+   "bytes": 10017,
+   "sha256": "a06a63ccf2437373397e82dedc972afd4f2affa5ed1dd04dca64f157ddb47e3a"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/web-pentest.md",
+   "bytes": 12908,
+   "sha256": "39a2bbbfca07402744b4fa5ccb68ee925bc3e7bbe805dadedc09b17bac454489"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/tools/windows-pentest.md",
+   "bytes": 2084,
+   "sha256": "6bebbdfb5877ff550d2786f276ce8de29bc1bfef8c0a017d25bb3b193193e8a9"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/payloader/waf-bypass.md",
+   "bytes": 174144,
+   "sha256": "0f8322d70c541db23cbf815c9bb0a148415fd65cf43df1e6af10c4ac96185e7f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/00-index.md",
+   "bytes": 3178,
+   "sha256": "2e5db2023d4f16fe9585cb40f00d0098ffb9fec82d8ec091a74aa8a47994b78f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/api-rest.md",
+   "bytes": 46692,
+   "sha256": "2dc8dcd220e8ae550598b4fb2ef5c8525ea45a76c1a9a5a19d944fa79f3ea536"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/arbitrary-x-authz.md",
+   "bytes": 21090,
+   "sha256": "4b49d9ad5fac7b5d68af1276389d49e1311327fbe9197be3ea87f8135e909c15"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/dos.md",
+   "bytes": 29718,
+   "sha256": "fe0cd04fa3bd2387f08fbf00b6cd5ca60bc9fe6bc418597d12f91104fecec10f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/file-upload.md",
+   "bytes": 45840,
+   "sha256": "c5eea2b3f7dda4cf87ab83152b61d50c12c798a5bdb6b1818ef89f54c8dbbdd9"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/graphql.md",
+   "bytes": 6024,
+   "sha256": "19299dbd6e793af42ab1d3eb9e461f549e8a5764bfec362f1b808cc2a5b52993"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/http-smuggling.md",
+   "bytes": 22053,
+   "sha256": "a16e0353c68452a86fdb0e423d6456f43a74c9e7e3cae4717e71a67bc2f9b4ff"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/info-disclosure.md",
+   "bytes": 16754,
+   "sha256": "7587baf3015a9ea586217b137ad394fdee32ebe10ab8e4e012c4fcfa3592e416"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/intranet-postexp.md",
+   "bytes": 110573,
+   "sha256": "ec13fecd42fd921e6c228c7f3177b172eef81743a938ee24f52a9e6dd9f832e4"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/llm-prompt-injection.md",
+   "bytes": 56701,
+   "sha256": "e55394b264373f9c1e56f5d048b0c30273b8960bfff6725786c04cce7fb535ce"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/logic-flaws.md",
+   "bytes": 52488,
+   "sha256": "c6202bdeb7369269a5d47b10e191ef81c5f8f866e446dfe8fac78560dd587238"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/mobile.md",
+   "bytes": 14313,
+   "sha256": "e1c162b2b00a4d515aee89c92752b920e14b2764ce098e9b185a2a10f02e590f"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/oauth-saml-jwt.md",
+   "bytes": 79500,
+   "sha256": "a2eea6ad60ecbb00ff3346e570c4f416ce8d355c9c77dc58f07dac5e8c2f7232"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/path-traversal.md",
+   "bytes": 33130,
+   "sha256": "5b510fb29b45c82bba29ee544daed668668cdce0992d2e7dc11c3a154d422c1d"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/race-conditions.md",
+   "bytes": 7753,
+   "sha256": "ab7f045612d0f17210749f81156cfb182b7b5a81e2139c5920f30336fb54f315"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/rce.md",
+   "bytes": 123817,
+   "sha256": "fd7de24b75cc682b90665d46b5efba8334521b2fe9e36981040bff5c3ecdcaba"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/sqli.md",
+   "bytes": 45906,
+   "sha256": "1c4dafd5224ac6c9b51d714207e8e9602b26f5d136f36483dd0dd648d5338e83"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/ssrf-cache-host.md",
+   "bytes": 63460,
+   "sha256": "99e239aa90a45da4da0d69ef529085eea7173e62003b2750c72fc6ed6697ec6c"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/unauth-access.md",
+   "bytes": 14722,
+   "sha256": "084c7c3f1a5d8ebd607587760cc370c0c1f5cd118abe1930311f41b9d3e729df"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/playbooks/xss.md",
+   "bytes": 31135,
+   "sha256": "ee762d64e45fa697a5beada275a6cbb4a3cf53dc64ec894d5da5c8176ec3727c"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/templates/report-submission.md",
+   "bytes": 10267,
+   "sha256": "89adaa848bc83ed3bf88d5acc51eab998e6f39778bd88f712a82e208606766cf"
+  },
+  {
+   "path": "pentest-tools/src-hunter/references/tools/mcp-jshook.md",
+   "bytes": 16530,
+   "sha256": "7f715ea8ca42888cd340e0310cc65a9e59a1bc5e6d519068280b48fb0f456799"
+  },
+  {
+   "path": "pentest-tools/templates/findings.md",
+   "bytes": 773,
+   "sha256": "d7901b1c455512da40353f2ed724d453a7c719dbf0e36798c9b25bd64d407850"
+  },
+  {
+   "path": "pentest-tools/templates/progress.md",
+   "bytes": 687,
+   "sha256": "75f43310e31f8f3c5395201c9def0608c2d3bf1b3833c8ed6bc7301512e8a146"
+  },
+  {
+   "path": "pentest-tools/templates/rules.md",
+   "bytes": 1167,
+   "sha256": "ea4ff7a094e7d62ac423b74e58dced6828efa51974f363b6cea48e497d7c3048"
+  },
+  {
+   "path": "pentest-tools/templates/scope.md",
+   "bytes": 867,
+   "sha256": "25c8f4fe0a064245328fb9ee4affedfbad14a9a3f37e70f497e185ee40b71447"
+  },
+  {
+   "path": "pentest-tools/templates/task_plan.md",
+   "bytes": 988,
+   "sha256": "57da2a413f0070be76a52ae1f2f0a8d41006b2d3d7b48c92081b52a4f2c9c2db"
+  },
+  {
+   "path": "phishing-kit/SKILL.md",
+   "bytes": 1157,
+   "sha256": "f2cdefbac6135cfbe60c9bb3a2f4f0743f75a777ee2e7bbb93864057f6d02d5c"
+  },
+  {
+   "path": "pipeline-renderer/SKILL.md",
+   "bytes": 1618,
+   "sha256": "a1938c4f462b84d221ec3d1e6577e24ebba7115f634059bbc0a99475d3fce5f0"
+  },
+  {
+   "path": "politics-history/SKILL.md",
+   "bytes": 924,
+   "sha256": "688e4dc676b9cdf6b66791ad2a5a9569557c1b372390e83ba9515c10e5cc4599"
+  },
+  {
+   "path": "protocol-reverse-engineering/LICENSE",
+   "bytes": 1068,
+   "sha256": "8ceaab71b527eb5db43810b74afc618ee36556197d2d51c45fd00aac483988c1"
+  },
+  {
+   "path": "protocol-reverse-engineering/SKILL.md",
+   "bytes": 13609,
+   "sha256": "8565e39026fd1528637e7b686063d43e2836034e711c781d5ddb194f75b69b62"
+  },
+  {
+   "path": "protocol-reversing/SKILL.md",
+   "bytes": 1518,
+   "sha256": "56f01c2cfb5715c3c9fa3dfadf3c8da193ba48f685d5e9e2f7e51d425fdb0659"
+  },
+  {
+   "path": "pwn-chain/SKILL.md",
+   "bytes": 9416,
+   "sha256": "194f9c31aa1471a35aa467181929866b17d1c48c12b53896789c5fa59178dbdb"
+  },
+  {
+   "path": "pwn-chain/references/heap-pwn.md",
+   "bytes": 9638,
+   "sha256": "d004dc3859f14158479008a70ab1ea95c07cc6bd1eec40fb7c97de8879b8fb73"
+  },
+  {
+   "path": "pwn-chain/references/kernel-pwn.md",
+   "bytes": 12686,
+   "sha256": "0d3f4893a5f91ed1bb4cdf93df7430d6737dd74aa37fd8022fd54bd7c955c5df"
+  },
+  {
+   "path": "pwn-chain/references/stack-pwn.md",
+   "bytes": 9268,
+   "sha256": "c75c8018865069ba0670fc3e19f5398c2af277a33e2874bdc3227d268983035c"
+  },
+  {
+   "path": "radare2/SKILL.md",
+   "bytes": 10880,
+   "sha256": "2a4d61fc7c9665e9852123f8970fa7ebf304f21256bec8204a3b62baf1f47562"
+  },
+  {
+   "path": "radare2/references/cheatsheet.md",
+   "bytes": 1330,
+   "sha256": "bef50e81ef040a81362218487eaf2f6f97bae8b92f45554362f040531b29b84f"
+  },
+  {
+   "path": "radare2/scripts/recon.ps1",
+   "bytes": 2614,
+   "sha256": "afddbaeb5cf68c35328d1451eecdac8cfbf36b990780594442adaca307e44a47"
+  },
+  {
+   "path": "radare2/scripts/recon.sh",
+   "bytes": 2993,
+   "sha256": "2f3d5292f958e84796b4213ae1d9e18d3becc0092a7379735596d10e398a058f"
+  },
+  {
+   "path": "rei-fallback/SKILL.md",
+   "bytes": 867,
+   "sha256": "8039f1e606359d998a149fa348e4e82461170aa4b9cd6e2c4493ad5ac4e28593"
+  },
+  {
+   "path": "research-rigor/SKILL.md",
+   "bytes": 9056,
+   "sha256": "cd36ac5a8b91c79b270f4a85e4c1f9d1c89a07f92c9dbf08a45bffe3569c5940"
+  },
+  {
+   "path": "reverse-engineering-api/CHANGELOG.md",
+   "bytes": 1703,
+   "sha256": "a91dbcceed4f69194427b939db7296497ab9eabfe22a7c1e6c4f756796a0460e"
+  },
+  {
+   "path": "reverse-engineering-api/LICENSE",
+   "bytes": 1066,
+   "sha256": "05b4c6033716d2f2c5e427a9ecc7ccb78d6d041bc303473cb6cd48197e8c4112"
+  },
+  {
+   "path": "reverse-engineering-api/SKILL.md",
+   "bytes": 10216,
+   "sha256": "8de307b489a0d06ba6559f57d383702e80e77710888b7e872c04f79e6f293bf7"
+  },
+  {
+   "path": "reverse-engineering-api/references/AUTH_PATTERNS.md",
+   "bytes": 15710,
+   "sha256": "afa6d7664bc858da19a04e14218ead661dd6eae83188a0a5ffb9aad4023bd41e"
+  },
+  {
+   "path": "reverse-engineering-api/references/HAR_ANALYSIS.md",
+   "bytes": 9670,
+   "sha256": "19202f13489398af519179161f2abe1904dbe08dd8fdc711ddf3b951ca47340c"
+  },
+  {
+   "path": "reverse-engineering-api/scripts/har_analyze.py",
+   "bytes": 17497,
+   "sha256": "d26a4210c91e7a4e5012be9b4bae1211f8aa9147cbab073e8b84a4c2ab3fac31"
+  },
+  {
+   "path": "reverse-engineering-api/scripts/har_filter.py",
+   "bytes": 10569,
+   "sha256": "dee3b6e43dda1834d096c6548aab856ca86cf85d71bbb5af344bbbeb10d2f7b3"
+  },
+  {
+   "path": "reverse-engineering-api/scripts/har_utils.py",
+   "bytes": 9674,
+   "sha256": "b44dfcd98608d6c73450dde13c62bb56fc7fe2b06f1b5206c67301e7772fc11e"
+  },
+  {
+   "path": "reverse-engineering-api/scripts/har_validate.py",
+   "bytes": 13046,
+   "sha256": "f76b1c1e3dc10e10679e1cc1a054560bcc638ad90422794db3133969f5fd0cb5"
+  },
+  {
+   "path": "reverse-engineering-api/templates/api_client.py",
+   "bytes": 13496,
+   "sha256": "8f478b269aa9ee9dc9aa9fd4809ce6461fb855711e2b153cd1834b89ef9b76bb"
+  },
+  {
+   "path": "reverse-engineering/SKILL.md",
+   "bytes": 12756,
+   "sha256": "a52ac093427f3012d4e7db41fb0bbd5e99993cf74d988ba792d6d3a0503b6a53"
+  },
+  {
+   "path": "reverse-engineering/anti-analysis.md",
+   "bytes": 28609,
+   "sha256": "136ad9c53b3010fe1720b9c6b0a7fc21b651dceec2f10425f667b87a734f78e8"
+  },
+  {
+   "path": "reverse-engineering/awesome-re-resources.md",
+   "bytes": 6955,
+   "sha256": "cae4a555320d681963cb093d8a3dbee67baca3cb1fa92001579f1966034d5095"
+  },
+  {
+   "path": "reverse-engineering/crypto-decode-tools.md",
+   "bytes": 7293,
+   "sha256": "4c959a68c3b80602495a458d094db6237075810a174cf62e1bc037b02b319660"
+  },
+  {
+   "path": "reverse-engineering/elf-analysis.md",
+   "bytes": 9063,
+   "sha256": "58797e7a75ac2bb966938a8d5f5bac8a8cdd4294ac55fa0a015d6b0822106c20"
+  },
+  {
+   "path": "reverse-engineering/field-notes.md",
+   "bytes": 39571,
+   "sha256": "bef50044d15226341ac2b491d223b52af17201f38b226a2dcf15111f75b11547"
+  },
+  {
+   "path": "reverse-engineering/go-reverse.md",
+   "bytes": 7695,
+   "sha256": "4288e184108f5cd605ec4d06236869e19ba125b1e631486f607b0df15c076c3a"
+  },
+  {
+   "path": "reverse-engineering/kernel-driver-reverse.md",
+   "bytes": 10665,
+   "sha256": "61cbd07f9cbaa23843277c55d11fda6a14f58e24ad380d0813cf812141410095"
+  },
+  {
+   "path": "reverse-engineering/languages-compiled.md",
+   "bytes": 22110,
+   "sha256": "9c40f587c118fe47ac5a8bcdc3b9ba1c8c64c8342df847863e0f7638e9c183a7"
+  },
+  {
+   "path": "reverse-engineering/languages-platforms.md",
+   "bytes": 23915,
+   "sha256": "2c32c3dcfb4a3913596e02c901b7bb42621b45177d69cd1db96bed4194f20115"
+  },
+  {
+   "path": "reverse-engineering/languages.md",
+   "bytes": 20994,
+   "sha256": "81aac38ca60e1513402845ff988c14daf466aec958971468561876c3fada0e4d"
+  },
+  {
+   "path": "reverse-engineering/patterns-ctf-2.md",
+   "bytes": 19665,
+   "sha256": "95519a7cb1a8350aae389d1cdbed7630a1917f430387dbed65af42656497b7dc"
+  },
+  {
+   "path": "reverse-engineering/patterns-ctf-3.md",
+   "bytes": 35117,
+   "sha256": "91e025ed344141634ae953fda96c87785ad0e4b088a8148ba659473c0d9d9cd1"
+  },
+  {
+   "path": "reverse-engineering/patterns-ctf.md",
+   "bytes": 24694,
+   "sha256": "d4bb06a4fabe7bc089c91cc6b1cd13cfdfda5a58b496a57d3d2775015746af37"
+  },
+  {
+   "path": "reverse-engineering/patterns.md",
+   "bytes": 30425,
+   "sha256": "768007f3cba59c9df23471ae28fff7fb8f8f3977113f2e78835d2287784f02b7"
+  },
+  {
+   "path": "reverse-engineering/platforms-hardware.md",
+   "bytes": 11593,
+   "sha256": "aec46370b350f5ce6138a537eced1291b64cc180236284370aa80eaa2734d4fc"
+  },
+  {
+   "path": "reverse-engineering/platforms.md",
+   "bytes": 14724,
+   "sha256": "216a7d0a2d58f9946638d05cd72aed73f96311b8a3c608b64d444c86b0dc97c9"
+  },
+  {
+   "path": "reverse-engineering/references/ai-assisted-re.md",
+   "bytes": 5227,
+   "sha256": "71e0982be2d7634afe166835e0836ee15cf8e89175637a9daa35a018b84bc635"
+  },
+  {
+   "path": "reverse-engineering/references/ollvm-deobfuscation.md",
+   "bytes": 23871,
+   "sha256": "a415ba41f7ca90bca6a30bc3b7c323aa1da08aeceb47a17ea09efdacb8da3490"
+  },
+  {
+   "path": "reverse-engineering/tools-advanced.md",
+   "bytes": 26962,
+   "sha256": "330dd2cbeb5d0d53a399fd76aed2ec820ae950ade0a50404d037c0475426d126"
+  },
+  {
+   "path": "reverse-engineering/tools-dynamic.md",
+   "bytes": 30414,
+   "sha256": "efa56dcfe47c01dc0d997dbe1d630811d5ce7bd0fb6f63d8b9d8c25827f6b79d"
+  },
+  {
+   "path": "reverse-engineering/tools.md",
+   "bytes": 15165,
+   "sha256": "199431c023362738912694c528492b6f19545386487362d255d558d1e913f425"
+  },
+  {
+   "path": "seagull-anticheat/SKILL.md",
+   "bytes": 3924,
+   "sha256": "1e5f6a8f5459375aa8a16a8713d5560999497617c6072809295f444d532a1a99"
+  },
+  {
+   "path": "seagull-anticheat/agents/openai.yaml",
+   "bytes": 119,
+   "sha256": "ff2773c46a3f639a5f14a5109cfc6988d919e84ade51b423679f08c8a3e9760c"
+  },
+  {
+   "path": "seagull-anticheat/references/ace-mihoyo-surface.md",
+   "bytes": 1637,
+   "sha256": "144c70df2d7bd648e7cfdb7936f0a30ff89d18f9677b6a184863c25819f609ad"
+  },
+  {
+   "path": "seagull-anticheat/references/force-start-templates.md",
+   "bytes": 986,
+   "sha256": "1ba0bd35eb26c59b189a1ce8a7c22a054fa1af474cb103e0c93c6267fae5afdd"
+  },
+  {
+   "path": "seagull-anticheat/scripts/new_hsr_lab.py",
+   "bytes": 1574,
+   "sha256": "6a7a2ed40cbf1d15ef1ff7e672fa28a7ac17c4af7d2eedac099f16b2c9051a47"
+  },
+  {
+   "path": "seagull-auto-ops/SKILL.md",
+   "bytes": 10176,
+   "sha256": "cc8ed02f5b3fe5d6e6d226133adea5506fc40a1b539a4ce319ddac288a90d0ea"
+  },
+  {
+   "path": "seagull-auto-ops/agents/openai.yaml",
+   "bytes": 274,
+   "sha256": "004dca92b946b1ded0be4c8049c7a99f82c1310de5e530d7fdea6651982ff378"
+  },
+  {
+   "path": "seagull-auto-ops/references/execution-continuity.md",
+   "bytes": 3478,
+   "sha256": "454610182afa5eb1f2e7ed8a492600075822cd320f580950c73267634945875e"
+  },
+  {
+   "path": "seagull-evasion/SKILL.md",
+   "bytes": 3461,
+   "sha256": "920383cf8e30c159ba7a39a64e5c62ac82269064f8488b44919b653b134edab8"
+  },
+  {
+   "path": "seagull-evasion/agents/openai.yaml",
+   "bytes": 272,
+   "sha256": "1b156a50c0e6edeacedc506bee50e06a7d25a78b1fdde94737f6375af27187ac"
+  },
+  {
+   "path": "seagull-evasion/references/behavioral-bypass.md",
+   "bytes": 3241,
+   "sha256": "0fa3c671f874a28871513deb5c218d9ab07ee3369a4831eafc14e528ffea6c39"
+  },
+  {
+   "path": "seagull-evasion/references/defense-audit.md",
+   "bytes": 3407,
+   "sha256": "f9cf6aa726543c6601989247daf56e77284e00da5fb91dde8ee8df836e52e1c5"
+  },
+  {
+   "path": "seagull-evasion/references/shellcode.md",
+   "bytes": 3140,
+   "sha256": "82c66fef106209a53eae69c3db348fb2288c1009c7116b8d1cd46bbf76fd3713"
+  },
+  {
+   "path": "seagull-evasion/references/signature-bypass.md",
+   "bytes": 2788,
+   "sha256": "0995c950ac9adf13573fd5475305cbf7aece658a7e6196f400abf77606f38f58"
+  },
+  {
+   "path": "seagull-evasion/scripts/detect_profile.py",
+   "bytes": 3485,
+   "sha256": "8b30070b78b525d4ac3c5ca5d1a923419f92542044a12bac809e22a5b0182c4d"
+  },
+  {
+   "path": "seagull-exploit/SKILL.md",
+   "bytes": 2597,
+   "sha256": "c09d0d7eed52c4bebbafecff36c1330c832491d934718d0d0eadfcb098882cb6"
+  },
+  {
+   "path": "seagull-exploit/agents/openai.yaml",
+   "bytes": 277,
+   "sha256": "690171d2e98e3e2781b5c6588cddaa57544b23e6b92bbb8131da51466f76b881"
+  },
+  {
+   "path": "seagull-exploit/references/heap.md",
+   "bytes": 2506,
+   "sha256": "422d6ed3f2abe66d49a205355f01d5a5d45a4bf66464fb05a68e553a58cf1f6d"
+  },
+  {
+   "path": "seagull-exploit/references/kernel.md",
+   "bytes": 3440,
+   "sha256": "4cc088a37404ae0abdc3b38d9bd7433d7c048394d579dbdbe816f98a25a6771d"
+  },
+  {
+   "path": "seagull-exploit/references/sandbox.md",
+   "bytes": 3190,
+   "sha256": "0e6ab1c59323a724121f4b00b0c2f4b8422ad306479ca5825edc6d37d3c95d55"
+  },
+  {
+   "path": "seagull-exploit/references/stack-rop.md",
+   "bytes": 2370,
+   "sha256": "90ee68b88b6eee5e68ed578078f28bf690174616b8757e90a0a94e1951fbbbc5"
+  },
+  {
+   "path": "seagull-exploit/scripts/triage_crash.py",
+   "bytes": 1878,
+   "sha256": "fec95811c41f91cb1716906e7ca3102029a1abbc633590ad707dba6b3f8dad35"
+  },
+  {
+   "path": "seagull-game-hack/SKILL.md",
+   "bytes": 5161,
+   "sha256": "85d6b09a22cd1e56519d5eedbd6122156d4e57b6aa435c7cb7a2dec274ecbc16"
+  },
+  {
+   "path": "seagull-game-hack/agents/openai.yaml",
+   "bytes": 282,
+   "sha256": "4f0f50c862306f16752a505e4f3ea006b0c7706850608b94074703ed0257081c"
+  },
+  {
+   "path": "seagull-game-hack/references/aimbot.md",
+   "bytes": 3641,
+   "sha256": "d63633562958ce2cb9ff84bb7b439315c562bfe8b08e97795ff85d34797cd4c4"
+  },
+  {
+   "path": "seagull-game-hack/references/anticheat-bypass.md",
+   "bytes": 3150,
+   "sha256": "a32760d1a2a9adf21428ca0d8cf6d9a88a6521d37f994debe1b703ad1afa47db"
+  },
+  {
+   "path": "seagull-game-hack/references/entity-memory.md",
+   "bytes": 3038,
+   "sha256": "5eef0ca3861513245780b1e08bf866757d248dc354ffd0c39c721d3a0c92c93b"
+  },
+  {
+   "path": "seagull-game-hack/references/w2s-overlay.md",
+   "bytes": 3607,
+   "sha256": "b6c7860c2be4931c225bc9c5104dcec6347bfcb1415c98884816f4a07ec34c8e"
+  },
+  {
+   "path": "seagull-game-hack/references/zzy-game-tech-extract.md",
+   "bytes": 52656,
+   "sha256": "b030771c98d338d328c945c7f24341345fdcd8361f477bf723a39e473a589212"
+  },
+  {
+   "path": "seagull-game-hack/scripts/find_offsets.py",
+   "bytes": 2148,
+   "sha256": "a1c8a0dba338677ed58c9e3534623069ac6f3d9156eea6b6497d65431ae5c89c"
+  },
+  {
+   "path": "seagull-game-redteam/SKILL.md",
+   "bytes": 3070,
+   "sha256": "6d1c61d1d8521cf89ac69729cde533ffa54dd78c306494c327ea774d16b78c94"
+  },
+  {
+   "path": "seagull-game-redteam/agents/openai.yaml",
+   "bytes": 123,
+   "sha256": "c7d1e364f9510260123dcd265b2b715dfd60d7928b4ab089561a26cb354497ec"
+  },
+  {
+   "path": "seagull-game-redteam/references/ace-esp-pipeline.md",
+   "bytes": 1271,
+   "sha256": "1e4e3ab208bc9e82578b677b47080f7b3d7ca87f9a8de1bdf6200abd0dbfe2a1"
+  },
+  {
+   "path": "seagull-game-redteam/references/manual-map-research.md",
+   "bytes": 856,
+   "sha256": "357faf88cfea591e19e186697e986360565f38a1066c735107840b6d92f7477b"
+  },
+  {
+   "path": "seagull-game-redteam/references/ring3-ace-ctf.md",
+   "bytes": 832,
+   "sha256": "673a12a5b03592975d49f1ab87f7ffbe5f0097effbd80e7695d074daf4b2f7b5"
+  },
+  {
+   "path": "seagull-game-redteam/scripts/new_game_redteam_lab.py",
+   "bytes": 1544,
+   "sha256": "7046cc0c61d0fe8eff9c0f9f4362b586a269ce400b80d817a05f9505a4d9f6bd"
+  },
+  {
+   "path": "seagull-game-security/SKILL.md",
+   "bytes": 2877,
+   "sha256": "1f8fa80f2b790c51dc77eedc8ada390c1745c4f9e7405818d456207818d0253f"
+  },
+  {
+   "path": "seagull-game-security/agents/openai.yaml",
+   "bytes": 261,
+   "sha256": "0d2c288f61fff1eee68ebc64b964088ec65fa3bc26c59b632f462298cb46e0c6"
+  },
+  {
+   "path": "seagull-game-security/references/anti-cheat-design.md",
+   "bytes": 1372,
+   "sha256": "4565c3a3b2c2e61b5522ade799d79faebffc16a0f807688c97f756468be03430"
+  },
+  {
+   "path": "seagull-game-security/references/cheat-architecture.md",
+   "bytes": 2098,
+   "sha256": "c44c22e8a30202d0ec4d045d53009a8f7cab0f84a813e8e0f6fd0cacd7a5caad"
+  },
+  {
+   "path": "seagull-game-security/references/engine-security.md",
+   "bytes": 1339,
+   "sha256": "918180781c1501b0b7f3eba2176ad98f05f46094d466a0dc1959563cf75672da"
+  },
+  {
+   "path": "seagull-game-security/references/incident-analysis.md",
+   "bytes": 1176,
+   "sha256": "29f60151c427d1d36f04d336853d381f9b9f3ecc1f8617305264b0e3096a93e4"
+  },
+  {
+   "path": "seagull-game-security/scripts/integrity_manifest.py",
+   "bytes": 2067,
+   "sha256": "8f230476e4b6f044ff834ed63f0f27bfa8664e29709ae68982763a5cd1210da0"
+  },
+  {
+   "path": "seagull-game-security/scripts/telemetry_analyze.py",
+   "bytes": 3014,
+   "sha256": "e8cd3da924d12de55e3401d28b40c0552ea66fc0f78991ecfda99149eafdffda"
+  },
+  {
+   "path": "seagull-lab/SKILL.md",
+   "bytes": 2246,
+   "sha256": "34545a8ed7171b105a8b6b316295b80f5309d1c1d6f77e885e165cedef957087"
+  },
+  {
+   "path": "seagull-lab/agents/openai.yaml",
+   "bytes": 230,
+   "sha256": "ab7c69fb9755ac22aac52e89f1c1bf9ea95be1962f08e68006bb899285a12405"
+  },
+  {
+   "path": "seagull-lab/references/case-workflow.md",
+   "bytes": 1046,
+   "sha256": "254c668c1759c66c92917c06977bafa479cacbbe65a872fd2f7f81f2a781c55a"
+  },
+  {
+   "path": "seagull-lab/references/ctf-operations.md",
+   "bytes": 1931,
+   "sha256": "6447d8d47f16698fdcb7bb929fab276654355826a1db91142358a15d0c514ef3"
+  },
+  {
+   "path": "seagull-lab/references/evidence.md",
+   "bytes": 1088,
+   "sha256": "3c1136683c5e04bbb12dce1f949cbe9c808f164644d054c452bd3d69eb499619"
+  },
+  {
+   "path": "seagull-lab/scripts/hash_artifact.py",
+   "bytes": 1461,
+   "sha256": "24077e6d2c43e9f61b7e3578242950d96ce2b143051d292c24096ba820664f1d"
+  },
+  {
+   "path": "seagull-lab/scripts/new_case.py",
+   "bytes": 1388,
+   "sha256": "19b2007ca9c81a45cea257d26f223d338ef74cedbd592ab603226f1f932e0f6d"
+  },
+  {
+   "path": "seagull-license-security/SKILL.md",
+   "bytes": 3145,
+   "sha256": "1b2486e16cb596874ccae1e8014c11ddbedc725393afc081ec97e12411b74958"
+  },
+  {
+   "path": "seagull-license-security/agents/openai.yaml",
+   "bytes": 266,
+   "sha256": "34cf054be17a44a324ab43abc3e52092027225351ccfa8269acb8d2cfbafc2eb"
+  },
+  {
+   "path": "seagull-license-security/references/operations.md",
+   "bytes": 1412,
+   "sha256": "437bc659a59fd10b0740eff17775380e8d4641cfcd7e131249aac42319233a60"
+  },
+  {
+   "path": "seagull-license-security/references/reverse-audit.md",
+   "bytes": 1435,
+   "sha256": "67ce586ea8bb824efa7e249d310b583c3bb62bf20577880227e59ff0330ef912"
+  },
+  {
+   "path": "seagull-license-security/references/secure-design.md",
+   "bytes": 1660,
+   "sha256": "c67399a65319fc97c40e5ece2b486fb332de6eff58bb1a606d8178e5c99dd2bb"
+  },
+  {
+   "path": "seagull-license-security/references/threat-model.md",
+   "bytes": 1517,
+   "sha256": "1f0adc019e8e697cb110cc2bec71e2ca3168528ddaa09182da50ac625ac60563"
+  },
+  {
+   "path": "seagull-license-security/scripts/audit_license_config.py",
+   "bytes": 2059,
+   "sha256": "6f9efc4a01e1c7558a7a378fcb3ec1cfde8b14d562e392115d013a2061c3724c"
+  },
+  {
+   "path": "seagull-license-security/scripts/license_tool.py",
+   "bytes": 4257,
+   "sha256": "c0d488f3bcc46a8efaaffe434e08565b15d03bb99555ed895ae69e61fde0e85a"
+  },
+  {
+   "path": "seagull-malware/SKILL.md",
+   "bytes": 2590,
+   "sha256": "c781f4e16ea27d5f1a8cab04c9595cea9ad05c19dfb4671b17a7d576fee5e1d1"
+  },
+  {
+   "path": "seagull-malware/agents/openai.yaml",
+   "bytes": 287,
+   "sha256": "9b459fc294c4980f9ffd53a943803bf64acadf7444961f5bc5f2b19dadb3cb17"
+  },
+  {
+   "path": "seagull-malware/references/c2-protocol.md",
+   "bytes": 3236,
+   "sha256": "1de8bb6a1248159e75eee8293e6b3b92e8b1550dc3a5156654ca32dc53c2d690"
+  },
+  {
+   "path": "seagull-malware/references/detection.md",
+   "bytes": 3746,
+   "sha256": "ab71b7f3049e43af77e5122e5d47d79dc613b23ab10c4cc592735aad42a99e42"
+  },
+  {
+   "path": "seagull-malware/references/ttp-mapping.md",
+   "bytes": 3597,
+   "sha256": "4154f8c7fda24bc64b45f67deab7b5f6b308d19e8984090feb0873513c9000fd"
+  },
+  {
+   "path": "seagull-malware/references/unpacking.md",
+   "bytes": 3043,
+   "sha256": "33dd9f4f6c4c73832736ce7b9c4b5fd35ee8c4fd1e9175aaa429fdd3c1525f5b"
+  },
+  {
+   "path": "seagull-malware/scripts/static_triage.py",
+   "bytes": 3592,
+   "sha256": "9c5e319e4831a6bfd53d30b6cbef5954078ebeab7cf423f95b635c8c42becae6"
+  },
+  {
+   "path": "seagull-mature-content/SKILL.md",
+   "bytes": 4918,
+   "sha256": "5ca28b46d43cd26d3dbe8e860b3cf28bf55eb01730724e463a9b369a5090aee7"
+  },
+  {
+   "path": "seagull-mature-content/agents/openai.yaml",
+   "bytes": 297,
+   "sha256": "56ac6e89e33bb61702f4bda6d73ca5b25bf6f187e7a6d781affa42b68508000e"
+  },
+  {
+   "path": "seagull-mature-content/references/mature-product-patterns.md",
+   "bytes": 2710,
+   "sha256": "6e40cd50fd79d4d5fe49d8782353231bfa4d3485fd9c75ace9f71847b5ac7873"
+  },
+  {
+   "path": "seagull-memory/SKILL.md",
+   "bytes": 2634,
+   "sha256": "fba4d93161997f1f8e839b0aeb10d4db5d77852bfb55edc5a07be9341ac72ad5"
+  },
+  {
+   "path": "seagull-memory/agents/openai.yaml",
+   "bytes": 236,
+   "sha256": "9dd198f51172689dfa9b00cc0bbbebfa406cda28911dd7c87b1b736a956367cf"
+  },
+  {
+   "path": "seagull-memory/references/dump-structures.md",
+   "bytes": 1507,
+   "sha256": "8cace69c5976b61ef79f81027543f452444ced04aa06d902a5c424a193b203d9"
+  },
+  {
+   "path": "seagull-memory/references/linux-android.md",
+   "bytes": 1213,
+   "sha256": "aa2acc11e46a4864b68972f9161c53d71b11c86f6855fe8ff3ac9e7026dfa113"
+  },
+  {
+   "path": "seagull-memory/references/windows.md",
+   "bytes": 1340,
+   "sha256": "10453710e874e8b4435204e352229f40452093b21ff6f6d4bc2e3e3aac43c5b5"
+  },
+  {
+   "path": "seagull-memory/scripts/aob_scan.py",
+   "bytes": 1583,
+   "sha256": "7deff20c063a27003c96e44c00d85bbfc779d664646fd1bb52be5d013ce759a2"
+  },
+  {
+   "path": "seagull-memory/scripts/dump_strings.py",
+   "bytes": 1038,
+   "sha256": "19435c49d04b2c4b922921c8697dc0b44f877ee730544b721d3025f7f896089f"
+  },
+  {
+   "path": "seagull-pentest/SKILL.md",
+   "bytes": 5006,
+   "sha256": "ee5ca5526bf92c6ebb4b36998361cc5d3e301f122f6d005a8796815e1e9ed95a"
+  },
+  {
+   "path": "seagull-pentest/agents/openai.yaml",
+   "bytes": 238,
+   "sha256": "d41b598eedcd6a0861ed8e2a529cabdbfeef4b2e26b02a018716d78487793016"
+  },
+  {
+   "path": "seagull-pentest/references/cloud-container.md",
+   "bytes": 1157,
+   "sha256": "37878c6baff1430dfc1b5bc76d3937444798c72d7a7bc792f79fd67b21f48127"
+  },
+  {
+   "path": "seagull-pentest/references/graphql-realtime.md",
+   "bytes": 1133,
+   "sha256": "b1bad55e69d835427fdf251c2e23dc22ab5bb8439c1e34ae7a02f72a4cd62374"
+  },
+  {
+   "path": "seagull-pentest/references/network-identity.md",
+   "bytes": 1217,
+   "sha256": "ca846c5ccf80cfb57e93b024b0eea0093ab80bbc97abfb6597530bd2e1193d88"
+  },
+  {
+   "path": "seagull-pentest/references/oauth-jwt.md",
+   "bytes": 1084,
+   "sha256": "0a73d6e43fc3a8089d0f4078aeda3c414c3646f7fb6d78fbee0a2d3d9fff9d54"
+  },
+  {
+   "path": "seagull-pentest/references/parser-smuggling.md",
+   "bytes": 1096,
+   "sha256": "3831e779ebc58096c7e8d3b2fa283631ac59a1cb1980d79eb1ff5f5f7564cf06"
+  },
+  {
+   "path": "seagull-pentest/references/race-business.md",
+   "bytes": 1039,
+   "sha256": "6f13316f231b53aa33b9b5643a351fd84c6f10d3833fd4f935faad9a79b796b2"
+  },
+  {
+   "path": "seagull-pentest/references/reporting.md",
+   "bytes": 1037,
+   "sha256": "05af0d8d079ad571553e19cebc32b18167545b728a6d4a18722f2305f84ca82f"
+  },
+  {
+   "path": "seagull-pentest/references/web-api.md",
+   "bytes": 1407,
+   "sha256": "34e304cc3f11a0536c84b62ab93a06855de9f3b0eca5396a26581b641bf9bde8"
+  },
+  {
+   "path": "seagull-pentest/scripts/http_recon.py",
+   "bytes": 2154,
+   "sha256": "d356f4bd420e7b74275f858880677b226e07ad2046e76394ad6c0d7f103da93a"
+  },
+  {
+   "path": "seagull-pentest/scripts/js_routes.py",
+   "bytes": 1175,
+   "sha256": "996f83be4cab42e87ea3dd2fceef8366a2fa5442f9ecb5740718350336f5fe32"
+  },
+  {
+   "path": "seagull-pentest/scripts/jwt_inspect.py",
+   "bytes": 1694,
+   "sha256": "7f7edd066e3fc8b5e8b7ebd6b5c2bdcdc26d7bd573c2abc4e826e281efb24e07"
+  },
+  {
+   "path": "seagull-pentest/scripts/openapi_inventory.py",
+   "bytes": 2159,
+   "sha256": "bae87aab1cb2ecdedf054c6b9e9945afa53ec2c3946a4fdb4191e8d52fb69b8b"
+  },
+  {
+   "path": "seagull-pentest/scripts/request_matrix.py",
+   "bytes": 2340,
+   "sha256": "eda926ffa37a0d15ab1b299efd64c0d6f63bab5279f4ef3de5f157ef0600980b"
+  },
+  {
+   "path": "seagull-reverse/SKILL.md",
+   "bytes": 2813,
+   "sha256": "c34fe767524bdfc002fbfacf8dad3c45ca36f472eef3bfcb1058648b924a3067"
+  },
+  {
+   "path": "seagull-reverse/agents/openai.yaml",
+   "bytes": 225,
+   "sha256": "2279428955358a928fd6125a57d4a05096fe8314a2b8df76723e14faa81e2a4f"
+  },
+  {
+   "path": "seagull-reverse/references/extended-tool-routing.md",
+   "bytes": 1668,
+   "sha256": "e192945b5f94895796695b70f9d5c4ef9322c45ff43823285b7dcde57251919d"
+  },
+  {
+   "path": "seagull-reverse/references/managed-game.md",
+   "bytes": 1426,
+   "sha256": "3d15c150b059e96ee6564e9fe28c511a19d65783a4459bb8ce10028583501957"
+  },
+  {
+   "path": "seagull-reverse/references/native-workflow.md",
+   "bytes": 1491,
+   "sha256": "17bb6deec80e23cd640288ae1ac07011822f6004300692475f03de9a121abba0"
+  },
+  {
+   "path": "seagull-reverse/references/protocol-reverse.md",
+   "bytes": 1176,
+   "sha256": "885b23bae8f23df7639736131d56da7f35810a3a6e7ce20270c748aca6e8ea69"
+  },
+  {
+   "path": "seagull-reverse/references/unpacking-obfuscation.md",
+   "bytes": 1492,
+   "sha256": "c2d14c19c9aba1446fa78cd1b6ad1757912e45848e9a85caed2b86d6851ff044"
+  },
+  {
+   "path": "seagull-reverse/scripts/triage_binary.py",
+   "bytes": 2829,
+   "sha256": "2565910219a016e6d5ea9f51158d0c715611e2877a6383c209ed34b9810b0131"
+  },
+  {
+   "path": "seagull-social-eng/SKILL.md",
+   "bytes": 2850,
+   "sha256": "482b767ed864f64b832812cf3320e26e9564f99d8163621293c68cdcdd914133"
+  },
+  {
+   "path": "seagull-social-eng/agents/openai.yaml",
+   "bytes": 268,
+   "sha256": "fae4681a7c26ea08bf9e03196040b8558db2661ac06e883c3c6b1e04a16eae12"
+  },
+  {
+   "path": "seagull-social-eng/references/awareness.md",
+   "bytes": 3394,
+   "sha256": "b1a41f8353c4720b07539a389f6c5d7f8f15457bdc91a4f9f76851ea22cb3509"
+  },
+  {
+   "path": "seagull-social-eng/references/infrastructure-osint.md",
+   "bytes": 2595,
+   "sha256": "df2cbfdcd6ddb7f3e366a474b445289beb424c9f6838716e12012e746758685e"
+  },
+  {
+   "path": "seagull-social-eng/references/person-osint.md",
+   "bytes": 2325,
+   "sha256": "6079f0c2ed2659c8e3b02b75629994d65eb57dfc51e04eb26cf384273e8c5096"
+  },
+  {
+   "path": "seagull-social-eng/references/phishing-analysis.md",
+   "bytes": 3591,
+   "sha256": "0f0783d0b875293a7976d4d31b64e482a7c2a0ee7f3af3f6115f37f4654685c4"
+  },
+  {
+   "path": "seagull-social-eng/scripts/domain_recon.py",
+   "bytes": 2867,
+   "sha256": "1f7079891747797abbe29b6e1ae1c8dda418be86b3212faa45a52274e7eea636"
+  },
+  {
+   "path": "seagull-unlimited/SKILL.md",
+   "bytes": 6540,
+   "sha256": "b8e5e19b9903b212ee1e99e72de8c015f7a85f4f0ba24a9ef7bc9dc56197bd0c"
+  },
+  {
+   "path": "windows-kernel/SKILL.md",
+   "bytes": 42145,
+   "sha256": "2d157ad67ffa9a1574d2570e1a6b3f9318ec0f1d4f3b98fa32bb8fb8c643f7ed"
+  }
+ ]
+}

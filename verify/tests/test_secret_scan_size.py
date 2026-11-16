@@ -63,10 +63,31 @@ with tempfile.TemporaryDirectory() as tmp:
     rc, out = run(tmp)
     check('C3b 10MB+1 翻红', rc == 2, f'rc={rc}')
 
+# C4 git ls-files 分支的 SKIP_DIRS 过滤（W7-B 病15 回归）：
+#   git 分支原先绕过 SKIP_DIRS，只读原文资产目录里的明文会被漏报。
+#   造一个 git 仓：v4_skills/ 下放必被抓的 ghp_ 密钥，正常目录放一个，
+#   验证排除目录不误放行也不误伤——排除目录里的抓不到、正常目录里的抓得到。
+with tempfile.TemporaryDirectory() as tmp:
+    subprocess.run(['git', 'init', '-q', tmp], capture_output=True)
+    excluded = os.path.join(tmp, 'v4_skills', 'leak.md')
+    os.makedirs(os.path.dirname(excluded), exist_ok=True)
+    with open(excluded, 'w', encoding='utf-8') as f:
+        f.write('token: ghp_' + 'A' * 24 + '\n')
+    normal = os.path.join(tmp, 'normal_leak.md')
+    with open(normal, 'w', encoding='utf-8') as f:
+        f.write('token: ghp_' + 'B' * 24 + '\n')
+    subprocess.run(['git', '-C', tmp, 'add', '-A'], capture_output=True)
+    rc, out = run(tmp)
+    check('C4a 排除目录 v4_skills 密钥不被误报', 'v4_skills' not in out,
+          f'rc={rc}, out={out[:300]!r}')
+    check('C4b 正常目录密钥仍被抓（过滤不误伤）',
+          rc == 2 and 'normal_leak.md' in out,
+          f'rc={rc}, out={out[:300]!r}')
+
 print('============================================')
 if fails:
     print(f'✗ {len(fails)} 项失败')
     for f in fails:
         print(f'  ✗ {f}')
     sys.exit(1)
-print('✓ 大文件闸回归通过（4 用例）')
+print('✓ 大文件闸 + git 分支过滤回归通过（6 用例）')

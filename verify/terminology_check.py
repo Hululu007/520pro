@@ -60,6 +60,13 @@ EXEMPT = {
 
 SCAN_EXT = ('.md',)
 SKIP_DIRS = {'.git', '__pycache__', 'node_modules', '.codebuddy'}   # .codebuddy 是部署产物
+# M7 有意例外（W7-B）：capability_63/v4_skills 是从 MilkCode APK 解出的**上游第三方
+# 只读原文资产**（63 域技能正文），不是本仓自有维护文档。其中的引用（如
+# seagull-social-eng/SKILL.md 引用 upstream 本就缺失的 person_osint.py）属上游原文
+# 既有缺陷，按原样归档、不修改（改了就不是一手真源）。病15：本判据对象是「本仓自有
+# 文档的引用完整性」，识别范围不该覆盖只读原文资产。正文自身的完整性由 core.body_ok
+# 的 bytes/sha256 逐条对账保证（manifest 为锚），不靠本 T3 断链判据。
+SKIP_DIRS |= {'v4_skills'}
 
 results = []
 

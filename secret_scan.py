@@ -89,7 +89,12 @@ def hygiene_exempt(rel):
     return None
 
 
-SKIP_DIRS = ('.git', 'node_modules', '__pycache__')
+# M7 有意例外（W7-B）：capability_63/v4_skills 是从 MilkCode APK 解出的上游第三方
+# 只读原文资产，其中 JWT/OAuth 安全教程里出现的示例 token 字样（如
+# pentest-tools/.../jwt-security.md）是原文教学内容，不是本仓凭证。只读归档、不改写
+# （改写即破坏一手真源）。病15：零明文凭证判据的对象是「本仓运行时/配置凭证」，识别
+# 范围不该覆盖只读第三方正文。exempt 按目录名匹配整棵子树。
+SKIP_DIRS = ('.git', 'node_modules', '__pycache__', 'v4_skills')
 SCAN_EXT = ('.py', '.sh', '.json', '.md', '.yml', '.yaml', '.toml', '.env', '.txt', '.cfg', '.ini')
 
 
@@ -129,14 +134,24 @@ def candidate_files(root):
         r1 = subprocess.run(base, capture_output=True, text=True, timeout=30)
         r2 = subprocess.run(base + ['--others', '--exclude-standard'],
                             capture_output=True, text=True, timeout=30)
+        # 病15（W7-B）修复：git ls-files 分支原先绕过 SKIP_DIRS，导致只读原文资产
+        # （v4_skills）及 .git/node_modules 等目录被追踪时漏过滤。按**路径段**统一排除，
+        # 与 os.walk 分支的 dirs[:] 过滤语义对齐（覆盖所有文件收集路径）。
+        def _skip(p):
+            parts = set(os.path.normpath(p).replace('\\', '/').split('/'))
+            return bool(parts & set(SKIP_DIRS))
         if r1.returncode == 0:
             for line in r1.stdout.split('\0'):
                 if line.strip():
-                    files.add(os.path.normpath(os.path.join(root, line)))
+                    full = os.path.normpath(os.path.join(root, line))
+                    if not _skip(full):
+                        files.add(full)
         if r2.returncode == 0:
             for line in r2.stdout.split('\0'):
                 if line.strip():
-                    files.add(os.path.normpath(os.path.join(root, line)))
+                    full = os.path.normpath(os.path.join(root, line))
+                    if not _skip(full):
+                        files.add(full)
         if files:
             return files
     except Exception:

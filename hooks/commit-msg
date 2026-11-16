@@ -76,9 +76,17 @@ L="$(field Lesson)"
 [ -n "$L" ] || fail "缺 Lesson: 行" "踩坑写 病N（第K次）/ 新病：<一句>；没踩写 无"
 # 「病N（第K次）」与「新病：」都要落到台账——否则 Lesson 只是一句谁也不会再看的话。
 if printf '%s' "$L" | grep -qE '病[0-9]+（第 ?[0-9]+ ?次）|新病：'; then
-  printf '%s\n' "$STAGED_ALL" | grep -qx 'docs/通病台账.md' \
-    || fail "Lesson 记了病（复发或新病），但本次提交没改 docs/通病台账.md" \
-            "病历要落在台账上才算数；否则「第 K 次」「新病」都是编的"
+  # 病15 第16例施工连带（W7-B）：中文路径用 grep -qx 字面量匹配在真实 commit 的
+  # env-bash + git 环境下失配（外面测试 bash 却通过——shell/locale 差异），
+  # 改成 Python UTF-8 精确比对，不依赖 shell 的字节/locale 解释。
+  python3 - "$ROOT" <<'PYEOF' || fail "Lesson 记了病（复发或新病），但本次提交没改 docs/通病台账.md" "病历要落在台账上才算数；否则「第 K 次」「新病」都是编的"
+import subprocess, sys
+root = sys.argv[1]
+out = subprocess.run(
+    ['git', '-C', root, '-c', 'core.quotepath=false', 'diff', '--cached', '--name-only'],
+    capture_output=True, text=True, encoding='utf-8', timeout=30)
+sys.exit(0 if 'docs/通病台账.md' in out.stdout.splitlines() else 1)
+PYEOF
   # 机器记账：拦截型复发由 guard_cmd 拦截时已记；这里补 Lesson 手写复发的机器计数。
   # 去重由 _bump_recurrence 同分钟逻辑兜底；记账失败不阻断提交（B-13：账可以晚到，闸不拦人）。
   BUMP_ID="$(printf '%s' "$L" | grep -oE '病[0-9]+' | head -1)"

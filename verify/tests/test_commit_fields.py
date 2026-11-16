@@ -111,6 +111,7 @@ def case3_lesson_no_ledger(d):
           f'rc={r.returncode} out={r.stdout[-120:]}')
 
 
+
 def case4_reuse_lie(d):
     msg = GOOD.replace('Reuse: docs/工程纪律.md 扩展', 'Reuse: 复用现有件，新建 0')
     assert '新建 0' in msg, '变异未落盘'

@@ -38,6 +38,13 @@ MANIFEST = os.path.join(os.path.dirname(HERE), 'manifest.json')
 ASSETS_DIR = os.path.join(os.path.dirname(HERE), 'assets', 'capability_63')
 ASSET_FILE = os.path.join(ASSETS_DIR, 'capability_assets.json')
 DEEP_FILE = os.path.join(ASSETS_DIR, 'source_deep.json')
+# W7 阶段B：63 域脚本正文落点（从本机 MilkCode APK 的 assets/breaker/v4-skills
+# 全量解出）。manifest 记录每条正文的 bytes/sha256，判据据此对账磁盘真实文件，
+# 堵住「ported=true 但正文文件不在册」的 ghost-port 空架子盲区。
+V4_SKILLS_DIR = os.path.join(ASSETS_DIR, 'v4_skills')
+V4_MANIFEST = os.path.join(ASSETS_DIR, 'v4_skills_manifest.json')
+BODY_ANCHORS = {'domains': 63, 'files': 349, 'scripts': 38}
+_BODY_SCRIPT_EXT = ('.py', '.ps1', '.sh', '.js')
 
 # 26 个工具名：tools/list 实测顺序（唯一真源，不复制文档枚举）
 TOOLS_26 = [
@@ -173,6 +180,66 @@ def port_ok(surface_d, assets=None, deep_path=None):
     return True, f'{len(ported_ids)}/63 转正：资产落点齐 + 签名数与脚本数自洽 + 真源 sha 一致 + 六维自洽（中性摆出）'
 
 
+def body_ok(manifest_obj=None, skills_dir=None):
+    """W7 阶段B 正文落点判据（病15：识别范围 = 对象范围）。
+
+    port_ok 只验脚本**签名元数据**，ported=true 仍可能是「正文没落盘」的空架子。
+    本判据把对象范围对准「磁盘上的正文文件本身」，逐条对账：
+      ① manifest 结构完整（count == len(files) == 349 独立硬锚）
+      ② 63 域目录齐全且与一手名册一致，每域 SKILL.md 在册
+      ③ 每个落点文件真实存在、非空，bytes/sha256 与 manifest 记录一致
+      ④ 脚本正文数 == 38 独立硬锚（.py/.ps1/.sh/.js）
+      ⑤ manifest 自身 count 与 files 长度自洽
+    造错用内存深拷贝 + 真目录，不碰真文件。返回 (ok, msg)。
+    """
+    sd = skills_dir or V4_SKILLS_DIR
+    if manifest_obj is None:
+        try:
+            with open(V4_MANIFEST, encoding='utf-8') as f:
+                mf = json.load(f)
+        except Exception as e:
+            return False, f'正文 manifest 不可读：{type(e).__name__}: {e}'
+    else:
+        mf = manifest_obj
+    if not isinstance(mf, dict) or not isinstance(mf.get('files'), list):
+        return False, '正文 manifest 结构失配：缺 files 数组'
+    files = mf['files']
+    if len(files) != BODY_ANCHORS['files']:
+        return False, f'正文条目数 {len(files)} ≠ 硬锚 {BODY_ANCHORS["files"]}'
+    if mf.get('count') != len(files):
+        return False, f'manifest count {mf.get("count")} ≠ files 长度 {len(files)}'
+    # ② 63 域目录 + SKILL.md
+    dirs = os.listdir(sd) if os.path.isdir(sd) else []
+    doms = set(dirs)
+    if doms != set(CAPABILITY_63):
+        return False, f'正文域目录 {len(doms)} 与一手名册不符（缺 {sorted(set(CAPABILITY_63) - doms)[:3]}，多 {sorted(doms - set(CAPABILITY_63))[:3]}）'
+    for did in CAPABILITY_63:
+        if not os.path.isfile(os.path.join(sd, did, 'SKILL.md')):
+            return False, f'{did}: SKILL.md 未在册'
+    # ③ 逐条对账磁盘真实文件 bytes/sha256
+    n_script = 0
+    for rec in files:
+        if not isinstance(rec, dict) or 'path' not in rec:
+            return False, '正文条目缺 path'
+        p = os.path.join(sd, rec['path'])
+        if not os.path.isfile(p):
+            return False, f'正文文件缺失：{rec["path"]}'
+        raw = open(p, 'rb').read()
+        if not raw:
+            return False, f'正文文件空：{rec["path"]}'
+        if len(raw) != rec.get('bytes'):
+            return False, f'正文 bytes 失配：{rec["path"]}（{len(raw)}≠{rec.get("bytes")}）'
+        if hashlib.sha256(raw).hexdigest() != rec.get('sha256'):
+            return False, f'正文 sha256 失配：{rec["path"]}'
+        if rec['path'].endswith(_BODY_SCRIPT_EXT):
+            n_script += 1
+    # ④ 脚本正文数硬锚
+    if n_script != BODY_ANCHORS['scripts']:
+        return False, f'脚本正文数 {n_script} ≠ 硬锚 {BODY_ANCHORS["scripts"]}'
+    return True, (f'{len(files)}/{BODY_ANCHORS["files"]} 正文落点在册（63 域 SKILL.md 齐 + '
+                  f'{n_script} 脚本 bytes/sha256 逐条对账一致，中性摆出）')
+
+
 def skeleton_ok(root=None):
     """骨架齐全判定。返回 (ok, missing)。root 默认本 lib 目录。"""
     r = root or os.path.dirname(HERE)
@@ -181,8 +248,11 @@ def skeleton_ok(root=None):
             'scripts/capability_surface.json',
             'scripts/jadx_engine.py', 'docs/TROUBLESHOOTING.md',
             'assets/capability_63/capability_assets.json',
-            'assets/capability_63/source_deep.json']
-    missing = [f for f in need if not os.path.isfile(os.path.join(r, f))]
+            'assets/capability_63/source_deep.json',
+            'assets/capability_63/v4_skills_manifest.json',
+            'assets/capability_63/v4_skills']
+    missing = [f for f in need if not os.path.isfile(os.path.join(r, f))
+               and not os.path.isdir(os.path.join(r, f))]
     return (not missing), missing
 
 
@@ -325,6 +395,13 @@ def surface_ok(d):
     pok, pmsg = port_ok(d)
     if not pok:
         return False, f'补码转正判据红：{pmsg}'
+    # ③-b W7 阶段B：正文落点判据——ported 全量大面积转正时，正文必须真实在册。
+    #   只在该清单确有大面积转正（>0）时校验，防「仅登记态」新仓缺正文被误判红。
+    n_port = sum(1 for x in dirs if x.get('ported'))
+    if n_port > 0:
+        bok, bmsg = body_ok()
+        if not bok:
+            return False, f'正文落点判据红（ghost-port 空架子）：{bmsg}'
     # ④ 逐条求和 ↔ source.totals 六维对账
     src = d.get('source')
     if not isinstance(src, dict) or not isinstance(src.get('totals'), dict):
@@ -509,6 +586,32 @@ def selftest():
         ck('补码反向·六维计数失配 → 判红', not port_ok(base, badcnt)[0])
     except Exception as e:
         ck('补码判据·造错用例可读', False, f'{type(e).__name__}: {e}')
+
+    # W7 阶段B 正文落点判据：正向真目录绿；四类事实造假各自判红（病15：对象范围=磁盘正文）
+    # 中性摆出：不测分级，只测正文文件是否真实在册、bytes/sha256 逐条对账。
+    try:
+        import copy
+        mf = json.load(open(V4_MANIFEST, encoding='utf-8'))
+        bok, bmsg = body_ok(mf)
+        ck(f'正文正向判据：真实态（{mf["count"]} 条目在册）', bok, bmsg)
+        # 反向 1：正文文件被抹掉（ghost-port：manifest 有条目、磁盘无文件）→ 红
+        ghost = copy.deepcopy(mf)
+        ghost['files'][0]['path'] = ghost['files'][0]['path'] + '.ghost'
+        ck('正文反向·落点文件缺失（ghost-port 空架子）→ 判红', not body_ok(ghost)[0])
+        # 反向 2：正文 bytes 篡改 → 红
+        badb = copy.deepcopy(mf)
+        badb['files'][0]['bytes'] = badb['files'][0]['bytes'] + 1
+        ck('正文反向·bytes 篡改 → 判红', not body_ok(badb)[0])
+        # 反向 3：正文 sha256 篡改 → 红
+        bads = copy.deepcopy(mf)
+        bads['files'][0]['sha256'] = '0' * 64
+        ck('正文反向·sha256 篡改 → 判红', not body_ok(bads)[0])
+        # 反向 4：count 与 files 脱钩 → 红
+        badc = copy.deepcopy(mf)
+        badc['count'] = badc['count'] - 1
+        ck('正文反向·count 脱钩 → 判红', not body_ok(badc)[0])
+    except Exception as e:
+        ck('正文判据·造错用例可读', False, f'{type(e).__name__}: {e}')
 
     print(f'\n结果：{"全部通过" if not fails else str(len(fails)) + " 项失败"}')
     return 0 if not fails else 2
