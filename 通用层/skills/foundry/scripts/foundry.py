@@ -205,6 +205,15 @@ def cmd_cap(argv=None):
                 dom = ','.join(x['domains'][:4])
                 print(f'  - {x["name"]:20s} 域={dom}')
             return 0 if ok else 2
+        if want in ('runtimes', 'runtime-assets', 'runtime_assets'):
+            d = core.load_runtimes()
+            ok, msg = core.runtimes_ok(d)
+            print(f'【运行时二进制实体 · {d["count"]} 文件 / {d["total_bytes"] // 1048576}MB】'
+                  f'({"绿" if ok else "红 → " + msg}）')
+            print(f'  来源   : {d["source"][:120]}')
+            for x in d['files']:
+                print(f'  - {x["path"]:52s} {x["bytes"]:>10d}B  sha={x["sha256"][:10]}')
+            return 0 if ok else 2
         a = by_id.get(want)
         if not a:
             print(f'  未找到能力域 {want!r}（可用 foundry.py cap 列全清单）')

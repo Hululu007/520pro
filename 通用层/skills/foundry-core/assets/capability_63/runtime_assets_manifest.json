@@ -1,0 +1,55 @@
+{
+  "source": "MilkCode APK (weixin.zip/Milk Code_MilkCode1.0.4.apk.1.1.1) 解出的上游运行时只读二进制实体；arm64 架构，本机 amd64 未加载执行，仅保真归档",
+  "count": 8,
+  "total_bytes": 236440579,
+  "files": [
+    {
+      "path": "frida/frida-server-17.23.3-android-arm64",
+      "bytes": 59175728,
+      "sha256": "8887fb3dc84222416e2cdde706a10037c920df01d7858025168739d926c2fe17",
+      "source": "assets/frida/frida-server-17.23.3-android-arm64"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/cacert.pem",
+      "bytes": 188900,
+      "sha256": "a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505",
+      "source": "assets/linux-tools/arm64-v8a/cacert.pem"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/curl",
+      "bytes": 9995584,
+      "sha256": "c392bc0ea0c7951ee170e0eb7874c9d4000397254d788552ffaa4e7ccb75ae07",
+      "source": "assets/linux-tools/arm64-v8a/curl"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/jq",
+      "bytes": 1709616,
+      "sha256": "4dd2d8a0661df0b22f1bb9a1f9830f06b6f3b8f7d91211a1ef5d7c4f06a8b4a5",
+      "source": "assets/linux-tools/arm64-v8a/jq"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/node-gnu.bin",
+      "bytes": 30172012,
+      "sha256": "a44aeb94849a299b22df10b9e622ec2f605c2183501bc40590705131de7c740f",
+      "source": "assets/linux-tools/arm64-v8a/node-gnu.bin"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/node-musl.bin",
+      "bytes": 32518752,
+      "sha256": "5464aed53fda1c1fe69941e9715fee74b20503b22b30a56b2efc6b776ead5451",
+      "source": "assets/linux-tools/arm64-v8a/node-musl.bin"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/python-gnu.bin",
+      "bytes": 52312565,
+      "sha256": "c0574c9c9fec561eb192ad510e4e79aaad039929b3531b3bb873e2f630fb14a9",
+      "source": "assets/linux-tools/arm64-v8a/python-gnu.bin"
+    },
+    {
+      "path": "linux-tools/arm64-v8a/python-musl.bin",
+      "bytes": 50367422,
+      "sha256": "76555f7ca479eea6e804a89d786573b43eba934dc8630a98c23f689f234bfab1",
+      "source": "assets/linux-tools/arm64-v8a/python-musl.bin"
+    }
+  ]
+}

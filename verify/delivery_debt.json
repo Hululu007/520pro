@@ -1757,6 +1757,25 @@
    "note": "机器核销：ledger 回执已现"
   },
   {
+   "id": "D-203b28f-F04",
+   "flow": "F04",
+   "folder": "🧬 520进化论/03-子项目演进",
+   "commit": "203b28f",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(skills): W8-C 破甲路由——seagull-pentest 接入为 520 可路由技能",
+   "expect": "演进时间线/逐版交付说明",
+   "evidence": "改动文件: 通用层/skills/seagull-pentest/CHANGELOG.md",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "",
+   "waived_until": "2027-02-04",
+   "note": "豁免至 2027-02-04：W8-C 交付落库：space-hub connector 未绑定云端，无法真 archive 回执；与前笔 D-d6262dd/D-c1fd64d 同型 waive，到期自动转 open",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-16T22:23:03"
+  },
+  {
    "id": "D-7b1769d-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",

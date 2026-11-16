@@ -50,6 +50,10 @@ REA_FILE = os.path.join(ASSETS_DIR, 'rea_tools.json')
 TOKENS_FILE = os.path.join(ASSETS_DIR, 'tool_tokens.json')
 REA_COUNT = 24          # rea-preset.json 实测工具数（唯一真源）
 TOKENS_COUNT = 65       # source_deep.json 63 域 tool_tokens 去重实测数
+# W8-D：frida-server + linux-tools arm64 上游只读二进制实体（保真归档，非本仓运行时）
+RUNTIME_DIR = os.path.join(ASSETS_DIR, 'runtime_assets')
+RUNTIME_MANIFEST = os.path.join(ASSETS_DIR, 'runtime_assets_manifest.json')
+RUNTIME_COUNT = 8       # 同一 APK 解出的实体文件数（唯一真源，manifest 自洽校验）
 
 # 26 个工具名：tools/list 实测顺序（唯一真源，不复制文档枚举）
 TOOLS_26 = [
@@ -150,6 +154,15 @@ def load_tokens(path=None):
     return d
 
 
+def load_runtimes(path=None):
+    """读 W8-D 运行时二进制实体清单。缺失/坏结构抛异常（B-02）。"""
+    with open(path or RUNTIME_MANIFEST, encoding='utf-8') as f:
+        d = json.load(f)
+    if not isinstance(d, dict) or not isinstance(d.get('files'), list):
+        raise ValueError('runtime_assets_manifest.json 结构失配：缺 files 数组')
+    return d
+
+
 def rea_ok(d=None):
     """REA 24 工具名册判据：count 自洽 + 24 个无重复 + 与 26 工具集非同一套。
     返回 (ok, msg)。病15：识别范围=对象范围——只验名册自洽，不虚构版本/用途。"""
@@ -188,6 +201,50 @@ def tokens_ok(d=None):
         if target not in names:
             return False, f'缺目标工具 {target}'
     return True, f'{len(toks)} 个 token 自洽（五项目标工具命中）'
+
+
+def runtimes_ok(d=None, assets_dir=None):
+    """W8-D 运行时实体判据（病15：识别范围=对象范围）——验磁盘实体本身，非只看清单。
+      ① manifest 结构完整（count == len(files) == 8 硬锚）
+      ② count/total_bytes 与 files 自洽
+      ③ 每条 path 无越界（不含 .. / 绝对路径），实体真实存在、非空
+      ④ 逐条 bytes/sha256 与 manifest 记录一致（篡改/掉包即红）
+      ⑤ 来源标注在册（证明同源 APK 原样解出，非凭空生成）
+    返回 (ok, msg)。不执行任何二进制（arm64 实体在本机 amd64 仅保真归档）。
+    """
+    d = d if d is not None else load_runtimes()
+    root = assets_dir or RUNTIME_DIR
+    files = d.get('files')
+    if not isinstance(files, list):
+        return False, 'files 非数组'
+    if d.get('count') != len(files):
+        return False, f'count {d.get("count")} ≠ files 实际 {len(files)}'
+    if len(files) != RUNTIME_COUNT:
+        return False, f'实体数 {len(files)} ≠ 实测 {RUNTIME_COUNT}'
+    total = 0
+    for rec in files:
+        if not isinstance(rec, dict) or 'path' not in rec:
+            return False, '实体条目缺 path'
+        rel = rec['path']
+        if os.path.isabs(rel) or '..' in rel.split('/'):
+            return False, f'实体 path 越界：{rel}'
+        p = os.path.join(root, *rel.split('/'))
+        if not os.path.isfile(p):
+            return False, f'实体文件缺失：{rel}'
+        raw = open(p, 'rb').read()
+        if not raw:
+            return False, f'实体文件空：{rel}'
+        if len(raw) != rec.get('bytes'):
+            return False, f'实体 bytes 失配：{rel}（{len(raw)}≠{rec.get("bytes")}）'
+        if hashlib.sha256(raw).hexdigest() != rec.get('sha256'):
+            return False, f'实体 sha256 失配：{rel}（可能篡改/掉包）'
+        if not rec.get('source'):
+            return False, f'实体缺来源标注：{rel}'
+        total += len(raw)
+    if d.get('total_bytes') != total:
+        return False, f'total_bytes {d.get("total_bytes")} ≠ 逐条求和 {total}'
+    return True, (f'{len(files)}/{RUNTIME_COUNT} 运行时实体落点在册（bytes/sha256 逐条对账一致，'
+                  f'{total / 1048576:.1f}MB，未加载执行）')
 
 
 def port_ok(surface_d, assets=None, deep_path=None):
@@ -704,6 +761,33 @@ def selftest():
         ck('token 反向·重复 → 判红', not tokens_ok(dup)[0])
     except Exception as e:
         ck('W8-A 判据·造错用例可读', False, f'{type(e).__name__}: {e}')
+
+    # W8-D 运行时实体判据：正向绿（真磁盘实体逐条对账），造错判红（病15：对象范围=磁盘实体）
+    try:
+        import copy
+        rt = load_runtimes()
+        rok, rmsg = runtimes_ok(rt)
+        ck(f'runtime 正向判据：真实态（{rt["count"]} 实体/{rt["total_bytes"] // 1048576}MB）', rok, rmsg)
+        # 反面 1：篡改某实体 sha → 红（掉包/篡改必抓）
+        badsha = copy.deepcopy(rt); badsha['files'][0]['sha256'] = '0' * 64
+        ck('runtime 反向·实体 sha 篡改 → 判红', not runtimes_ok(badsha)[0])
+        # 反面 2：实体 bytes 与清单脱钩 → 红
+        badbytes = copy.deepcopy(rt); badbytes['files'][0]['bytes'] += 1
+        ck('runtime 反向·实体 bytes 脱钩 → 判红', not runtimes_ok(badbytes)[0])
+        # 反面 3：count 脱钩 → 红
+        badcount = copy.deepcopy(rt); badcount['count'] += 1
+        ck('runtime 反向·count 脱钩 → 判红', not runtimes_ok(badcount)[0])
+        # 反面 4：path 越界（../） → 红
+        badpath = copy.deepcopy(rt); badpath['files'][0]['path'] = '../evil.bin'
+        ck('runtime 反向·path 越界 → 判红', not runtimes_ok(badpath)[0])
+        # 反面 5：缺来源标注 → 红（无法证明同源解出）
+        nosrc = copy.deepcopy(rt); nosrc['files'][0].pop('source', None)
+        ck('runtime 反向·缺来源标注 → 判红', not runtimes_ok(nosrc)[0])
+        # 反面 6：total_bytes 脱钩 → 红
+        badtotal = copy.deepcopy(rt); badtotal['total_bytes'] += 1
+        ck('runtime 反向·total_bytes 脱钩 → 判红', not runtimes_ok(badtotal)[0])
+    except Exception as e:
+        ck('W8-D 判据·造错用例可读', False, f'{type(e).__name__}: {e}')
 
     print(f'\n结果：{"全部通过" if not fails else str(len(fails)) + " 项失败"}')
     return 0 if not fails else 2

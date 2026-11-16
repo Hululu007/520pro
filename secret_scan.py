@@ -94,7 +94,12 @@ def hygiene_exempt(rel):
 # pentest-tools/.../jwt-security.md）是原文教学内容，不是本仓凭证。只读归档、不改写
 # （改写即破坏一手真源）。病15：零明文凭证判据的对象是「本仓运行时/配置凭证」，识别
 # 范围不该覆盖只读第三方正文。exempt 按目录名匹配整棵子树。
-SKIP_DIRS = ('.git', 'node_modules', '__pycache__', 'v4_skills')
+# M7 有意例外（W8-D）：capability_63/runtime_assets 是从同一个 MilkCode APK 解出的
+# frida-server / linux-tools arm64 只读二进制实体（225.5MB，8 文件，manifest 逐条 sha 对账）。
+# 与 v4_skills 同性质——上游第三方只读归档、不改写、不参与本仓运行时；本机 amd64 未加载执行。
+# 大文件闸（>10MB）的对象是「本仓状态文件/incremental 产物」（工程纪律 §8：大对象走资料库），
+# 不该覆盖上游只读实体的保真归档。篡改/新增由 runtime_assets_manifest.json 的 bytes/sha 判据捕获。
+SKIP_DIRS = ('.git', 'node_modules', '__pycache__', 'v4_skills', 'runtime_assets')
 SCAN_EXT = ('.py', '.sh', '.json', '.md', '.yml', '.yaml', '.toml', '.env', '.txt', '.cfg', '.ini')
 
 
