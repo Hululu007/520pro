@@ -1865,6 +1865,44 @@
    "note": "豁免至 2027-02-04：本会话未绑定 spaceengine 资料库 connector（list/reconnect 均拒），无法经 space-hub archive 正门真补 F02 方法论落库；显式豁免留痕，到期自动转 open 待资料库可用时真补，与上批 D-7b1769d 三条同期限统一处理，不假称已还、不改成 closed 洗绿",
    "waived_by": "agent",
    "waived_ts": "2026-11-16T08:58:51"
+  },
+  {
+   "id": "D-d6262dd-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "d6262dd",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(skills): W8-B1 元技能三件套分流迁移（照搬=空架子→吸收原则到换机司/foundry）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 迁移外部技能先实证源语境——三个 SKILL.md 照搬是空架子（installer 依赖 520 没有的 MCP 专有工具、creator 是 workspa",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "",
+   "waived_until": "2027-02-04",
+   "note": "豁免至 2027-02-04：本会话未绑定 spaceengine 资料库 connector（list/reconnect 均拒），无法经 space-hub archive 正门真补落库；显式豁免留痕，到期自动转 open 待资料库可用时真补，与前批 D-7b1769d/D-c1fd64d 同期限统一处理，不假称已还、不改成 closed 洗绿",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-16T09:19:48"
+  },
+  {
+   "id": "D-d6262dd-F04",
+   "flow": "F04",
+   "folder": "🧬 520进化论/03-子项目演进",
+   "commit": "d6262dd",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(skills): W8-B1 元技能三件套分流迁移（照搬=空架子→吸收原则到换机司/foundry）",
+   "expect": "演进时间线/逐版交付说明",
+   "evidence": "改动文件: 通用层/skills/foundry/CHANGELOG.md",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "",
+   "waived_until": "2027-02-04",
+   "note": "豁免至 2027-02-04：本会话未绑定 spaceengine 资料库 connector（list/reconnect 均拒），无法经 space-hub archive 正门真补落库；显式豁免留痕，到期自动转 open 待资料库可用时真补，与前批 D-7b1769d/D-c1fd64d 同期限统一处理，不假称已还、不改成 closed 洗绿",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-16T09:19:48"
   }
  ]
 }

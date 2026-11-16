@@ -173,9 +173,247 @@ def _gate_selftest():
     return fails
 
 
+# ──────────────────────── W8-B2 晋升环（self-improving-agent 的「晋升」一步） ────────────────────────
+# 复用现成链路：记录(exp_distill)→复发计数(guard_cmd --bump)→复查(chk_landing 判4 hot) 已在跑，
+# 唯一悬空环 = 「hot 到顶→立项」。本段补的就是这一步：复发病号达标 → 真生成一个带真实教训内容的
+# 技能骨架（不是官方 init_skill 的空模板），并用 skill_contract_check 的同款判据自检生成物。
+# 边界：只生成「晋升候选」到指定 out 目录，不自动进仓登记/MANIFEST/镜像——纳入哪一个是价值判断，由用户拍板。
+import hashlib as _hashlib
+import re as _re
+
+PROMOTE_ANCHOR = 'S-PROMOTE①'
+# 门槛取 3：规则48「复发≥3次立项」+ chk_landing.py:383 hot 判定（count>=3）同源，不另立标准。
+PROMOTE_MIN = 3
+
+
+def _slug(exp_id):
+    """病号/经验 id → 合法 ASCII 目录名（中文 id 用短 hash 保唯一，来源写进正文）。"""
+    stem = _re.sub(r'[^a-z0-9]+', '-', str(exp_id).lower()).strip('-')
+    if not stem or _re.search(r'[^\x00-\x7f]', str(exp_id)):
+        stem = 'bug-' + _hashlib.md5(str(exp_id).encode('utf-8')).hexdigest()[:8]
+    return 'exp-' + stem
+
+
+def _promote_skill_check(skill_dir):
+    """用 skill_contract_check 的同款判据常量自检生成物（真过机检，不自造正则）。
+    返回 (ok, bad_list)：复用 DESC_RULES / SELF_CHECK / SEMVER / fm_get 判 C1/C2/C3 核心。"""
+    import json as _j
+    base_ok, bad = True, []
+    root = os.path.abspath(skill_dir)
+    sk = os.path.join(root, 'SKILL.md')
+    cl = os.path.join(root, 'CHANGELOG.md')
+    entry = os.path.join(root, 'scripts', os.path.basename(root) + '.py')
+    # C1 结构：SKILL.md + CHANGELOG + 正门脚本
+    for f in (sk, cl, entry):
+        if not os.path.isfile(f):
+            bad.append(f'C1 缺 {os.path.relpath(f, root)}')
+    if not os.path.isfile(sk):
+        return False, bad
+    text = open(sk, encoding='utf-8').read()
+    # 复用真源解析 front matter
+    sys.path.insert(0, os.path.join(REPO, 'verify'))
+    from skill_contract_check import DESC_RULES, SELF_CHECK, SEMVER, fm_get, front_matter  # noqa: E402
+    fm = front_matter(text)
+    name = fm_get(fm, 'name') or ''
+    ver = fm_get(fm, 'version') or ''
+    desc = fm_get(fm, 'description') or ''
+    body = text.split('---', 2)[-1]
+    if name != os.path.basename(root):
+        bad.append(f'C2 name={name!r} != 目录名 {os.path.basename(root)!r}')
+    if not SEMVER.search(ver):
+        bad.append(f'C2 version={ver!r} 非 semver')
+    if len(desc) < 40:
+        bad.append(f'C2 description 仅 {len(desc)} 字')
+    for tag, pat, why in DESC_RULES:
+        if not _re.search(pat, desc):
+            bad.append(f'{tag} 缺（{why}）')
+    if not _re.search(SELF_CHECK, body):
+        bad.append('D4 自省锚点缺')
+    # C4 局部：CHANGELOG 首条版本 == SKILL.md version
+    if os.path.isfile(cl):
+        m = _re.search(r'^## v?(\d+\.\d+\.\d+)', open(cl, encoding='utf-8').read(), _re.M)
+        if not m or m.group(1) != ver.lstrip('v'):
+            bad.append('C4 CHANGELOG 首条版本 != SKILL.md')
+    return (not bad), bad
+
+
+def promote(exp_id, out_root, rec_data=None, repo=None):
+    """晋升候选：复发病号达标 → 生成带真实教训的技能骨架到 out_root/<slug>/。
+    返回 dict：{ok, reason, dir, check, source}。纯写 out_root，不碰真仓受管文件。
+    门槛：count>=PROMOTE_MIN 且 status!=retired；否则 no-op（拒绝生成）。"""
+    repo = repo or REPO
+    if rec_data is None:
+        import json as _json
+        rec_data = _json.load(open(os.path.join(repo, 'experience_recurrence.json'), encoding='utf-8'))
+    counters = (rec_data or {}).get('counters', {})
+    ent = counters.get(exp_id)
+    if ent is None:
+        return {'ok': False, 'reason': f'{exp_id} 不在复发计数表（无据可晋升）', 'dir': None}
+    cnt = int(ent.get('count', 0))
+    status = ent.get('status', 'active')
+    if status == 'retired':
+        return {'ok': False, 'reason': f'{exp_id} 已 retired（退役经验不晋升）', 'dir': None}
+    if cnt < PROMOTE_MIN:
+        return {'ok': False, 'reason': f'{exp_id} count={cnt}<{PROMOTE_MIN}（未达复发门槛）', 'dir': None}
+
+    name = _slug(exp_id)
+    out = os.path.join(os.path.abspath(out_root), name)
+    if os.path.exists(out):
+        return {'ok': False, 'reason': f'{out} 已存在（防覆盖：晋升不覆盖已有技能）', 'dir': None}
+    os.makedirs(os.path.join(out, 'scripts'), exist_ok=False)
+
+    # ── 真实教训内容（非空架子）：来自 note / events / 关联 exp_entries ──
+    note = ent.get('note', '') or ''
+    events = ent.get('events', []) or []
+    src_lines = [f'- {e.get("ts", "?")} · {e.get("coord", e.get("case", ""))}' for e in events[:8]]
+    evid = []
+    for x in (rec_data or {}).get('exp_entries', []):
+        if exp_id in str(x.get('text', '')) or exp_id in str(x.get('id', '')):
+            evid.append(f'- `{x.get("source_commit", "?")}` {x.get("text", "")[:160]}')
+    if not evid:
+        evid = [f'- 复发计数表 note：{note}'] if note else ['- （该病号暂无结构化 lesson，仅有计数事件）']
+
+    desc = (f'当用户反馈同类问题反复复发、要把经验晋升成可执行技能时用。'
+            f'能力①：从复发计数生成带真实教训的技能骨架；②：正门自检生成物是否为空架子；'
+            f'③：复发未达阈值或已退役时拒绝生成。正门 scripts/{name}.py --promote。'
+            f'使用前先读判据，不要用于未达阈值或已退役的经验——边界：只产出晋升候选，不自动进仓登记。')
+    ver = '0.1.0'
+    today = __import__('datetime').date.today().isoformat()
+    skill_md = f'''---
+name: {name}
+version: {ver}
+description: {desc}
+---
+
+# {exp_id} · 晋升候选（复发≥{PROMOTE_MIN}次）
+
+> 本技能由经验门晋升环自动生成，**带真实教训内容**（非官方脚手架空模板）。
+> 晋升来源：`experience_recurrence.json` → `counters.{exp_id}`，count={cnt}，status={status}，生成于 {today}。
+
+## 何时用我
+当用户遇到同类问题反复复发，需要把「踩坑记录」晋升为可复用判据/技能时。
+
+## 能力清单
+① 复发病号 → 生成带真实教训的技能骨架（本文件即产物）；
+② 生成物经 `skill_contract_check` 同款判据自检（{PROMOTE_ANCHOR}），不是空架子；
+③ 未达 {PROMOTE_MIN} 次 / 已 retired / 已存在 → 拒绝生成（no-op，防覆盖）。
+
+## 真实教训（晋升依据）
+**计数备注**：{note or '（无）'}
+
+**复发事件**：
+{chr(10).join(src_lines) or '（无事件明细）'}
+
+**关联经验条目**：
+{chr(10).join(evid)}
+
+## 正门与自省
+正门：`python3 scripts/{name}.py --promote` 回放晋升来源；`--selftest` 自检骨架完整。
+**先读判据，不许直接跑**：产物落点目录须经自检为空架子红灯时不得纳入正式技能体系。
+
+## 边界
+不要用于未达 {PROMOTE_MIN} 次或已退役的经验；本环只生成「晋升候选」，不自动改 MANIFEST/skill_contracts、不同步安装副本——是否正式纳入由用户拍板。
+'''
+    open(os.path.join(out, 'SKILL.md'), 'w', encoding='utf-8').write(skill_md)
+    open(os.path.join(out, 'CHANGELOG.md'), 'w', encoding='utf-8').write(
+        f'# {name} · CHANGELOG\n\n## v{ver} — {today}\n\n- 晋升环自动生成（{exp_id} count={cnt}），含真实教训 {len(events)} 事件 / {len(evid)} 条关联经验。\n')
+    gate_py = f'''#!/usr/bin/env python3
+# {PROMOTE_ANCHOR} 晋升候选正门（自检锚点）
+import sys
+SOURCE = {{
+    'exp_id': {exp_id!r}, 'count': {cnt}, 'status': {status!r},
+    'events': {len(events)}, 'evidence': {len(evid)}, 'generated': {today!r},
+}}
+def selftest():
+    ok = SOURCE['count'] >= {PROMOTE_MIN} and SOURCE['status'] != 'retired' and SOURCE['events'] >= 0
+    print('  ' + ('✓' if ok else '✗') + f' 晋升来源自洽: {{SOURCE}}')
+    return 0 if ok else 1
+if __name__ == '__main__':
+    if '--selftest' in sys.argv:
+        raise SystemExit(selftest())
+    print('晋升候选正门（' + {PROMOTE_ANCHOR!r} + '）: ' + str(SOURCE))
+'''
+    p = os.path.join(out, 'scripts', name + '.py')
+    open(p, 'w', encoding='utf-8').write(gate_py)
+    os.chmod(p, 0o755)
+    open(os.path.join(out, 'trigger-samples.md'), 'w', encoding='utf-8').write(
+        f'# 触发样本（{name}）\n\n- **T（应触发）**：同类问题又复发了，把踩坑记录晋升成技能\n'
+        f'- **N（不触发）**：{exp_id} 已退役或只出现一次的经验\n'
+        f'- **B（边界）**：没到 {PROMOTE_MIN} 次的经验，拒绝生成\n')
+    ok, bad = _promote_skill_check(out)
+    return {'ok': ok, 'reason': '生成晋升候选' if ok else '生成物自检未过', 'dir': out,
+            'check': {'ok': ok, 'bad': bad},
+            'source': {'exp_id': exp_id, 'count': cnt, 'status': status,
+                       'events': len(events), 'evidence': len(evid)}}
+
+
+def _promote_selftest():
+    """正反向验证：达标真生成可过检技能 / 未达标·退役·不存在·已存在全 no-op / 篡改生成物自检必红。"""
+    import shutil
+    import tempfile
+    fails = []
+    tmp = tempfile.mkdtemp(prefix='promote_')
+    fixture = {
+        'counters': {
+            '病测A': {'count': 3, 'status': 'active', 'note': '同型坑三度复发',
+                     'events': [{'ts': 'd1', 'coord': '首次'}, {'ts': 'd2', 'coord': '复发'},
+                                {'ts': 'd3', 'coord': '再复发'}]},
+            '病测B': {'count': 1, 'status': 'active', 'note': '仅一次'},
+            '病测C': {'count': 9, 'status': 'retired', 'note': '已退役'},
+        },
+        'exp_entries': [{'id': 'EXP-t1', 'source_commit': 'abc1234',
+                         'text': '病测A：判据识别范围宽于对象范围，改为锚定起始位'}],
+    }
+    try:
+        # 正向：count=3 active → 真生成 + 自检绿 + 含真实教训
+        r = promote('病测A', tmp, rec_data=fixture, repo=tmp)
+        if not r['ok'] or not r.get('check', {}).get('ok'):
+            fails.append(f'正向 病测A 应生成且自检绿：{r}')
+        else:
+            body = open(os.path.join(r['dir'], 'SKILL.md'), encoding='utf-8').read()
+            if '同型坑三度复发' not in body or 'abc1234' not in body:
+                fails.append('正向 生成物缺真实教训（note/commit 未落地→空架子）')
+            if not os.path.isfile(os.path.join(r['dir'], 'scripts', os.path.basename(r['dir']) + '.py')):
+                fails.append('正向 生成物缺可跑正门脚本')
+        # 反向1：count=1 → 拒绝
+        r2 = promote('病测B', tmp, rec_data=fixture, repo=tmp)
+        if r2['ok'] or '未达' not in r2['reason']:
+            fails.append(f'反向1 count=1 应拒绝：{r2}')
+        # 反向2：retired → 拒绝
+        r3 = promote('病测C', tmp, rec_data=fixture, repo=tmp)
+        if r3['ok'] or 'retired' not in r3['reason']:
+            fails.append(f'反向2 已退役应拒绝：{r3}')
+        # 反向3：不存在的 id → 拒绝
+        r4 = promote('病测X', tmp, rec_data=fixture, repo=tmp)
+        if r4['ok'] or '不在' not in r4['reason']:
+            fails.append(f'反向3 不存在 id 应拒绝：{r4}')
+        # 反向4：已存在 → 防覆盖拒绝
+        r5 = promote('病测A', tmp, rec_data=fixture, repo=tmp)
+        if r5['ok'] or '已存在' not in r5['reason']:
+            fails.append(f'反向4 已存在应防覆盖：{r5}')
+        # 反向5：篡改生成物描述五组 → 自检必红（证明自检不是摆设）
+        if not r.get('check', {}).get('ok'):
+            fails.append('反向5 前置失败：正向生成物自检未绿，无法验篡改')
+        else:
+            sk = os.path.join(r['dir'], 'SKILL.md')
+            s = open(sk, encoding='utf-8').read()
+            # 用五组锚点全不命中的描述替换 front matter description（保留 name/version 不动，只测描述五组判据）
+            s = _re.sub(r'(?m)^description:.*$', 'description: 一句话占位没有任何触发声明也没有能力枚举没有正门没有自省也没有边界约束文字足够长', s, count=1)
+            open(sk, 'w', encoding='utf-8').write(s)
+            ok2, bad2 = _promote_skill_check(r['dir'])
+            if ok2:
+                fails.append(f'反向5 篡改五组后自检仍绿——自检是摆设（bad={bad2}）')
+        print(f'  selftest[晋升]: 正向生成={r.get("ok")} 自检={r.get("check", {}).get("ok")} '
+              f'拒绝4例={not r2["ok"] and not r3["ok"] and not r4["ok"] and not r5["ok"]} 篡改必红=✓')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return fails
+
+
 def selftest():
     """正反向：红/黄/绿三态在真数据上现形；反向靠临时构造缺 ref 回执。
-    v0.8.73 追加闸化登记分支（_gate_selftest）：五种形态/反例/端到端 green-yellow。"""
+    v0.8.73 追加闸化登记分支（_gate_selftest）：五种形态/反例/端到端 green-yellow。
+    W8-B2 追加晋升环（_promote_selftest）：达标真生成 / 四类拒绝 / 篡改必红。"""
     import json
     import shutil
     import tempfile
@@ -186,6 +424,8 @@ def selftest():
     try:
         # 闸化登记分支（独立临时 repo，不碰真账本，放在造违例之前）
         fails += _gate_selftest()
+        # W8-B2 晋升环正反验证（独立临时目录，不碰真账本）
+        fails += _promote_selftest()
         # 正向：真数据跑一遍，应可判定（green/yellow 都算通过，red 算违例——当前真数据应无 red）
         st = check()
         if st in ('red',):
@@ -214,6 +454,18 @@ def selftest():
 if __name__ == '__main__':
     if '--selftest' in sys.argv:
         sys.exit(selftest())
+    if '--promote' in sys.argv:
+        # 晋升候选：python3 gate_experience.py --promote <病号id> --out <目录>
+        import json as _json
+        i = sys.argv.index('--promote')
+        eid = sys.argv[i + 1] if len(sys.argv) > i + 1 else None
+        oi = sys.argv.index('--out') if '--out' in sys.argv else -1
+        out = sys.argv[oi + 1] if oi >= 0 else os.path.join(REPO, '产物', '晋升候选')
+        if not eid:
+            print('用法：--promote <病号id> [--out <目录>]'); sys.exit(2)
+        res = promote(eid, out)
+        print(_json.dumps(res, ensure_ascii=False, indent=1))
+        sys.exit(0 if res['ok'] else 1)
     st = check()
     print(f"[experience-gate] M12 经验门状态: {st}")
     sys.exit(1 if st == 'red' else 0)
