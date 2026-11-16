@@ -1,5 +1,10 @@
 # machine-bootstrap · CHANGELOG
 
+## v1.0.4 — 环境体检正门 scripts/check-env.sh（2026-11-16；未 bump：原则落成可执行脚本，无资料库交付承诺）
+- 新增 `scripts/check-env.sh`：把 W8-B1 吸收的两节原则落成可执行体检正门——①三态链路审计（7 工具两级验证 command -v + 真跑退出码；B 类 JAVA_HOME/git 仓库链路；A 未补全/C 假就绪）；②技能安装边界（比对 MANIFEST 登记技能 SKILL.md sha 验内置不可覆盖 + 来源白名单/精确 id/只落文件不执行三条策略自证）；③换机后版本对账（VERSION + git HEAD）。`--selftest` 正反 7 例（缺工具=A/假就绪=C/仓库不可识别=B/镜像缺失=B/sha漂移=B/正向两级过/镜像一致）全绿。
+- 镜像对账只比 SKILL.md/CHANGELOG.md 的 sha，刻意不遍历 runtime_assets（226MB）——避开 W8-D 大文件。
+- frontmatter description 加正门锚点（C3），契约 required_files + entry 登记 scripts/check-env.sh。未 bump：易名为原则的可执行化，无对应资料库交付承诺，沿用 v1.0.4（避免假交付闸）。
+
 ## W8-B1 吸收 MilkCode 环境自检 + 安装边界原则（2026-11-16；未 bump：纯原则文档吸收）
 - SKILL.md 新增「环境自检：三态链路审计」节（吸收 env-audit 的 A 未补全/B 链路断开/C 假就绪三态 + `command -v` 与真跑退出码两级验证；只存在但执行失败归 C 不报已就绪）。MilkCode 语境的 `/.milkcode-*` 标记与 MCP 专有工具不照搬（520 无此环境），只吸收可迁移原则
 - 新增「技能安装边界」节（吸收 skill-installer 三条原则：内置不可覆盖 / 来源白名单 / 冲突需精确 id + 装文件不执行）。520 安装正门仍是 `install.sh --user-skill`，不另造通道

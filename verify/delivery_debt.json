@@ -1833,6 +1833,25 @@
    "waived_ts": "2026-11-16T08:22:23"
   },
   {
+   "id": "D-af35bf3-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "af35bf3",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(assets): W8-D frida+linux-tools 上游只读二进制实体入仓（225.5MB/8文件）",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 病15（复发·判据识别范围）—— 大文件闸 SKIP_DIRS 在 v4_skills 与 runtime_assets 两处同类豁免，登记理由不可省；实体判据",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "",
+   "waived_until": "2027-02-04",
+   "note": "豁免至 2027-02-04：W8-D 交付落库：space-hub connector 未绑定云端，无法真 archive 回执；与前笔 D-203b28f/D-d6262dd 同型 waive，到期自动转 open",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-16T22:37:13"
+  },
+  {
    "id": "D-b1b1430-F02",
    "flow": "F02",
    "folder": "🧬 520进化论/01-方法论",

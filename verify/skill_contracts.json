@@ -44,9 +44,10 @@
       "version": "1.0.4",
       "required_files": [
         "SKILL.md",
-        "CHANGELOG.md"
+        "CHANGELOG.md",
+        "scripts/check-env.sh"
       ],
-      "entry": "",
+      "entry": "scripts/check-env.sh",
       "trigger_samples": "references/trigger-samples.md"
     },
     "seagull-pentest": {
