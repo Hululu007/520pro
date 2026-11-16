@@ -33,6 +33,13 @@
           "role": "一键换机/克隆工作副本（W8-B1 吸收环境三态自检 + 技能安装边界原则）",
           "version": "1.0.4"
         },
+        "skills/seagull-pentest/SKILL.md": {
+          "install_to": "~/.codebuddy/skills/seagull-pentest/SKILL.md",
+          "role": "渗透工程（W8-C 从 MilkCode 63 域接入；5 脚本纯标准库可跑；授权先行+中转站保护；原文保真+520 接入层约束）",
+          "entry": "scripts/http_recon.py",
+          "self_check": "python3 scripts/http_recon.py --help → usage 正常（5 脚本 5/5 实测）",
+          "version": "1.0.0"
+        },
         "skills/artifact-store/SKILL.md": {
           "role": "本地产物轻量化·防手机卡顿",
           "version": "1.1.0"

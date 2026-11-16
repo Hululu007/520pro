@@ -49,6 +49,25 @@
       "entry": "",
       "trigger_samples": "references/trigger-samples.md"
     },
+    "seagull-pentest": {
+      "kind": "skill",
+      "layer": "通用层",
+      "path": "通用层/skills/seagull-pentest",
+      "version": "1.0.0",
+      "required_files": [
+        "SKILL.md",
+        "CHANGELOG.md",
+        "references/trigger-samples.md",
+        "scripts/http_recon.py",
+        "scripts/js_routes.py",
+        "scripts/jwt_inspect.py",
+        "scripts/openapi_inventory.py",
+        "scripts/request_matrix.py"
+      ],
+      "entry": "scripts/http_recon.py",
+      "trigger_samples": "references/trigger-samples.md",
+      "_note": "W8-C 从 MilkCode 63 域能力面资产区接入；正文保真迁移（授权先行+中转站保护由 520 接入层覆盖）；5 脚本纯标准库 --help 5/5 实测可跑，无 MCP 依赖"
+    },
     "inspect-hub": {
       "kind": "skill",
       "layer": "通用层",
