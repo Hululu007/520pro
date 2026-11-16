@@ -26,7 +26,7 @@
 
 **熔铸司 W4 产出接入已收口（本轮，0.8.76 主线内增量，不 bump / 不改技能 CHANGELOG / 不动线上）**：修 `verify/gate_archive_ledger.py` 的 `SKILLS` 硬编码盲区（原 7 技能无 foundry，其 2 条 bump v1.0.0/v1.1.0 完全漏检）——foundry 纳入 `SKILLS`+`SKILL_DIRS`。**修前先破「只纳入即假绿」陷阱（病15 第15例）**：旧判据 `ver in json.dumps(e)` 只认版本，foundry v1.1.0 会命中 artifact-store v1.1.0 他人回执假绿；诊断又发现「只认版本→假绿」与「强制本技能署名→误伤 space-hub v2.7.9 无署名补登回执」两头坑，正解=**排他性归属判据 `_owned_hit()`**：版本 token 完整命中（防 1.1.0 命中 1.1.01）+ 回执未署名其他技能，对象范围=「回执归属本 bump」。`--selftest` 加 5 例正反（本技能核销绿 / 他人署名假绿反向 / 无署名补登防误伤 / token 边界 / result 非 ok），并顺手补纯函数 `result=='ok'` 自洽（selftest 抓出的真缺陷，check 原靠 ok_rows 预过滤）。**五类产出经 space-hub archive 正门端到端落库**：按 `foundry/artifacts.json` 五类落点（能力面对照/解码资产→04-侦察资产、工具清单→📦产物归档/清单、板块演进→03-子项目演进、真调判例→05-复盘与判例）落 5 份 md（数字全来自 capability_surface/tools_schema 真源，不编造），note 只写 foundry+版本号不混入其他技能代号（避免落库侧同型串味），5 节点回读确认 + 回执写 archive_ledger.json；foundry 2 条 bump 各命中 5 条干净回执转绿。**连带真欠账清偿**：b5109eb（在途任务跟踪）提交 Lesson 触发 F02 方法论欠账 `D-b5109eb-F02`，经正门落「在途任务跨回合跟踪」方法论条目（形态+修法+实例坐标），探测器 scan 机器核销（不洗绿、不 waive）。**判据**：gate 真实态 9/9 bump 绿、selftest rc=0、delivery_debt open 0（closed 69/waived 28）、`bash verify.sh` 全绿。**遗留**：W5 收口推送。
 
-**下一步**：W7 阶段B 收口 — 起点：本笔提交后走 `hooks/git_push_safe.sh` 正门推 git、核对远端 main=HEAD — 完成判据：远端确认 + 正文落点证据可回读（`foundry.py cap apk-reverse` 显示 13 正文在册 + sha）+ 交付报告；本笔 Lesson 记「病15 第16例：ghost-port——port_ok 只验签名元数据不验正文文件在册，识别范围（签名）≠对象范围（磁盘正文），补 body_ok 逐条 bytes/sha 对账」，预期触发 F02/F06 欠账按正门真补。阶段B 收口后 520 熔铸司 W0→W7 全主线完成。
+**下一步**：无待办主线（W0→W7 全主线完成，远端 main = HEAD = `7fcc8fc`，工作区干净，verify 0✗/0⚠）。W7 阶段B 已于本轮收口并推送：`7b1769d`（63 域 349 正文从本机 MilkCode APK 解仓 + body_ok 逐条 bytes/sha 对账 + ghost-port 防线 + 两类机检 M7 排除 + secret_scan git 分支盲区修复 + commit-msg 中文路径 Python 修复）、`7fcc8fc`（Lesson 派生 3 条欠账 F02/F04/F06 显式 waive 至 2027-02-04：资料库 connector 未绑定无法真补，留痕非洗绿，到期自动转 open 待真补）。**遗留（P2）**：3 条 waived 欠账到期前若 spaceengine connector 可用，经 space-hub archive 正门真补落库核销；26 条历史旧账同批 2026-12-31 复检。
 
 > v0.8.40–52 已收口：`git show 1c5a2ae` / `f5973ae` / `c4d8bee` / `596c2d8` / `d7a92c2` / `ca47338` / `8176cff` / `1954613`。
 
@@ -60,7 +60,7 @@
 
 | 级别 | 事项 | owner | next | due |
 |---|---|---|---|---|
-| P0 | 熔铸司 W7 阶段B 收口：63 域 349 正文从本机 APK 解仓落库 + body_ok 逐条对账 + ghost-port 防线 + 两类机检模式级修复；代码/判据/selftest/verify 全绿已就位，待推 git | 我 | 按 commit-msg 规范提交（Verify/Next/Lesson/Reuse）→ `hooks/git_push_safe.sh` 正门推 git → 核对远端 main = HEAD；本笔 Lesson 若触发 F02/F06 欠账按正门真补不洗绿 | 阶段B git 推送远端确认 + 交付报告 |
+| ~~P0（已完成）~~ | 熔铸司 W7 阶段B 收口：63 域 349 正文从本机 APK 解仓落库 + body_ok 逐条对账 + ghost-port 防线 + 两类机检模式级修复 + commit-msg 中文路径修复 | 我 | **已闭环**：`7b1769d` 主体 + `7fcc8fc` 欠账豁免推送，远端 main = HEAD = `7fcc8fc`，AHEAD/BEHIND 0/0，工作区干净，verify 0✗/0⚠，`foundry.py cap apk-reverse` 回读 13 正文在册 + sha，body_ok selftest 全绿 | ✅ 2026-11-16 远端确认 + 交付报告 |
 | P2 | 重采链路批量跑（123 个存活仓库）**挂起**：熔铸司施工期间不并行，原 P0 未收敛不删除 | 我 | W5 收口后由用户决定是否恢复：先跑 10 仓质量复核通过再放全量，成品库留入库回执 | W5 收口后用户重新批准批量 |
 | P2 | 云端收件箱 2 个测试库待删 | 用户 | 在资料库 App 内手动点删 | 用户确认删除即完 |
 | P2 | 26 条内容流旧账已豁免至 2026-12-31（quotepath 盲区期漏账，见病15 第 11 例）；到期由探测器自动转 open | 我 | 到期前复核：能真补的经 `archive` 落库核销，仍不补的重新豁免并写明继续不补的具体原因（不许转成 closed 洗绿） | 2026-12-31 |
