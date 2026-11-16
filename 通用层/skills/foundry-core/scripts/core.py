@@ -45,6 +45,11 @@ V4_SKILLS_DIR = os.path.join(ASSETS_DIR, 'v4_skills')
 V4_MANIFEST = os.path.join(ASSETS_DIR, 'v4_skills_manifest.json')
 BODY_ANCHORS = {'domains': 63, 'files': 349, 'scripts': 38}
 _BODY_SCRIPT_EXT = ('.py', '.ps1', '.sh', '.js')
+# W8-A：REA 24 工具名册（第二工具集）+ 65 外部工具 token 弱明细
+REA_FILE = os.path.join(ASSETS_DIR, 'rea_tools.json')
+TOKENS_FILE = os.path.join(ASSETS_DIR, 'tool_tokens.json')
+REA_COUNT = 24          # rea-preset.json 实测工具数（唯一真源）
+TOKENS_COUNT = 65       # source_deep.json 63 域 tool_tokens 去重实测数
 
 # 26 个工具名：tools/list 实测顺序（唯一真源，不复制文档枚举）
 TOOLS_26 = [
@@ -125,6 +130,64 @@ def load_assets(path=None):
     if not isinstance(d, dict) or not isinstance(d.get('assets'), list):
         raise ValueError('capability_assets.json 结构失配：缺 assets 数组')
     return d
+
+
+def load_rea(path=None):
+    """读 W8-A REA 工具名册。缺失/坏结构抛异常，不折叠成空（B-02）。"""
+    with open(path or REA_FILE, encoding='utf-8') as f:
+        d = json.load(f)
+    if not isinstance(d, dict) or not isinstance(d.get('tools'), list):
+        raise ValueError('rea_tools.json 结构失配：缺 tools 数组')
+    return d
+
+
+def load_tokens(path=None):
+    """读 W8-A 外部工具 token 弱明细。缺失/坏结构抛异常（B-02）。"""
+    with open(path or TOKENS_FILE, encoding='utf-8') as f:
+        d = json.load(f)
+    if not isinstance(d, dict) or not isinstance(d.get('tokens'), list):
+        raise ValueError('tool_tokens.json 结构失配：缺 tokens 数组')
+    return d
+
+
+def rea_ok(d=None):
+    """REA 24 工具名册判据：count 自洽 + 24 个无重复 + 与 26 工具集非同一套。
+    返回 (ok, msg)。病15：识别范围=对象范围——只验名册自洽，不虚构版本/用途。"""
+    d = d if d is not None else load_rea()
+    tools = d.get('tools')
+    if not isinstance(tools, list):
+        return False, 'tools 非数组'
+    if d.get('count') != len(tools):
+        return False, f'count {d.get("count")} ≠ tools 实际 {len(tools)}'
+    if len(tools) != REA_COUNT:
+        return False, f'工具数 {len(tools)} ≠ 实测 {REA_COUNT}'
+    if len(set(tools)) != len(tools):
+        return False, '名册有重复'
+    if set(tools) == set(TOOLS_26):
+        return False, 'REA 名册与 26 工具集相同（应为不同工具集）'
+    if not d.get('sha256_source'):
+        return False, '缺来源 sha256（无法证明原样解出）'
+    return True, f'{len(tools)} 个 REA 工具自洽（与 26 工具集不同）'
+
+
+def tokens_ok(d=None):
+    """外部工具 token 弱明细判据：count 自洽 + 65 个 + 五项目标工具命中。
+    只验弱明细（name/domains/evidence），不虚构版本号。返回 (ok, msg)。"""
+    d = d if d is not None else load_tokens()
+    toks = d.get('tokens')
+    if not isinstance(toks, list):
+        return False, 'tokens 非数组'
+    if d.get('count') != len(toks):
+        return False, f'count {d.get("count")} ≠ tokens 实际 {len(toks)}'
+    if len(toks) != TOKENS_COUNT:
+        return False, f'token 数 {len(toks)} ≠ 实测 {TOKENS_COUNT}'
+    names = {t.get('name') for t in toks if isinstance(t, dict)}
+    if len(names) != len(toks):
+        return False, 'token 有重复'
+    for target in ('idalib-mcp', 'nmap', 'nuclei', 'burpsuite', 'frida-ps'):
+        if target not in names:
+            return False, f'缺目标工具 {target}'
+    return True, f'{len(toks)} 个 token 自洽（五项目标工具命中）'
 
 
 def port_ok(surface_d, assets=None, deep_path=None):
@@ -250,7 +313,9 @@ def skeleton_ok(root=None):
             'assets/capability_63/capability_assets.json',
             'assets/capability_63/source_deep.json',
             'assets/capability_63/v4_skills_manifest.json',
-            'assets/capability_63/v4_skills']
+            'assets/capability_63/v4_skills',
+            'assets/capability_63/rea_tools.json',
+            'assets/capability_63/tool_tokens.json']
     missing = [f for f in need if not os.path.isfile(os.path.join(r, f))
                and not os.path.isdir(os.path.join(r, f))]
     return (not missing), missing
@@ -612,6 +677,33 @@ def selftest():
         ck('正文反向·count 脱钩 → 判红', not body_ok(badc)[0])
     except Exception as e:
         ck('正文判据·造错用例可读', False, f'{type(e).__name__}: {e}')
+
+    # W8-A REA 24 工具 + 65 token 弱明细判据：正向绿，造错判红（病15：对象范围=名册自洽）
+    try:
+        import copy
+        rea = load_rea(); tok = load_tokens()
+        rok, rmsg = rea_ok(rea); tokok, tomsg = tokens_ok(tok)
+        ck(f'REA 正向判据：真实态（{rea["count"]} 工具）', rok, rmsg)
+        ck(f'token 正向判据：真实态（{tok["count"]} token）', tokok, tomsg)
+        # 反面 1：REA count 脱钩 → 红
+        badr = copy.deepcopy(rea); badr['count'] += 1
+        ck('REA 反向·count 脱钩 → 判红', not rea_ok(badr)[0])
+        # 反面 2：REA 与 26 工具集雷同（识别范围≠对象范围）→ 红
+        samer = copy.deepcopy(rea); samer['tools'] = list(TOOLS_26)
+        ck('REA 反向·与26工具集雷同 → 判红', not rea_ok(samer)[0])
+        # 反面 3：REA 缺来源 sha（无法证明原样解出）→ 红
+        nosha = copy.deepcopy(rea); nosha.pop('sha256_source', None)
+        ck('REA 反向·缺来源 sha → 判红', not rea_ok(nosha)[0])
+        # 反面 4：token 缺目标工具 → 红
+        badt = copy.deepcopy(tok)
+        badt['tokens'] = [x for x in badt['tokens'] if x['name'] != 'nmap']
+        badt['count'] = len(badt['tokens'])
+        ck('token 反向·缺目标工具 nmap → 判红', not tokens_ok(badt)[0])
+        # 反面 5：token 有重复 → 红
+        dup = copy.deepcopy(tok); dup['tokens'].append(dup['tokens'][0]); dup['count'] += 1
+        ck('token 反向·重复 → 判红', not tokens_ok(dup)[0])
+    except Exception as e:
+        ck('W8-A 判据·造错用例可读', False, f'{type(e).__name__}: {e}')
 
     print(f'\n结果：{"全部通过" if not fails else str(len(fails)) + " 项失败"}')
     return 0 if not fails else 2

@@ -185,6 +185,26 @@ def cmd_cap(argv=None):
     pok, pmsg = core.port_ok(surf, assets)
     want = argv[2] if len(argv) > 2 else None
     if want:
+        # W8-A 第二工具集检索：REA 24 名册 / 65 外部工具 token 弱明细
+        if want in ('rea', 'rea-tools', 'rea_tools'):
+            d = core.load_rea()
+            ok, msg = core.rea_ok(d)
+            print(f'【REA 工具名册 · {d["count"]} 工具】({"绿" if ok else "红 → " + msg}）')
+            print(f'  来源   : {d["origin"]}')
+            print(f'  sha256 : {d["sha256_source"][:16]}…')
+            for i, t in enumerate(d['tools'], 1):
+                print(f'  {i:2d}. {t}')
+            return 0 if ok else 2
+        if want in ('tokens', 'tool-tokens', 'tool_tokens'):
+            d = core.load_tokens()
+            ok, msg = core.tokens_ok(d)
+            print(f'【外部工具 token 弱明细 · {d["count"]} 个】({"绿" if ok else "红 → " + msg}）')
+            print(f'  来源   : {d["origin"]}')
+            print(f'  口径   : {d["note"]}')
+            for x in d['tokens']:
+                dom = ','.join(x['domains'][:4])
+                print(f'  - {x["name"]:20s} 域={dom}')
+            return 0 if ok else 2
         a = by_id.get(want)
         if not a:
             print(f'  未找到能力域 {want!r}（可用 foundry.py cap 列全清单）')

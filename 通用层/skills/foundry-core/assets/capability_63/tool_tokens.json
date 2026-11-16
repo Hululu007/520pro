@@ -1,0 +1,502 @@
+{
+ "origin": "从 source_deep.json（W6 一手真源，= /tmp/milk63_deep.json）的 63 域 tool_tokens 字段派生",
+ "count": 65,
+ "note": "65 个去重外部工具 token + 来源域 + mech 证据原句（弱明细）。无标准版本号/规范用途字段——只有零散 token 串与证据句，不虚构结构化明细。中性摆出。",
+ "tokens": [
+  {
+   "name": "%USERPROFILE%\\Tools\\radare2\\",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "Anti Cheat > Detection:Frida",
+   "domains": [
+    "mobile-security"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "Cheat > Frida",
+   "domains": [
+    "mobile-security"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "Cheat > QEMU/KVM/PVE/VBOX",
+   "domains": [
+    "game-hacking"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "Get-Command jadx,frida,ida,ghidra,curl,nmap",
+   "domains": [
+    "l-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "Insecure.Nmap",
+   "domains": [
+    "pentest-tools"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "adb",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": [
+    {
+     "domain": "apk-reverse",
+     "evidence": "| adb | ✓ | winget / fallback path | 自动安装 Android Platform-Tools |"
+    }
+   ]
+  },
+  {
+   "name": "adb devices",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "adb install",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "adb logcat",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "apktool",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "apktool --version",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "apktool b",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "apt install qemu-system-x86",
+   "domains": [
+    "pwn-chain"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "brew install pwndbg/tap/pwndbg-gdb",
+   "domains": [
+    "reverse-engineering"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "burpsuite",
+   "domains": [
+    "attack-chain"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "frida-ps",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "frida-ps -U",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "har_analyze.py",
+   "domains": [
+    "reverse-engineering-api"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "har_filter.py",
+   "domains": [
+    "reverse-engineering-api"
+   ],
+   "evidence": [
+    {
+     "domain": "reverse-engineering-api",
+     "evidence": "- `har_filter.py` - Filter HAR files to API endpoints only"
+    }
+   ]
+  },
+  {
+   "name": "har_utils.py",
+   "domains": [
+    "reverse-engineering-api"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "har_validate.py",
+   "domains": [
+    "reverse-engineering-api"
+   ],
+   "evidence": [
+    {
+     "domain": "reverse-engineering-api",
+     "evidence": "- `har_validate.py` - Validate generated code against HAR analysis"
+    }
+   ]
+  },
+  {
+   "name": "ida-pro-mcp",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "ida-reverse",
+   "domains": [
+    "js-reverse",
+    "radare2"
+   ],
+   "evidence": [
+    {
+     "domain": "radare2",
+     "evidence": "如果用户明确要 GUI 逆向、Hex-Rays 风格伪代码、或 IDA 工作流，优先考虑 `ida-reverse`。如果是网页 JS 逆向，优先考虑 `reverse-engineering`。"
+    }
+   ]
+  },
+  {
+   "name": "ida-reverse/",
+   "domains": [
+    "binary-diff",
+    "dotnet-reverse",
+    "firmware-pentest",
+    "patch-diff-exploit",
+    "pentest-tools",
+    "pwn-chain",
+    "radare2",
+    "reverse-engineering"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idalib-mcp",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idalib_open",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": [
+    {
+     "domain": "ida-reverse",
+     "evidence": "- 部分代码 AI 客户端 的 MCP 客户端对 `idalib_open` 的 output schema 校验有 BUG"
+    }
+   ]
+  },
+  {
+   "name": "idalib_open(run_auto_analysis=true)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_*",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_analyze_function(addr, include_asm=false)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_decompile(addr)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_disasm(addr, max_instructions=N)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_entity_query(kind, filter)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_func_profile(queries)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_list_funcs(queries)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_list_globals(queries)",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "idapro_survey_binary(detail_level=\"minimal\")",
+   "domains": [
+    "ida-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "jadx",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "jadx + apktool",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "jadx --version",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "nmap",
+   "domains": [
+    "attack-chain"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "nmap -sV -sC -O target",
+   "domains": [
+    "pentest-tools"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "nuclei",
+   "domains": [
+    "attack-chain"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "nuclei -u target -t cves/",
+   "domains": [
+    "pentest-tools"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2 -A",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2 -w <file>",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2 <file>",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2pipe",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "r2pm.exe",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "radare2",
+   "domains": [
+    "js-reverse",
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "radare2-*-w64.zip",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "radare2.exe",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "radare2/",
+   "domains": [
+    "binary-diff",
+    "dotnet-reverse",
+    "firmware-pentest",
+    "patch-diff-exploit",
+    "pentest-tools",
+    "pwn-chain",
+    "reverse-engineering"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "references/burpsuite-mcp-guide.md",
+   "domains": [
+    "pentest-tools"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "references/frida-objection-deep.md",
+   "domains": [
+    "mobile-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "scripts/frida-run.ps1",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "scripts/http_recon.py",
+   "domains": [
+    "seagull-pentest"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "scripts/jwt_inspect.py",
+   "domains": [
+    "seagull-pentest"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "scripts/openapi_inventory.py",
+   "domains": [
+    "seagull-pentest"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "smali_dirs",
+   "domains": [
+    "apk-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "帮我看看这个 exe 干了什么，用 radare2 就行",
+   "domains": [
+    "radare2"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "；Ghidra → ",
+   "domains": [
+    "l-reverse"
+   ],
+   "evidence": []
+  },
+  {
+   "name": "；r2 → ",
+   "domains": [
+    "l-reverse"
+   ],
+   "evidence": []
+  }
+ ]
+}
