@@ -1846,6 +1846,25 @@
    "closed_by": "archive 判例_病15第15例_gate假绿.md @b1b1430 @ 2026-11-16",
    "waived_until": "",
    "note": "机器核销：ledger 回执已现"
+  },
+  {
+   "id": "D-c1fd64d-F02",
+   "flow": "F02",
+   "folder": "🧬 520进化论/01-方法论",
+   "commit": "c1fd64d",
+   "commit_date": "2026-11-16",
+   "target_version": "",
+   "title": "feat(foundry): W8-A REA 24 工具名册 + 65 外部工具 token 弱明细落库与判据",
+   "expect": "方法论条目（形态+修法+实例坐标）",
+   "evidence": "Lesson: 源数据口径按实测不沿用早报——rea-preset.json 实为 24 工具（非 25），",
+   "status": "waived",
+   "age_commits": 0,
+   "first_seen": "2026-11-16",
+   "closed_by": "",
+   "waived_until": "2027-02-04",
+   "note": "豁免至 2027-02-04：本会话未绑定 spaceengine 资料库 connector（list/reconnect 均拒），无法经 space-hub archive 正门真补 F02 方法论落库；显式豁免留痕，到期自动转 open 待资料库可用时真补，与上批 D-7b1769d 三条同期限统一处理，不假称已还、不改成 closed 洗绿",
+   "waived_by": "agent",
+   "waived_ts": "2026-11-16T08:58:51"
   }
  ]
 }

@@ -1,5 +1,10 @@
 # machine-bootstrap · CHANGELOG
 
+## W8-B1 吸收 MilkCode 环境自检 + 安装边界原则（2026-11-16；未 bump：纯原则文档吸收）
+- SKILL.md 新增「环境自检：三态链路审计」节（吸收 env-audit 的 A 未补全/B 链路断开/C 假就绪三态 + `command -v` 与真跑退出码两级验证；只存在但执行失败归 C 不报已就绪）。MilkCode 语境的 `/.milkcode-*` 标记与 MCP 专有工具不照搬（520 无此环境），只吸收可迁移原则
+- 新增「技能安装边界」节（吸收 skill-installer 三条原则：内置不可覆盖 / 来源白名单 / 冲突需精确 id + 装文件不执行）。520 安装正门仍是 `install.sh --user-skill`，不另造通道
+- 未 bump 版本：本次为原则文档吸收，无对应资料库交付承诺，不制造版本升级（避免假交付闸误判）
+
 ## v1.0.4 — 触发语义前置（520 v0.8.31 工程K，2026-11-13）
 - description 首句改为「当用户说「…」「…」时使用本技能」，把 5 个高频口语说法提到前 80 字内：平台只把描述编成截断预览给模型看，触发词写在尾巴上等于没写（C9 机检）
 - 依赖项：`verify/skill_contract_check.py` 新增 C9 触发前置 / C10 样本词桥；`verify/tests/test_trigger_frontload.py` 8 用例变异回归

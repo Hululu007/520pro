@@ -2,6 +2,12 @@
 
 > 版本号四处对账：`SKILL.md` front matter / `CHANGELOG.md` 首条 / `verify/skill_contracts.json` / `MANIFEST.json` 通用层登记（C4）。
 
+## W8-A / W8-B1 能力资产落库 + 原则吸收（2026-11-16；未 bump：无对应资料库交付承诺）
+
+- **W8-A**：REA 24 工具名册 + 65 外部工具 token 弱明细落 `foundry-core/assets/capability_63/`（`rea_tools.json`/`tool_tokens.json`）；`core.py` 加 `rea_ok`/`tokens_ok` 判据 + selftest 7 例正反；`foundry.py cap rea`/`cap tokens` 检索回读。源按实测：rea 实为 24 工具（非早报 25）、纯名册无版本字段，token 只有弱明细，不虚构结构化详情（B-02）。
+- **W8-B1**：SKILL.md 新增「技能脚手架」节（吸收 MilkCode skill-creator 的 description 即触发契约 / 正文短程序化 / 资源按需 / 第一动作自省锚点原则，对齐 520 契约 C1–C10，不搬 workspace 语境）。
+- **判据**：core/foundry selftest 全绿、`bash verify.sh` 0✗/0⚠、契约机检全绿。未 bump 版本：原则吸收+能力资产落库无对应资料库交付承诺，不制造版本升级。
+
 ## v1.1.0 — 2026-11-15
 
 - **W2 引擎上提与 26 工具全量接线**：引擎真源 `foundry-core/scripts/jadx_engine.py` 落地（26 工具泛化）；`status` 增 `schema_ok` 转正判定 26/26、引擎真源与产出落点，`tools` 展示每个工具的 `inputSchema`/`required`/真调配方。

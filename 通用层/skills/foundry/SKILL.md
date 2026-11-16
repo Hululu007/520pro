@@ -26,6 +26,17 @@ allowed-tools: Read, Grep, Glob, Bash
 | space-hub（库务司） | 云端空间治理、归档、索引 | **本板块的产出承接方**，落库一律走它，不自造上传通道 |
 | foundry-core | 无 SKILL.md 的共享库 | 本板块的引擎内核，被 import，不注册、不路由 |
 
+## 技能脚手架（W8-B1 吸收 MilkCode skill-creator 原则）
+
+> 熔铸司承接「能力迁移」，新建/改造技能是迁移的落地动作。本节吸收 skill-creator 的结构原则，
+> 对齐 520 既有契约（`verify/skill_contracts.json` C1–C10 + `contract_check`），不搬 MilkCode 的 workspace/Android 语境。
+
+- **description 即触发契约**：frontmatter `description` 写清「任务类型 + 触发词 + 重要环境/工具」，不写"万能工具"式空话。
+- **正文短、程序化**：`SKILL.md` 只放判据与 imperative 步骤；详细参考进 `references/`，重复流程进 `scripts/`，模板进 `assets/`。
+- **资源按需**：只在真需要时建 `scripts/` / `references/` / `assets/`，不堆空目录（空架子）。
+- **第一动作自省锚点**：技能开头写"先读 SKILL.md 判据再动手"，判据在文件里不在记忆里（本板块各技能已贯彻）。
+- **命名**：小写字母/数字/连字符，短且动作导向；新建技能须过契约机检 + 同步安装副本（`install.sh --user-skill`），否则不算落地。
+
 ## 正门（`scripts/foundry.py`）
 
 | 命令 | 作用 |
